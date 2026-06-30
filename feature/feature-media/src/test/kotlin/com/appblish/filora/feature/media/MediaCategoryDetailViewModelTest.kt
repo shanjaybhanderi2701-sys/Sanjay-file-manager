@@ -7,6 +7,7 @@ import com.appblish.filora.core.domain.model.MediaCategory
 import com.appblish.filora.core.domain.repository.MediaRepository
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flowOf
@@ -19,6 +20,7 @@ import org.junit.After
 import org.junit.Before
 import org.junit.Test
 
+@OptIn(ExperimentalCoroutinesApi::class)
 class MediaCategoryDetailViewModelTest {
     private val dispatcher = StandardTestDispatcher()
 
