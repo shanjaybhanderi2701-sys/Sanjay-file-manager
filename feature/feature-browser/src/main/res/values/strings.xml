@@ -32,6 +32,7 @@
     <string name="browser_sort_type">Type</string>
 
     <!-- Batch action bar (FR-4.1) -->
+    <string name="browser_action_select">Select</string>
     <string name="browser_action_clear_selection">Clear selection</string>
     <string name="browser_action_select_all">Select all</string>
     <string name="browser_selected_count">%1$d selected</string>
@@ -48,6 +49,7 @@
     <string name="browser_chooser_open_with">Open with</string>
     <string name="browser_chooser_share">Share</string>
     <string name="browser_share_no_app">No app can share these files.</string>
+    <string name="browser_open_no_app">No app can open this file.</string>
 
     <!-- New folder + operation results (FR-3.1, FR-3.5) -->
     <string name="browser_action_new_folder">New folder</string>

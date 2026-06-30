@@ -10,8 +10,11 @@ import com.appblish.filora.core.domain.model.ViewLayout
 import com.appblish.filora.core.domain.repository.FavoritesRepository
 import com.appblish.filora.core.domain.repository.FileRepository
 import com.appblish.filora.core.domain.repository.SettingsRepository
+import com.appblish.filora.core.domain.usecase.CreateFolderUseCase
+import com.appblish.filora.core.domain.usecase.DeleteUseCase
 import com.appblish.filora.core.domain.usecase.ListDirectoryUseCase
 import com.appblish.filora.core.domain.usecase.ObserveFavoritesUseCase
+import com.appblish.filora.core.domain.usecase.RenameUseCase
 import com.appblish.filora.core.domain.usecase.ToggleFavoriteUseCase
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.Dispatchers
@@ -38,7 +41,9 @@ class BrowserViewModelTest {
 
     @After fun tearDown() = Dispatchers.resetMain()
 
-    private fun visibleNames(vm: BrowserViewModel) = vm.uiState.value.entries.map { it.name }
+    private fun visibleNames(vm: BrowserViewModel) =
+        vm.uiState.value.entries
+            .map { it.name }
 
     private fun file(
         name: String,
@@ -57,6 +62,10 @@ class BrowserViewModelTest {
     private class FakeFileRepository : FileRepository {
         var snapshot: Result<List<FileItem>> = Result.Success(emptyList())
         val requestedSorts = mutableListOf<SortOrder>()
+        var createResult: Result<FileItem> = Result.Error(OperationError.Unknown())
+        var renameResult: Result<FileItem> = Result.Error(OperationError.Unknown())
+        var deleteResult: Result<DeleteOutcome> = Result.Success(DeleteOutcome(0, false))
+        val deletedPaths = mutableListOf<List<String>>()
 
         override fun listDirectory(
             path: String,
@@ -72,17 +81,20 @@ class BrowserViewModelTest {
         override suspend fun createFolder(
             parentPath: String,
             name: String,
-        ) = error("unused")
+        ) = createResult
 
         override suspend fun rename(
             path: String,
             newName: String,
-        ) = error("unused")
+        ) = renameResult
 
         override suspend fun delete(
             paths: List<String>,
             toTrash: Boolean,
-        ): Result<DeleteOutcome> = error("unused")
+        ): Result<DeleteOutcome> {
+            deletedPaths.add(paths)
+            return deleteResult
+        }
 
         override suspend fun copy(
             sourcePath: String,
@@ -148,6 +160,9 @@ class BrowserViewModelTest {
                 settings,
                 ToggleFavoriteUseCase(favorites),
                 ObserveFavoritesUseCase(favorites),
+                CreateFolderUseCase(repo),
+                RenameUseCase(repo),
+                DeleteUseCase(repo),
             )
         return BrowserFixture(vm, repo, settings, favorites)
     }
@@ -297,5 +312,115 @@ class BrowserViewModelTest {
             advanceUntilIdle()
 
             assertThat(vm.uiState.value.favoritePaths).contains("/root/a.txt")
+        }
+
+    // ---- Multi-select (T075/T076) -------------------------------------------
+
+    @Test
+    fun `toggling an item enters and exits selection mode`() =
+        runTest(dispatcher) {
+            val (vm, _, _) = viewModel(Result.Success(listOf(file("a.txt"), file("b.txt"))))
+            vm.bindLocation("/root")
+            advanceUntilIdle()
+            val item = vm.uiState.value.entries
+                .first()
+
+            vm.toggleSelection(item)
+            assertThat(vm.uiState.value.inSelectionMode).isTrue()
+            assertThat(vm.uiState.value.selection.count).isEqualTo(1)
+
+            vm.toggleSelection(item)
+            assertThat(vm.uiState.value.inSelectionMode).isFalse()
+        }
+
+    @Test
+    fun `select-all selects every visible entry and clear exits`() =
+        runTest(dispatcher) {
+            val (vm, _, _) = viewModel(Result.Success(listOf(file("a.txt"), file("Docs", isDirectory = true))))
+            vm.bindLocation("/root")
+            advanceUntilIdle()
+
+            vm.selectAll()
+            assertThat(vm.uiState.value.selection.count).isEqualTo(2)
+
+            vm.clearSelection()
+            assertThat(vm.uiState.value.inSelectionMode).isFalse()
+        }
+
+    // ---- Operations with in-place updates (T066–T068/T077) ------------------
+
+    @Test
+    fun `creating a folder adds it to the list in place`() =
+        runTest(dispatcher) {
+            val (vm, repo, _) = viewModel(Result.Success(listOf(file("a.txt"))))
+            vm.bindLocation("/root")
+            advanceUntilIdle()
+            val readsBefore = repo.requestedSorts.size
+            repo.createResult = Result.Success(file("New", isDirectory = true))
+
+            vm.showNewFolderDialog()
+            vm.confirmCreateFolder("New")
+            advanceUntilIdle()
+
+            assertThat(visibleNames(vm)).containsExactly("a.txt", "New")
+            assertThat(vm.uiState.value.dialog).isNull()
+            assertThat(repo.requestedSorts.size).isEqualTo(readsBefore) // in place, no re-read
+        }
+
+    @Test
+    fun `renaming swaps the entry in place without re-reading`() =
+        runTest(dispatcher) {
+            val (vm, repo, _) = viewModel(Result.Success(listOf(file("old.txt"))))
+            vm.bindLocation("/root")
+            advanceUntilIdle()
+            val item = vm.uiState.value.entries
+                .first()
+            val readsBefore = repo.requestedSorts.size
+            repo.renameResult = Result.Success(item.copy(name = "new.txt", path = "/root/new.txt"))
+
+            vm.showRenameDialog(item)
+            vm.confirmRename("new.txt")
+            advanceUntilIdle()
+
+            assertThat(visibleNames(vm)).containsExactly("new.txt")
+            assertThat(repo.requestedSorts.size).isEqualTo(readsBefore)
+        }
+
+    @Test
+    fun `deleting the selection removes the rows in place`() =
+        runTest(dispatcher) {
+            val (vm, repo, _) = viewModel(Result.Success(listOf(file("a.txt"), file("b.txt"))))
+            vm.bindLocation("/root")
+            advanceUntilIdle()
+            repo.deleteResult = Result.Success(DeleteOutcome(1, true))
+            val target = vm.uiState.value.entries
+                .first { it.name == "a.txt" }
+
+            vm.toggleSelection(target)
+            vm.showDeleteDialog()
+            vm.confirmDelete()
+            advanceUntilIdle()
+
+            assertThat(visibleNames(vm)).containsExactly("b.txt")
+            assertThat(repo.deletedPaths).contains(listOf("/root/a.txt"))
+            assertThat(vm.uiState.value.inSelectionMode).isFalse()
+            assertThat(vm.uiState.value.messageRes).isNotNull()
+        }
+
+    @Test
+    fun `a failed create closes the dialog and surfaces a message`() =
+        runTest(dispatcher) {
+            val (vm, repo, _) = viewModel(Result.Success(listOf(file("a.txt"))))
+            vm.bindLocation("/root")
+            advanceUntilIdle()
+            repo.createResult = Result.Error(OperationError.Conflict())
+
+            vm.showNewFolderDialog()
+            vm.confirmCreateFolder("New")
+            advanceUntilIdle()
+
+            assertThat(vm.uiState.value.dialog).isNull()
+            assertThat(vm.uiState.value.messageRes).isNotNull()
+            assertThat(visibleNames(vm)).containsExactly("a.txt")
         }
 }

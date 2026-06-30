@@ -4,6 +4,7 @@ import androidx.annotation.StringRes
 import com.appblish.filora.core.domain.model.FileItem
 import com.appblish.filora.core.domain.model.SortOrder
 import com.appblish.filora.core.domain.model.ViewLayout
+import com.appblish.filora.feature.browser.selection.SelectionState
 
 /**
  * Everything the Browser screen renders (T036, FR-2.1). [entries] is the already
@@ -12,6 +13,11 @@ import com.appblish.filora.core.domain.model.ViewLayout
  * show-hidden mirror the persisted preferences so the toolbar reflects them without a
  * second read. [favoritePaths] is the set of currently-pinned paths (FR-9.1, T094) so a
  * row's context menu can show "pin" or "unpin".
+ *
+ * [selection] drives multi-select mode and the batch action bar (T075/T076);
+ * [dialog] is the currently open create/rename/delete dialog (T066–T068); and
+ * [messageRes] is a one-shot snackbar message (operation result or failure, T079)
+ * the screen shows and then clears via [BrowserViewModel.clearMessage].
  */
 data class BrowserUiState(
     val location: String = "",
@@ -23,6 +29,9 @@ data class BrowserUiState(
     val isRefreshing: Boolean = false,
     val favoritePaths: Set<String> = emptySet(),
     @StringRes val errorMessageRes: Int? = null,
+    val selection: SelectionState = SelectionState(),
+    val dialog: BrowserDialog? = null,
+    @StringRes val messageRes: Int? = null,
 ) {
     enum class Phase { Loading, Content, Empty, Error }
 
@@ -30,4 +39,26 @@ data class BrowserUiState(
     val isEmpty: Boolean get() = phase == Phase.Empty
     val isLoading: Boolean get() = phase == Phase.Loading
     val isError: Boolean get() = phase == Phase.Error
+
+    /** True while a multi-selection is active — taps toggle instead of opening (FR-4.1). */
+    val inSelectionMode: Boolean get() = selection.isActive
+
+    /** The currently selected [entries], resolved from the selection's paths. */
+    fun selectedItems(): List<FileItem> = entries.filter { selection.isSelected(it.path) }
+}
+
+/**
+ * The create/rename/delete dialog currently shown over the browser, if any. Modelled
+ * as a sealed type so the screen renders exactly one and the ViewModel owns the
+ * transitions; [Rename] carries the single target identified when the dialog opened.
+ */
+sealed interface BrowserDialog {
+    data object NewFolder : BrowserDialog
+
+    data class Rename(
+        val path: String,
+        val currentName: String,
+    ) : BrowserDialog
+
+    data object ConfirmDelete : BrowserDialog
 }

@@ -1,6 +1,7 @@
 package com.appblish.filora.feature.browser
 
 import android.os.Environment
+import androidx.annotation.StringRes
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.appblish.filora.core.common.result.OperationError
@@ -9,9 +10,14 @@ import com.appblish.filora.core.domain.model.FileItem
 import com.appblish.filora.core.domain.model.SortOrder
 import com.appblish.filora.core.domain.model.ViewLayout
 import com.appblish.filora.core.domain.repository.SettingsRepository
+import com.appblish.filora.core.domain.usecase.CreateFolderUseCase
+import com.appblish.filora.core.domain.usecase.DeleteUseCase
 import com.appblish.filora.core.domain.usecase.ListDirectoryUseCase
 import com.appblish.filora.core.domain.usecase.ObserveFavoritesUseCase
+import com.appblish.filora.core.domain.usecase.RenameUseCase
 import com.appblish.filora.core.domain.usecase.ToggleFavoriteUseCase
+import com.appblish.filora.feature.browser.selection.MultiSelectReducer
+import com.appblish.filora.feature.browser.selection.SelectionState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -25,7 +31,8 @@ import javax.inject.Inject
 
 /**
  * Drives the Browser (FR-2.1 listing with loading/empty/error/content; FR-2.3 sort;
- * FR-2.4 show-hidden; FR-2.5 pull-to-refresh).
+ * FR-2.4 show-hidden; FR-2.5 pull-to-refresh) and its file operations (FR-3.1/3.2/3.4
+ * create/rename/delete with FR-4.1 multi-select).
  *
  * The directory listing ([ListDirectoryUseCase]) is collected per (location, sort): a
  * sort change cancels the in-flight listing and re-reads with the new order, while
@@ -38,6 +45,10 @@ import javax.inject.Inject
  * [ObserveFavoritesUseCase] and exposed on the state so each row knows whether to
  * offer "pin" or "unpin" in its context menu. [toggleFavorite] flips the pin via
  * [ToggleFavoriteUseCase]; the observed stream re-emits and refreshes the affordance.
+ *
+ * Create/rename/delete mutate [rawEntries] in place and re-derive the visible list
+ * (T077 — no full reload), so the row appears/updates/disappears immediately while the
+ * underlying listing Flow reconciles in the background.
  */
 @HiltViewModel
 class BrowserViewModel
@@ -47,6 +58,9 @@ class BrowserViewModel
         private val settingsRepository: SettingsRepository,
         private val toggleFavoriteUseCase: ToggleFavoriteUseCase,
         observeFavorites: ObserveFavoritesUseCase,
+        private val createFolderUseCase: CreateFolderUseCase,
+        private val renameUseCase: RenameUseCase,
+        private val deleteUseCase: DeleteUseCase,
     ) : ViewModel() {
         private val _uiState = MutableStateFlow(BrowserUiState())
         val uiState: StateFlow<BrowserUiState> = _uiState.asStateFlow()
@@ -72,7 +86,14 @@ class BrowserViewModel
             this.location = resolved
             hasLoaded = false
             rawEntries = emptyList()
-            _uiState.update { it.copy(location = resolved, phase = BrowserUiState.Phase.Loading) }
+            _uiState.update {
+                it.copy(
+                    location = resolved,
+                    phase = BrowserUiState.Phase.Loading,
+                    selection = SelectionState(),
+                    dialog = null,
+                )
+            }
             startPreferences()
             reload()
         }
@@ -111,6 +132,117 @@ class BrowserViewModel
         /** Persists the show-hidden toggle (T042); re-filters without re-reading. */
         fun setShowHidden(show: Boolean) {
             viewModelScope.launch { settingsRepository.setShowHiddenFiles(show) }
+        }
+
+        // ---- Multi-select (T075) -------------------------------------------------
+
+        /** Long-press, or an in-mode tap: toggles [item]'s membership in the selection. */
+        fun toggleSelection(item: FileItem) {
+            _uiState.update {
+                it.copy(selection = MultiSelectReducer.toggle(it.selection, item.path, item.isDirectory))
+            }
+        }
+
+        /** Selects every currently visible entry (select-all from the action bar). */
+        fun selectAll() {
+            _uiState.update { state ->
+                state.copy(
+                    selection =
+                        MultiSelectReducer.selectAll(
+                            state.selection,
+                            state.entries.associate { it.path to it.isDirectory },
+                        ),
+                )
+            }
+        }
+
+        /** Clears the selection and exits selection mode (Back or the bar's close). */
+        fun clearSelection() {
+            _uiState.update { it.copy(selection = SelectionState()) }
+        }
+
+        // ---- Dialogs (T066–T068) -------------------------------------------------
+
+        fun showNewFolderDialog() = _uiState.update { it.copy(dialog = BrowserDialog.NewFolder) }
+
+        fun showRenameDialog(item: FileItem) =
+            _uiState.update { it.copy(dialog = BrowserDialog.Rename(item.path, item.name)) }
+
+        fun showDeleteDialog() = _uiState.update { it.copy(dialog = BrowserDialog.ConfirmDelete) }
+
+        fun dismissDialog() = _uiState.update { it.copy(dialog = null) }
+
+        /** Acknowledges the one-shot snackbar message once the screen has shown it. */
+        fun clearMessage() = _uiState.update { it.copy(messageRes = null) }
+
+        /** Surfaces a one-shot snackbar from the screen (e.g. a share with no handler). */
+        fun showMessage(
+            @StringRes messageRes: Int,
+        ) = _uiState.update { it.copy(messageRes = messageRes) }
+
+        // ---- Operations (FR-3.1/3.2/3.4) ----------------------------------------
+
+        /** Creates a folder in the current directory and shows it in place (T066/T077). */
+        fun confirmCreateFolder(rawName: String) {
+            val parent = location ?: return
+            viewModelScope.launch {
+                when (val result = createFolderUseCase(parent, rawName)) {
+                    is Result.Success -> {
+                        rawEntries = rawEntries + result.data
+                        _uiState.update { it.copy(dialog = null) }
+                        applyVisible()
+                    }
+
+                    is Result.Error ->
+                        _uiState.update { it.copy(dialog = null, messageRes = result.error.toMessageRes()) }
+                }
+            }
+        }
+
+        /** Renames the dialog's target and swaps it in place without a reload (T067/T077). */
+        fun confirmRename(rawName: String) {
+            val target = _uiState.value.dialog as? BrowserDialog.Rename ?: return
+            viewModelScope.launch {
+                when (val result = renameUseCase(target.path, rawName, target.currentName)) {
+                    is Result.Success -> {
+                        rawEntries = rawEntries.map { if (it.path == target.path) result.data else it }
+                        _uiState.update { it.copy(dialog = null, selection = SelectionState()) }
+                        applyVisible()
+                    }
+
+                    is Result.Error ->
+                        _uiState.update { it.copy(dialog = null, messageRes = result.error.toMessageRes()) }
+                }
+            }
+        }
+
+        /** Deletes the current selection and removes the rows in place (T068/T077). */
+        fun confirmDelete() {
+            val paths = _uiState.value.selection.selected.keys
+                .toList()
+            if (paths.isEmpty()) {
+                _uiState.update { it.copy(dialog = null) }
+                return
+            }
+            viewModelScope.launch {
+                when (val result = deleteUseCase(paths, toTrash = true)) {
+                    is Result.Success -> {
+                        val removed = paths.toSet()
+                        rawEntries = rawEntries.filterNot { it.path in removed }
+                        _uiState.update {
+                            it.copy(
+                                dialog = null,
+                                selection = SelectionState(),
+                                messageRes = R.string.browser_deleted,
+                            )
+                        }
+                        applyVisible()
+                    }
+
+                    is Result.Error ->
+                        _uiState.update { it.copy(dialog = null, messageRes = result.error.toMessageRes()) }
+                }
+            }
         }
 
         private fun startPreferences() {

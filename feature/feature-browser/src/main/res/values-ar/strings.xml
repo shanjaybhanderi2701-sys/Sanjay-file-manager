@@ -10,6 +10,7 @@
     <string name="browser_action_pin">إضافة إلى المفضلة</string>
     <string name="browser_action_unpin">إزالة من المفضلة</string>
 
+    <string name="browser_action_select">تحديد</string>
     <string name="browser_action_clear_selection">إلغاء التحديد</string>
     <string name="browser_action_select_all">تحديد الكل</string>
     <string name="browser_selected_count">%1$d محدد</string>
@@ -24,6 +25,7 @@
     <string name="browser_chooser_open_with">فتح باستخدام</string>
     <string name="browser_chooser_share">مشاركة</string>
     <string name="browser_share_no_app">لا يوجد تطبيق يمكنه مشاركة هذه الملفات.</string>
+    <string name="browser_open_no_app">لا يوجد تطبيق يمكنه فتح هذا الملف.</string>
 
     <string name="browser_action_new_folder">مجلد جديد</string>
     <string name="browser_deleted">تم الحذف.</string>

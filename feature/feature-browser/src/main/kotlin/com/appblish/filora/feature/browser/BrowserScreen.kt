@@ -4,6 +4,7 @@ import android.content.Context
 import android.text.format.DateUtils
 import android.text.format.Formatter
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.border
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -15,8 +16,11 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.ViewList
+import androidx.compose.material.icons.outlined.Checklist
+import androidx.compose.material.icons.outlined.CreateNewFolder
 import androidx.compose.material.icons.outlined.Folder
 import androidx.compose.material.icons.outlined.GridView
 import androidx.compose.material.icons.outlined.Sort
@@ -29,9 +33,13 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.pulltorefresh.PullToRefreshBox
 import androidx.compose.runtime.Composable
@@ -39,6 +47,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -53,13 +62,29 @@ import com.appblish.filora.core.domain.model.ViewLayout
 import com.appblish.filora.core.ui.component.EmptyState
 import com.appblish.filora.core.ui.component.FileRow
 import com.appblish.filora.core.ui.component.GridTile
+import com.appblish.filora.feature.browser.dialog.CreateFolderDialog
+import com.appblish.filora.feature.browser.dialog.DeleteConfirmDialog
+import com.appblish.filora.feature.browser.dialog.DeleteConfirmation
+import com.appblish.filora.feature.browser.dialog.RenameDialog
+import com.appblish.filora.feature.browser.selection.BatchAction
+import com.appblish.filora.feature.browser.selection.BatchActionBar
+import com.appblish.filora.feature.browser.selection.SelectionState
+import com.appblish.filora.feature.browser.share.FileShareLauncher
+import kotlinx.coroutines.launch
 import androidx.compose.foundation.lazy.grid.items as gridItems
 
 /**
- * Browser screen (FR-2.1 listing; FR-2.3 sort; FR-2.4 show-hidden; FR-2.5 pull-to-refresh).
- * Tapping a folder navigates deeper via [onOpenDirectory]; the toolbar toggles list/grid,
- * opens the sort menu, and flips show-hidden — all persisted through the ViewModel.
+ * Browser screen (FR-2.1 listing; FR-2.3 sort; FR-2.4 show-hidden; FR-2.5 pull-to-refresh;
+ * FR-3.1/3.2/3.4 create/rename/delete; FR-4.1 multi-select + batch actions; FR-9.1 favorites;
+ * FR-10.2 share).
+ *
+ * A normal tap opens a folder ([onOpenDirectory]) or a file (system open); while a
+ * multi-selection is active a tap toggles instead. A long-press anchors a context menu
+ * offering "Select" (enter multi-select, T075) and pin/unpin (FR-9.1, T094). The batch
+ * action bar drives rename/delete/share; the new-folder FAB and the create/rename/delete
+ * dialogs route through the ViewModel, which mutates the list in place (T077).
  */
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BrowserScreen(
     location: String,
@@ -68,26 +93,151 @@ fun BrowserScreen(
     viewModel: BrowserViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val context = LocalContext.current
+    val scope = rememberCoroutineScope()
+    val snackbarHostState = remember { SnackbarHostState() }
 
     LaunchedEffect(location) { viewModel.bindLocation(location) }
 
-    BrowserContent(
-        uiState = uiState,
-        onOpenItem = { item -> if (item.isDirectory) onOpenDirectory(item.path) },
-        onToggleFavorite = viewModel::toggleFavorite,
-        onToggleLayout = viewModel::toggleLayout,
-        onSortBy = viewModel::setSortBy,
-        onToggleHidden = { viewModel.setShowHidden(!uiState.showHidden) },
-        onRefresh = viewModel::refresh,
+    // One-shot operation messages — show then acknowledge (T079 result/error reporting).
+    val messageRes = uiState.messageRes
+    if (messageRes != null) {
+        val message = stringResource(messageRes)
+        LaunchedEffect(messageRes, message) {
+            snackbarHostState.showSnackbar(message)
+            viewModel.clearMessage()
+        }
+    }
+
+    Scaffold(
         modifier = modifier,
+        snackbarHost = { SnackbarHost(snackbarHostState) },
+        floatingActionButton = {
+            if (!uiState.inSelectionMode && !uiState.isLoading && !uiState.isError) {
+                FloatingActionButton(onClick = viewModel::showNewFolderDialog) {
+                    Icon(
+                        imageVector = Icons.Outlined.CreateNewFolder,
+                        contentDescription = stringResource(R.string.browser_action_new_folder),
+                    )
+                }
+            }
+        },
+        bottomBar = {
+            if (uiState.inSelectionMode) {
+                BatchActionBar(
+                    state = uiState.selection,
+                    onClearSelection = viewModel::clearSelection,
+                    onSelectAll = viewModel::selectAll,
+                    onAction = { action ->
+                        onBatchAction(
+                            action = action,
+                            uiState = uiState,
+                            viewModel = viewModel,
+                            context = context,
+                            launch = { block -> scope.launch { block() } },
+                        )
+                    },
+                )
+            }
+        },
+    ) { padding ->
+        BrowserContent(
+            uiState = uiState,
+            onItemTap = { item ->
+                when {
+                    uiState.inSelectionMode -> viewModel.toggleSelection(item)
+                    item.isDirectory -> onOpenDirectory(item.path)
+                    else ->
+                        scope.launch {
+                            if (!FileShareLauncher.openFile(context, item)) {
+                                viewModel.showMessage(R.string.browser_open_no_app)
+                            }
+                        }
+                }
+            },
+            onToggleSelection = viewModel::toggleSelection,
+            onToggleFavorite = viewModel::toggleFavorite,
+            onToggleLayout = viewModel::toggleLayout,
+            onSortBy = viewModel::setSortBy,
+            onToggleHidden = { viewModel.setShowHidden(!uiState.showHidden) },
+            onRefresh = viewModel::refresh,
+            modifier = Modifier.padding(padding),
+        )
+    }
+
+    BrowserDialogs(
+        dialog = uiState.dialog,
+        uiState = uiState,
+        viewModel = viewModel,
     )
+}
+
+/** Routes a batch action to the ViewModel or the system share sheet (T076/T078). */
+private fun onBatchAction(
+    action: BatchAction,
+    uiState: BrowserUiState,
+    viewModel: BrowserViewModel,
+    context: Context,
+    launch: (suspend () -> Unit) -> Unit,
+) {
+    when (action) {
+        BatchAction.RENAME -> uiState.selectedItems().singleOrNull()?.let(viewModel::showRenameDialog)
+        BatchAction.DELETE -> viewModel.showDeleteDialog()
+        BatchAction.SHARE ->
+            launch {
+                val shared = FileShareLauncher.shareFiles(context, uiState.selectedItems())
+                if (!shared) viewModel.showMessage(R.string.browser_share_no_app)
+            }
+        // Move/copy/zip need a destination picker + worker progress surface (APP-26 follow-up).
+        BatchAction.MOVE, BatchAction.COPY, BatchAction.ZIP -> viewModel.showMessage(R.string.browser_coming_soon)
+    }
+}
+
+/** The create/rename/delete dialog overlay (T066–T068). */
+@Composable
+private fun BrowserDialogs(
+    dialog: BrowserDialog?,
+    uiState: BrowserUiState,
+    viewModel: BrowserViewModel,
+) {
+    when (dialog) {
+        BrowserDialog.NewFolder ->
+            CreateFolderDialog(
+                existingNames = uiState.entries.map(FileItem::name).toSet(),
+                onConfirm = viewModel::confirmCreateFolder,
+                onDismiss = viewModel::dismissDialog,
+            )
+
+        is BrowserDialog.Rename ->
+            RenameDialog(
+                currentName = dialog.currentName,
+                siblingNames = uiState.entries.filterNot { it.path == dialog.path }.map(FileItem::name).toSet(),
+                onConfirm = viewModel::confirmRename,
+                onDismiss = viewModel::dismissDialog,
+            )
+
+        BrowserDialog.ConfirmDelete ->
+            DeleteConfirmDialog(
+                prompt =
+                    DeleteConfirmation.forSelection(
+                        count = uiState.selection.count,
+                        containsDirectory = uiState.selection.containsDirectory,
+                        toTrash = true,
+                    ),
+                onConfirm = viewModel::confirmDelete,
+                onDismiss = viewModel::dismissDialog,
+            )
+
+        null -> Unit
+    }
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun BrowserContent(
     uiState: BrowserUiState,
-    onOpenItem: (FileItem) -> Unit,
+    onItemTap: (FileItem) -> Unit,
+    onToggleSelection: (FileItem) -> Unit,
     onToggleFavorite: (FileItem) -> Unit,
     onToggleLayout: () -> Unit,
     onSortBy: (SortOrder.By) -> Unit,
@@ -131,9 +281,9 @@ internal fun BrowserContent(
 
                 else ->
                     if (uiState.layout == ViewLayout.Grid) {
-                        BrowserGrid(uiState.entries, uiState.favoritePaths, onOpenItem, onToggleFavorite)
+                        BrowserGrid(uiState.entries, uiState.selection, uiState.favoritePaths, onItemTap, onToggleSelection, onToggleFavorite)
                     } else {
-                        BrowserList(uiState.entries, uiState.favoritePaths, onOpenItem, onToggleFavorite)
+                        BrowserList(uiState.entries, uiState.selection, uiState.favoritePaths, onItemTap, onToggleSelection, onToggleFavorite)
                     }
             }
         }
@@ -221,8 +371,10 @@ private fun SortMenu(
 @Composable
 private fun BrowserList(
     entries: List<FileItem>,
+    selection: SelectionState,
     favoritePaths: Set<String>,
-    onOpenItem: (FileItem) -> Unit,
+    onItemTap: (FileItem) -> Unit,
+    onToggleSelection: (FileItem) -> Unit,
     onToggleFavorite: (FileItem) -> Unit,
 ) {
     val context = LocalContext.current
@@ -231,14 +383,16 @@ private fun BrowserList(
             FileEntryContextMenu(
                 item = item,
                 isFavorite = item.path in favoritePaths,
-                onOpenItem = onOpenItem,
+                onItemTap = onItemTap,
+                onToggleSelection = onToggleSelection,
                 onToggleFavorite = onToggleFavorite,
-            ) { onOpen, onLongPress ->
+            ) { onTap, onLongPress ->
                 FileRow(
                     name = item.name,
                     subtitle = item.subtitle(context),
                     isDirectory = item.isDirectory,
-                    modifier = rowGestures(onOpen, onLongPress),
+                    selected = selection.isSelected(item.path),
+                    modifier = rowGestures(onTap, onLongPress),
                 )
             }
         }
@@ -248,8 +402,10 @@ private fun BrowserList(
 @Composable
 private fun BrowserGrid(
     entries: List<FileItem>,
+    selection: SelectionState,
     favoritePaths: Set<String>,
-    onOpenItem: (FileItem) -> Unit,
+    onItemTap: (FileItem) -> Unit,
+    onToggleSelection: (FileItem) -> Unit,
     onToggleFavorite: (FileItem) -> Unit,
 ) {
     val context = LocalContext.current
@@ -258,17 +414,29 @@ private fun BrowserGrid(
         modifier = Modifier.fillMaxSize().padding(horizontal = 8.dp),
     ) {
         gridItems(entries, key = FileItem::path) { item ->
+            val selected = selection.isSelected(item.path)
             FileEntryContextMenu(
                 item = item,
                 isFavorite = item.path in favoritePaths,
-                onOpenItem = onOpenItem,
+                onItemTap = onItemTap,
+                onToggleSelection = onToggleSelection,
                 onToggleFavorite = onToggleFavorite,
-            ) { onOpen, onLongPress ->
+            ) { onTap, onLongPress ->
                 GridTile(
                     label = item.name,
                     icon = fileIcon(item),
                     caption = item.subtitle(context),
-                    modifier = Modifier.padding(4.dp).then(rowGestures(onOpen, onLongPress)),
+                    modifier =
+                        Modifier
+                            .padding(4.dp)
+                            .then(rowGestures(onTap, onLongPress))
+                            .then(
+                                if (selected) {
+                                    Modifier.border(2.dp, MaterialTheme.colorScheme.primary, RoundedCornerShape(12.dp))
+                                } else {
+                                    Modifier
+                                },
+                            ),
                 )
             }
         }
@@ -276,24 +444,36 @@ private fun BrowserGrid(
 }
 
 /**
- * Wraps a list/grid entry with a long-press context menu carrying the pin/unpin action
- * (FR-9.1, T094). Tap still opens the item; a long-press anchors a [DropdownMenu] over
- * the entry whose single action toggles the favorite, with the label and star icon
- * reflecting [isFavorite]. [content] receives the open and long-press callbacks so the
+ * Wraps a list/grid entry with a long-press context menu (FR-4.1, FR-9.1). A tap routes
+ * to [onItemTap] (open, or toggle while selecting); a long-press anchors a [DropdownMenu]
+ * over the entry offering "Select" — which enters multi-select via [onToggleSelection]
+ * (T075) — and pin/unpin via [onToggleFavorite] (T094), the star icon and label
+ * reflecting [isFavorite]. [content] receives the tap and long-press callbacks so the
  * caller can attach them to either a [FileRow] or a [GridTile].
  */
 @Composable
 private fun FileEntryContextMenu(
     item: FileItem,
     isFavorite: Boolean,
-    onOpenItem: (FileItem) -> Unit,
+    onItemTap: (FileItem) -> Unit,
+    onToggleSelection: (FileItem) -> Unit,
     onToggleFavorite: (FileItem) -> Unit,
-    content: @Composable (onOpen: () -> Unit, onLongPress: () -> Unit) -> Unit,
+    content: @Composable (onTap: () -> Unit, onLongPress: () -> Unit) -> Unit,
 ) {
     var menuExpanded by remember { mutableStateOf(false) }
     Box {
-        content({ onOpenItem(item) }, { menuExpanded = true })
+        content({ onItemTap(item) }, { menuExpanded = true })
         DropdownMenu(expanded = menuExpanded, onDismissRequest = { menuExpanded = false }) {
+            DropdownMenuItem(
+                text = { Text(stringResource(R.string.browser_action_select)) },
+                leadingIcon = {
+                    Icon(imageVector = Icons.Outlined.Checklist, contentDescription = null)
+                },
+                onClick = {
+                    onToggleSelection(item)
+                    menuExpanded = false
+                },
+            )
             DropdownMenuItem(
                 text = {
                     Text(
@@ -323,9 +503,9 @@ private fun FileEntryContextMenu(
 
 @OptIn(ExperimentalFoundationApi::class)
 private fun rowGestures(
-    onOpen: () -> Unit,
+    onTap: () -> Unit,
     onLongPress: () -> Unit,
-): Modifier = Modifier.combinedClickable(onClick = onOpen, onLongClick = onLongPress)
+): Modifier = Modifier.combinedClickable(onClick = onTap, onLongClick = onLongPress)
 
 private fun sortLabel(by: SortOrder.By): Int =
     when (by) {
