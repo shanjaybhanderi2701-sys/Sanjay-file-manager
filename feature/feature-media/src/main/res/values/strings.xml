@@ -23,6 +23,9 @@
     <string name="media_open_with">Open with</string>
     <string name="media_type_file">File</string>
 
+    <!-- Accessibility: spoken TalkBack action for a tappable category tile. %1$s = category name. -->
+    <string name="media_a11y_open">Open %1$s</string>
+
     <!-- Share intents (FR-10) -->
     <string name="media_share_with">Share via</string>
     <string name="media_share">Share</string>

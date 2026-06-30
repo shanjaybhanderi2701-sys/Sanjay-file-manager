@@ -24,6 +24,9 @@
     <string name="home_browse_files">Browse files</string>
     <string name="home_browse_caption">All folders</string>
 
+    <!-- Accessibility: spoken TalkBack action for a tappable tile. %1$s = item name. -->
+    <string name="home_a11y_open">Open %1$s</string>
+
     <string name="home_caption_empty">Empty</string>
 
     <string name="home_cat_images">Images</string>

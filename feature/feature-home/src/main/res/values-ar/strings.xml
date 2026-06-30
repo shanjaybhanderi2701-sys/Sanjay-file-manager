@@ -38,4 +38,6 @@
         <item quantity="one">%1$d عنصر</item>
         <item quantity="other">%1$d عناصر</item>
     </plurals>
+
+    <string name="home_a11y_open">فتح %1$s</string>
 </resources>

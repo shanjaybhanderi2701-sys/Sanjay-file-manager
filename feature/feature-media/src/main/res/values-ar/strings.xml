@@ -33,4 +33,6 @@
 
     <string name="media_detail_error_permission">امنح وصول التخزين لعرض هذه الملفات.</string>
     <string name="media_detail_error_load">تعذّر تحميل هذه الفئة. اسحب للتحديث.</string>
+
+    <string name="media_a11y_open">فتح %1$s</string>
 </resources>

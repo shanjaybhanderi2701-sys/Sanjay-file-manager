@@ -1,7 +1,6 @@
 package com.appblish.filora.feature.home
 
 import androidx.annotation.StringRes
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -63,6 +62,7 @@ import com.appblish.filora.core.common.util.Formatters
 import com.appblish.filora.core.domain.model.FileItem
 import com.appblish.filora.core.domain.model.MediaCategory
 import com.appblish.filora.core.domain.model.StorageVolume
+import com.appblish.filora.core.ui.a11y.clickableTile
 import com.appblish.filora.core.ui.component.EmptyState
 import com.appblish.filora.core.ui.component.GridTile
 
@@ -220,11 +220,15 @@ private fun HomeDashboard(
 
         items(HomeCategory.entries.toList(), key = { it.name }) { hub ->
             val count = uiState.categoryCounts[hub.category]?.coerceAtLeast(0) ?: 0
+            val label = stringResource(hub.labelRes)
             GridTile(
-                label = stringResource(hub.labelRes),
+                label = label,
                 icon = hub.icon,
                 caption = captionFor(count),
-                modifier = Modifier.clickable { onOpenCategory(hub.category) },
+                modifier =
+                    Modifier.clickableTile(
+                        onClickLabel = stringResource(R.string.home_a11y_open, label),
+                    ) { onOpenCategory(hub.category) },
             )
         }
         // Folder handoff to the M2 file browser, spanning its own row.
@@ -233,7 +237,10 @@ private fun HomeDashboard(
                 label = stringResource(R.string.home_browse_files),
                 icon = Icons.Outlined.Folder,
                 caption = stringResource(R.string.home_browse_caption),
-                modifier = Modifier.clickable { onBrowse() },
+                modifier =
+                    Modifier.clickableTile(
+                        onClickLabel = stringResource(R.string.home_browse_files),
+                    ) { onBrowse() },
             )
         }
     }
@@ -275,7 +282,9 @@ private fun LazyGridScope.fileChipRow(
                     modifier =
                         Modifier
                             .width(120.dp)
-                            .clickable { onOpenItem(item) },
+                            .clickableTile(
+                                onClickLabel = stringResource(R.string.home_a11y_open, item.name),
+                            ) { onOpenItem(item) },
                 )
             }
         }
@@ -302,11 +311,14 @@ private fun VolumeSummaryCard(
     volume: StorageVolume,
     onOpenStorage: () -> Unit,
 ) {
+    val storageName = stringResource(R.string.home_section_storage)
     Card(
         modifier =
             Modifier
                 .fillMaxWidth()
-                .clickable { onOpenStorage() },
+                .clickableTile(
+                    onClickLabel = stringResource(R.string.home_a11y_open, storageName),
+                ) { onOpenStorage() },
     ) {
         Column(modifier = Modifier.padding(16.dp)) {
             Row(

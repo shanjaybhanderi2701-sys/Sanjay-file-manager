@@ -1,6 +1,5 @@
 package com.appblish.filora.feature.media
 
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
@@ -22,10 +21,12 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.appblish.filora.core.domain.model.MediaCategory
+import com.appblish.filora.core.ui.a11y.clickableTile
 import com.appblish.filora.core.ui.component.GridTile
 
 /**
@@ -73,7 +74,10 @@ internal fun MediaCategoryContent(
                 label = tile.label,
                 icon = tile.hub.icon,
                 caption = tile.caption,
-                modifier = Modifier.clickable { onOpenCategory(tile.hub.category) },
+                modifier =
+                    Modifier.clickableTile(
+                        onClickLabel = stringResource(R.string.media_a11y_open, tile.label),
+                    ) { onOpenCategory(tile.hub.category) },
             )
         }
     }
