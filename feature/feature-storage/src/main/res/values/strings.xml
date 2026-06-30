@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Storage breakdown screen (FR-8.1) -->
+    <string name="storage_title">Storage</string>
+    <string name="storage_empty_title">No storage volumes</string>
+    <string name="storage_empty_body">Couldn\'t find any mounted storage.</string>
+    <string name="storage_usage_summary">%1$s used · %2$s free of %3$s</string>
+
+    <plurals name="storage_item_count">
+        <item quantity="one">%1$d item</item>
+        <item quantity="other">%1$d items</item>
+    </plurals>
+
+    <!-- Category labels on the breakdown rows -->
+    <string name="storage_cat_images">Images</string>
+    <string name="storage_cat_video">Video</string>
+    <string name="storage_cat_audio">Audio</string>
+    <string name="storage_cat_documents">Documents</string>
+    <string name="storage_cat_archives">Archives</string>
+    <string name="storage_cat_apps">Apps</string>
+    <string name="storage_cat_downloads">Downloads</string>
+    <string name="storage_cat_other">Other</string>
+
+    <!-- Largest-files entry tile (FR-8.2) -->
+    <string name="storage_largest_files_title">Largest files</string>
+    <string name="storage_largest_files_subtitle">Find and clean up what\'s using the most space</string>
+
+    <!-- Largest-files view (FR-8.2) -->
+    <string name="storage_largest_empty_title">No large files</string>
+    <string name="storage_largest_empty_body">Files will appear here once there\'s something to clean up.</string>
+    <string name="storage_file_actions">File actions</string>
+    <string name="storage_action_open">Open</string>
+    <string name="storage_action_share">Share</string>
+    <string name="storage_action_delete">Delete</string>
+    <string name="storage_action_cancel">Cancel</string>
+    <string name="storage_delete_dialog_title">Delete file?</string>
+    <string name="storage_delete_dialog_body">\"%1$s\" (%2$s) will be permanently deleted.</string>
+
+    <!-- Largest-file action results -->
+    <string name="storage_open_no_app">No app can open this file</string>
+    <string name="storage_share_failed">Couldn\'t share this file</string>
+    <string name="storage_delete_succeeded">Deleted %1$s</string>
+    <string name="storage_delete_failed">Couldn\'t delete %1$s</string>
+    <string name="storage_chooser_open_with">Open with</string>
+    <string name="storage_chooser_share">Share</string>
+
+    <!-- Breakdown / largest-files scan error messages -->
+    <string name="storage_error_load">Couldn\'t read storage volumes.</string>
+    <string name="storage_largest_error_permission">Grant storage access to scan your files.</string>
+    <string name="storage_largest_error_not_found">Couldn\'t find a storage volume to scan.</string>
+    <string name="storage_largest_error_generic">Couldn\'t read your files. Try again.</string>
+
+    <!-- Storage-story hero band (hi-fi spec §3.5) -->
+    <string name="storage_story_free_caption">free of %1$s</string>
+    <string name="storage_story_top_category">%1$s is using the most space</string>
+    <string name="storage_story_used_summary">%1$s used of %2$s</string>
+    <string name="storage_story_bar_a11y">%1$s used of %2$s</string>
+</resources>

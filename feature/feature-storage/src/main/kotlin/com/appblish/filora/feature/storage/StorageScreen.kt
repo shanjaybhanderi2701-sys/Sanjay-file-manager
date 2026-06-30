@@ -49,6 +49,29 @@ import com.appblish.filora.core.domain.model.MediaCategory
 import com.appblish.filora.core.domain.model.StorageVolume
 import com.appblish.filora.core.domain.model.VolumeBreakdown
 import com.appblish.filora.core.ui.component.EmptyState
+import android.provider.Settings
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.RowScope
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.height
+import androidx.compose.material3.Surface
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.TransformOrigin
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
+import com.appblish.filora.core.ui.theme.FiloraElevation
+import com.appblish.filora.core.ui.theme.FiloraMotion
+import com.appblish.filora.core.ui.theme.FiloraSpacing
 
 /**
  * Storage breakdown screen (FR-8.1): one card per volume showing used/free plus a
@@ -105,9 +128,15 @@ internal fun StorageContent(
         else ->
             LazyColumn(
                 modifier = modifier.fillMaxSize(),
-                contentPadding = PaddingValues(16.dp),
-                verticalArrangement = Arrangement.spacedBy(16.dp),
+                contentPadding = PaddingValues(FiloraSpacing.lg),
+                verticalArrangement = Arrangement.spacedBy(FiloraSpacing.lg),
             ) {
+                val story = StorageStory.from(uiState.breakdown)
+                if (story.hasData) {
+                    item(key = "storage-story") {
+                        StorageStoryHero(story = story)
+                    }
+                }
                 item(key = "largest-files") {
                     LargestFilesCard(onClick = onOpenLargestFiles)
                 }
@@ -115,6 +144,176 @@ internal fun StorageContent(
                     VolumeCard(volume = volume, onOpenCategory = onOpenCategory)
                 }
             }
+    }
+}
+
+/**
+ * Storage-story hero band (hi-fi spec §3.5 — the Direction-C borrowing).
+ *
+ * A *calm* year-in-review on the Storage surface only: the big free-space number
+ * (`displaySmall`) counts up once, a segmented by-category bar grows once, and a single
+ * honest line names where space is going. It is `tertiaryContainer` so it reads as
+ * "insight", distinct from the teal primary action color (spec §1.1). Everything is
+ * derived from the already-computed [StorageStory] — no second scan (principle #3) — and
+ * the one-shot reveal honors the system animation scale / reduce-motion.
+ */
+@Composable
+private fun StorageStoryHero(
+    story: StorageStory,
+    modifier: Modifier = Modifier,
+) {
+    val motionEnabled = rememberStoryMotionEnabled()
+    var hasRevealed by rememberSaveable { mutableStateOf(false) }
+    val reveal = remember { Animatable(if (motionEnabled && !hasRevealed) 0f else 1f) }
+    LaunchedEffect(story.totalBytes) {
+        if (motionEnabled && !hasRevealed && story.hasData) {
+            reveal.snapTo(0f)
+            reveal.animateTo(
+                targetValue = 1f,
+                animationSpec = tween(FiloraMotion.storyReveal, easing = FiloraMotion.EmphasizedDecelerate),
+            )
+        } else {
+            reveal.snapTo(1f)
+        }
+        hasRevealed = true
+    }
+    val progress = reveal.value
+    val shownFree = (story.freeBytes * progress).toLong()
+
+    Surface(
+        modifier = modifier.fillMaxWidth(),
+        shape = MaterialTheme.shapes.large,
+        color = MaterialTheme.colorScheme.tertiaryContainer,
+        contentColor = MaterialTheme.colorScheme.onTertiaryContainer,
+        tonalElevation = FiloraElevation.level1,
+    ) {
+        Column(modifier = Modifier.padding(FiloraSpacing.xl)) {
+            Text(
+                text = Formatters.formatSize(shownFree),
+                style = MaterialTheme.typography.displaySmall,
+            )
+            Text(
+                text = stringResource(R.string.storage_story_free_caption, Formatters.formatSize(story.totalBytes)),
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onTertiaryContainer.copy(alpha = 0.8f),
+            )
+            StorageStoryBar(
+                story = story,
+                progress = progress,
+                modifier = Modifier.fillMaxWidth().padding(top = FiloraSpacing.lg),
+            )
+            Text(
+                text = storyHeadline(story),
+                style = MaterialTheme.typography.titleSmall,
+                modifier = Modifier.padding(top = FiloraSpacing.md),
+            )
+        }
+    }
+}
+
+/** The one motivating line: name the top category, or a neutral used/total summary. */
+@Composable
+private fun storyHeadline(story: StorageStory): String {
+    val top = story.topCategory
+    return if (top != null) {
+        stringResource(R.string.storage_story_top_category, stringResource(top.labelRes))
+    } else {
+        stringResource(
+            R.string.storage_story_used_summary,
+            Formatters.formatSize(story.usedBytes),
+            Formatters.formatSize(story.totalBytes),
+        )
+    }
+}
+
+/**
+ * Calm segmented bar: a single rounded track whose filled width is the used fraction,
+ * split into tonal slices (descending `onTertiaryContainer` alpha — no type-coded
+ * colors, spec §1.1 rule 1). The fill grows once via `scaleX` anchored on the leading
+ * edge; RTL is handled by Compose laying the track out mirrored.
+ */
+@Composable
+private fun StorageStoryBar(
+    story: StorageStory,
+    progress: Float,
+    modifier: Modifier = Modifier,
+) {
+    val accent = MaterialTheme.colorScheme.onTertiaryContainer
+    val barDesc =
+        stringResource(
+            R.string.storage_story_bar_a11y,
+            Formatters.formatSize(story.usedBytes),
+            Formatters.formatSize(story.totalBytes),
+        )
+    Box(
+        modifier =
+            modifier
+                .height(FiloraSpacing.md)
+                .clip(MaterialTheme.shapes.small)
+                .background(accent.copy(alpha = 0.12f))
+                .semantics { contentDescription = barDesc },
+    ) {
+        if (story.usedFraction > 0f) {
+            StorageStoryBarFill(story = story, accent = accent, progress = progress)
+        }
+    }
+}
+
+/** The filled (used) portion of the bar — tonal category segments that grow once. */
+@Composable
+private fun StorageStoryBarFill(
+    story: StorageStory,
+    accent: Color,
+    progress: Float,
+) {
+    val used = story.usedBytes.toFloat().coerceAtLeast(1f)
+    Row(
+        modifier =
+            Modifier
+                .fillMaxHeight()
+                .fillMaxWidth(story.usedFraction)
+                .graphicsLayer {
+                    scaleX = progress
+                    transformOrigin = TransformOrigin(0f, 0.5f)
+                },
+    ) {
+        story.slices.forEachIndexed { index, slice ->
+            val weight = slice.sizeBytes / used
+            val alpha = (0.9f - index * 0.12f).coerceIn(0.35f, 0.9f)
+            if (weight > 0f) StorageStorySegment(weight = weight, color = accent.copy(alpha = alpha))
+        }
+        val uncategorizedWeight = story.uncategorizedBytes / used
+        if (uncategorizedWeight > 0f) {
+            StorageStorySegment(weight = uncategorizedWeight, color = accent.copy(alpha = 0.25f))
+        }
+    }
+}
+
+/** One weighted, full-height segment of the storage-story bar. */
+@Composable
+private fun RowScope.StorageStorySegment(
+    weight: Float,
+    color: Color,
+) {
+    Box(
+        modifier =
+            Modifier
+                .fillMaxHeight()
+                .weight(weight)
+                .background(color),
+    )
+}
+
+/** True unless the system animation scale is 0 (reduce-motion / "Remove animations"). */
+@Composable
+private fun rememberStoryMotionEnabled(): Boolean {
+    val context = LocalContext.current
+    return remember(context) {
+        Settings.Global.getFloat(
+            context.contentResolver,
+            Settings.Global.ANIMATOR_DURATION_SCALE,
+            1f,
+        ) != 0f
     }
 }
 
