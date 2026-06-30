@@ -34,6 +34,9 @@ interface MediaStoreSource {
     /** Item counts per category across the external media collection. */
     fun countByCategory(): Map<MediaCategory, Int>
 
+    /** Total bytes per category across the external media collection. */
+    fun sizeByCategory(): Map<MediaCategory, Long>
+
     /** All entries belonging to [category], for category browsing. */
     fun entriesIn(category: MediaCategory): List<RawMediaEntry>
 }

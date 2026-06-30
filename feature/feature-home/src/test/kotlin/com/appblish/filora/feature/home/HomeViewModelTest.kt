@@ -40,7 +40,9 @@ class HomeViewModelTest {
         Dispatchers.resetMain()
     }
 
-    private class FakeAccess(var granted: Boolean) : MediaAccess {
+    private class FakeAccess(
+        var granted: Boolean
+    ) : MediaAccess {
         override fun hasReadAccess(): Boolean = granted
     }
 
@@ -56,6 +58,8 @@ class HomeViewModelTest {
             queries++
             return counts
         }
+
+        override suspend fun categorySizes(): Result<Map<MediaCategory, Long>> = Result.Success(emptyMap())
     }
 
     @Test

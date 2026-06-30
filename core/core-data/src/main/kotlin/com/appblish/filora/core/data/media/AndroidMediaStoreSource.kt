@@ -36,6 +36,12 @@ class AndroidMediaStoreSource
             return counts
         }
 
+        override fun sizeByCategory(): Map<MediaCategory, Long> {
+            val sizes = mutableMapOf<MediaCategory, Long>()
+            forEachEntry { entry -> sizes.merge(entry.category, entry.sizeBytes, Long::plus) }
+            return sizes
+        }
+
         override fun entriesIn(category: MediaCategory): List<RawMediaEntry> {
             val entries = mutableListOf<RawMediaEntry>()
             forEachEntry { entry -> if (entry.category == category) entries += entry }

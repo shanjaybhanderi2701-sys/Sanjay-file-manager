@@ -36,6 +36,9 @@ class MediaRepositoryImplTest {
         object : MediaStoreSource {
             override fun countByCategory(): Map<MediaCategory, Int> = entries.groupingBy { it.category }.eachCount()
 
+            override fun sizeByCategory(): Map<MediaCategory, Long> =
+                entries.groupingBy { it.category }.fold(0L) { acc, e -> acc + e.sizeBytes }
+
             override fun entriesIn(category: MediaCategory): List<RawMediaEntry> =
                 entries.filter { it.category == category }
         }
@@ -65,11 +68,52 @@ class MediaRepositoryImplTest {
         }
 
     @Test
+    fun `categorySizes returns a dense map summing bytes per category`() =
+        runTest(dispatcher) {
+            // entry() fixes sizeBytes = 100 each.
+            val source =
+                sourceOf(
+                    entry("a.jpg", mediaType = MediaClassifier.MEDIA_TYPE_IMAGE),
+                    entry("b.png", mediaType = MediaClassifier.MEDIA_TYPE_IMAGE),
+                    entry("song.mp3", mediaType = MediaClassifier.MEDIA_TYPE_AUDIO),
+                )
+
+            val result = repository(source).categorySizes()
+
+            assertThat(result).isInstanceOf(Result.Success::class.java)
+            val sizes = (result as Result.Success).data
+            assertThat(sizes.keys).containsExactlyElementsIn(MediaCategory.entries)
+            assertThat(sizes[MediaCategory.Images]).isEqualTo(200L)
+            assertThat(sizes[MediaCategory.Audio]).isEqualTo(100L)
+            assertThat(sizes[MediaCategory.Video]).isEqualTo(0L)
+        }
+
+    @Test
+    fun `categorySizes surfaces source failures as an Io error`() =
+        runTest(dispatcher) {
+            val source =
+                object : MediaStoreSource {
+                    override fun countByCategory() = emptyMap<MediaCategory, Int>()
+
+                    override fun sizeByCategory(): Map<MediaCategory, Long> = throw IOException("cursor blew up")
+
+                    override fun entriesIn(category: MediaCategory) = emptyList<RawMediaEntry>()
+                }
+
+            val result = repository(source).categorySizes()
+
+            assertThat(result).isInstanceOf(Result.Error::class.java)
+            assertThat((result as Result.Error).error).isInstanceOf(OperationError.Io::class.java)
+        }
+
+    @Test
     fun `categoryCounts surfaces source failures as an Io error`() =
         runTest(dispatcher) {
             val source =
                 object : MediaStoreSource {
                     override fun countByCategory(): Map<MediaCategory, Int> = throw IOException("cursor blew up")
+
+                    override fun sizeByCategory(): Map<MediaCategory, Long> = throw IOException("cursor blew up")
 
                     override fun entriesIn(category: MediaCategory) = emptyList<RawMediaEntry>()
                 }
@@ -109,6 +153,8 @@ class MediaRepositoryImplTest {
             val source =
                 object : MediaStoreSource {
                     override fun countByCategory() = emptyMap<MediaCategory, Int>()
+
+                    override fun sizeByCategory() = emptyMap<MediaCategory, Long>()
 
                     override fun entriesIn(category: MediaCategory): List<RawMediaEntry> =
                         throw IOException("query failed")

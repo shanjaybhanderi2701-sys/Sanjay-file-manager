@@ -11,4 +11,7 @@ interface MediaRepository {
 
     /** Item counts per category for Home tiles. */
     suspend fun categoryCounts(): Result<Map<MediaCategory, Int>>
+
+    /** Total bytes per category for the storage breakdown (FR-8.1). */
+    suspend fun categorySizes(): Result<Map<MediaCategory, Long>>
 }

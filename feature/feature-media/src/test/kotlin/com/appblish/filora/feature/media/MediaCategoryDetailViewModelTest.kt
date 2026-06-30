@@ -54,6 +54,8 @@ class MediaCategoryDetailViewModelTest {
         }
 
         override suspend fun categoryCounts(): Result<Map<MediaCategory, Int>> = Result.Success(emptyMap())
+
+        override suspend fun categorySizes(): Result<Map<MediaCategory, Long>> = Result.Success(emptyMap())
     }
 
     @Test

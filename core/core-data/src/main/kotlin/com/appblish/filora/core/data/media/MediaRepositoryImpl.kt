@@ -47,6 +47,14 @@ class MediaRepositoryImpl
                     MediaCategory.entries.associateWith { counts[it] ?: 0 }
                 }
             }
+
+        override suspend fun categorySizes(): Result<Map<MediaCategory, Long>> =
+            withContext(ioDispatcher) {
+                runCatchingResult({ OperationError.Io(it) }) {
+                    val sizes = source.sizeByCategory()
+                    MediaCategory.entries.associateWith { sizes[it] ?: 0L }
+                }
+            }
     }
 
 /** Maps a raw MediaStore entry to the platform-agnostic domain model. */

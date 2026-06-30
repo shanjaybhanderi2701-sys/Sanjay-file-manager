@@ -55,7 +55,13 @@ fun FiloraNavHost(
             val category = MediaCategory.valueOf(backStackEntry.toRoute<Route.Media>().category)
             MediaCategoryDetailScreen(category = category)
         }
-        composable<Route.Storage> { StorageScreen() }
+        composable<Route.Storage> {
+            StorageScreen(
+                // Volume-filtered hub lands when the media detail accepts a volume scope;
+                // for now a category tap opens that category's hub (FR-8.1 interaction).
+                onOpenCategory = { _, category -> navController.navigate(Route.Media(category.name)) },
+            )
+        }
         composable<Route.Settings> { SettingsScreen() }
     }
 }
