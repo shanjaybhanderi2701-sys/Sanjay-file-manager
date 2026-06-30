@@ -31,6 +31,9 @@ room = "2.6.1"
 work = "2.10.0"
 documentfile = "1.0.1"
 
+# --- Image loading (FR-6.2 thumbnails: mem+disk cache, video frames) ---
+coil = "2.7.0"
+
 # --- DI ---
 hilt = "2.54"
 hiltNavigationCompose = "1.2.0"
@@ -76,6 +79,10 @@ androidx-compose-material-icons-extended = { group = "androidx.compose.material"
 
 # Navigation
 androidx-navigation-compose = { group = "androidx.navigation", name = "navigation-compose", version.ref = "navigationCompose" }
+
+# Coil (image/video thumbnail loading with bounded mem+disk cache)
+coil-compose = { group = "io.coil-kt", name = "coil-compose", version.ref = "coil" }
+coil-video = { group = "io.coil-kt", name = "coil-video", version.ref = "coil" }
 
 # DataStore
 androidx-datastore-preferences = { group = "androidx.datastore", name = "datastore-preferences", version.ref = "datastore" }
