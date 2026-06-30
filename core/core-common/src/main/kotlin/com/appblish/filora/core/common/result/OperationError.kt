@@ -24,6 +24,17 @@ sealed interface OperationError {
         override val cause: Throwable? = null
     ) : OperationError
 
+    /**
+     * The supplied name is not a valid file/folder name (blank, reserved, too
+     * long, or contains illegal characters). The specific reason for inline
+     * display is produced by the validator in the domain layer; this coarse
+     * variant is the final gate use cases return when an invalid name slips
+     * past the UI.
+     */
+    data class InvalidName(
+        override val cause: Throwable? = null
+    ) : OperationError
+
     data class OutOfSpace(
         override val cause: Throwable? = null
     ) : OperationError
