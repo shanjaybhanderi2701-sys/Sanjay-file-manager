@@ -11,8 +11,12 @@
 
     <string name="home_error_load">Couldn\'t load your library. Pull to refresh.</string>
 
+    <string name="home_section_storage">Storage</string>
     <string name="home_section_recent">Recent</string>
     <string name="home_section_favorites">Favorites</string>
+
+    <!-- %1$s = used size, %2$s = total size -->
+    <string name="home_volume_usage">%1$s of %2$s used</string>
 
     <string name="home_chip_folder">Folder</string>
     <string name="home_chip_file">File</string>

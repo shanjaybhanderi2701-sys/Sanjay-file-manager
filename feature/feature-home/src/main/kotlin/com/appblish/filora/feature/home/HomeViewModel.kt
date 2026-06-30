@@ -7,6 +7,7 @@ import com.appblish.filora.core.domain.repository.MediaAccess
 import com.appblish.filora.core.domain.repository.MediaRepository
 import com.appblish.filora.core.domain.usecase.ObserveFavoritesUseCase
 import com.appblish.filora.core.domain.usecase.ObserveRecentsUseCase
+import com.appblish.filora.core.domain.usecase.ObserveStorageVolumesUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -28,8 +29,13 @@ import javax.inject.Inject
  * Favorites (FR-9.1) and recents (FR-9.2) are persisted in Room and observed
  * independently of the media permission, so the user's pins and recently-opened
  * entries show even before media access is granted. The two streams update their
- * own slice of [HomeUiState] as the user pins/unpins or opens files. Volumes stay
- * empty here; they have their own screen (T6.3).
+ * own slice of [HomeUiState] as the user pins/unpins or opens files.
+ *
+ * Storage volumes (FR-12.1) are observed too, so Home is the single aggregate the spec
+ * asks for — volumes + categories + favorites + recents (T6.5). The volume stream is a
+ * lightweight used/free summary that taps through to the full storage breakdown screen
+ * (T6.3); like favorites/recents it is independent of media access and re-emits as
+ * volumes mount/unmount, satisfying FR-12.1's "reflects live storage state on resume".
  */
 @HiltViewModel
 class HomeViewModel
@@ -39,6 +45,7 @@ class HomeViewModel
         private val mediaAccess: MediaAccess,
         observeFavorites: ObserveFavoritesUseCase,
         observeRecents: ObserveRecentsUseCase,
+        observeStorageVolumes: ObserveStorageVolumesUseCase,
     ) : ViewModel() {
         private val _uiState = MutableStateFlow(HomeUiState())
         val uiState: StateFlow<HomeUiState> = _uiState.asStateFlow()
@@ -50,6 +57,9 @@ class HomeViewModel
                 .launchIn(viewModelScope)
             observeRecents()
                 .onEach { recents -> _uiState.update { it.copy(recents = recents) } }
+                .launchIn(viewModelScope)
+            observeStorageVolumes()
+                .onEach { volumes -> _uiState.update { it.copy(volumes = volumes) } }
                 .launchIn(viewModelScope)
         }
 

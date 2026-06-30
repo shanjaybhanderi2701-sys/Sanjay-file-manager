@@ -4,11 +4,14 @@ import com.appblish.filora.core.common.result.OperationError
 import com.appblish.filora.core.common.result.Result
 import com.appblish.filora.core.domain.model.FileItem
 import com.appblish.filora.core.domain.model.MediaCategory
+import com.appblish.filora.core.domain.model.StorageVolume
 import com.appblish.filora.core.domain.repository.FavoritesRepository
 import com.appblish.filora.core.domain.repository.MediaAccess
 import com.appblish.filora.core.domain.repository.MediaRepository
+import com.appblish.filora.core.domain.repository.StorageRepository
 import com.appblish.filora.core.domain.usecase.ObserveFavoritesUseCase
 import com.appblish.filora.core.domain.usecase.ObserveRecentsUseCase
+import com.appblish.filora.core.domain.usecase.ObserveStorageVolumesUseCase
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -67,6 +70,22 @@ class HomeViewModelTest {
         override suspend fun categorySizes(): Result<Map<MediaCategory, Long>> = Result.Success(emptyMap())
     }
 
+    /** In-memory [StorageRepository] backing the volumes observe use case under test. */
+    private class FakeStorage : StorageRepository {
+        val volumes = MutableStateFlow<List<StorageVolume>>(emptyList())
+
+        override fun observeVolumes(): Flow<List<StorageVolume>> = volumes
+
+        override suspend fun getVolume(id: String): Result<StorageVolume> =
+            volumes.value.firstOrNull { it.id == id }?.let { Result.Success(it) }
+                ?: Result.Error(OperationError.NotFound())
+
+        override suspend fun largestFiles(
+            rootPath: String,
+            limit: Int,
+        ): Result<List<FileItem>> = Result.Success(emptyList())
+    }
+
     /** In-memory [FavoritesRepository] backing the two observe use cases under test. */
     private class FakeFavorites : FavoritesRepository {
         val favorites = MutableStateFlow<List<FileItem>>(emptyList())
@@ -93,12 +112,25 @@ class HomeViewModelTest {
         repository: MediaRepository,
         access: MediaAccess,
         favorites: FavoritesRepository = FakeFavorites(),
+        storage: StorageRepository = FakeStorage(),
     ) = HomeViewModel(
         mediaRepository = repository,
         mediaAccess = access,
         observeFavorites = ObserveFavoritesUseCase(favorites),
         observeRecents = ObserveRecentsUseCase(favorites),
+        observeStorageVolumes = ObserveStorageVolumesUseCase(storage),
     )
+
+    private fun volume(id: String) =
+        StorageVolume(
+            id = id,
+            label = id,
+            rootPath = "/storage/$id",
+            totalBytes = 100L,
+            availableBytes = 40L,
+            isRemovable = false,
+            isPrimary = true,
+        )
 
     private fun file(path: String) =
         FileItem(
@@ -183,6 +215,43 @@ class HomeViewModelTest {
             assertThat(state.permissionRequired).isTrue()
             assertThat(state.favorites.map { it.path }).containsExactly("/a/pinned.txt")
             assertThat(state.recents.map { it.path }).containsExactly("/a/opened.txt")
+        }
+
+    @Test
+    fun `storage volumes flow into state without media access`() =
+        runTest(dispatcher) {
+            val storage = FakeStorage()
+            storage.volumes.value = listOf(volume("internal"))
+
+            val vm =
+                viewModel(
+                    FakeRepository(Result.Success(emptyMap())),
+                    FakeAccess(granted = false),
+                    storage = storage,
+                )
+            advanceUntilIdle()
+
+            assertThat(
+                vm.uiState.value.volumes
+                    .map { it.id }
+            ).containsExactly("internal")
+        }
+
+    @Test
+    fun `volume mount re-emits into state`() =
+        runTest(dispatcher) {
+            val storage = FakeStorage()
+            val vm = viewModel(FakeRepository(Result.Success(emptyMap())), FakeAccess(true), storage = storage)
+            advanceUntilIdle()
+            assertThat(vm.uiState.value.volumes).isEmpty()
+
+            storage.volumes.value = listOf(volume("internal"), volume("sdcard"))
+            advanceUntilIdle()
+
+            assertThat(
+                vm.uiState.value.volumes
+                    .map { it.id }
+            ).containsExactly("internal", "sdcard").inOrder()
         }
 
     @Test

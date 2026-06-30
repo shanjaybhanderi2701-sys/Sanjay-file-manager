@@ -5,10 +5,13 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
@@ -29,13 +32,17 @@ import androidx.compose.material.icons.outlined.Image
 import androidx.compose.material.icons.outlined.InsertDriveFile
 import androidx.compose.material.icons.outlined.Lock
 import androidx.compose.material.icons.outlined.MusicNote
+import androidx.compose.material.icons.outlined.SdStorage
 import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material.icons.outlined.Star
+import androidx.compose.material.icons.outlined.Storage
 import androidx.compose.material.icons.outlined.Videocam
+import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -47,12 +54,15 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.LifecycleResumeEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.appblish.filora.core.common.util.Formatters
 import com.appblish.filora.core.domain.model.FileItem
 import com.appblish.filora.core.domain.model.MediaCategory
+import com.appblish.filora.core.domain.model.StorageVolume
 import com.appblish.filora.core.ui.component.EmptyState
 import com.appblish.filora.core.ui.component.GridTile
 
@@ -75,6 +85,7 @@ fun HomeScreen(
     onOpenSettings: () -> Unit,
     modifier: Modifier = Modifier,
     onOpenCategory: (MediaCategory) -> Unit = {},
+    onOpenStorage: () -> Unit = {},
     onBrowse: () -> Unit = {},
     onOpenItem: (FileItem) -> Unit = {},
     viewModel: HomeViewModel = hiltViewModel(),
@@ -107,6 +118,7 @@ fun HomeScreen(
         HomeContent(
             uiState = uiState,
             onOpenCategory = onOpenCategory,
+            onOpenStorage = onOpenStorage,
             onBrowse = onBrowse,
             onOpenItem = onOpenItem,
             modifier = Modifier.padding(padding),
@@ -120,6 +132,7 @@ internal fun HomeContent(
     onOpenCategory: (MediaCategory) -> Unit,
     onBrowse: () -> Unit,
     modifier: Modifier = Modifier,
+    onOpenStorage: () -> Unit = {},
     onOpenItem: (FileItem) -> Unit = {},
 ) {
     when {
@@ -155,6 +168,7 @@ internal fun HomeContent(
             HomeDashboard(
                 uiState = uiState,
                 onOpenCategory = onOpenCategory,
+                onOpenStorage = onOpenStorage,
                 onBrowse = onBrowse,
                 onOpenItem = onOpenItem,
                 modifier = modifier,
@@ -163,20 +177,23 @@ internal fun HomeContent(
 }
 
 /**
- * The granted-access dashboard: the user's Recents (FR-9.2) and Favorites (FR-9.1)
- * as horizontally scrolling rows, above the seven category tiles and the file-browser
- * handoff. Recents/favorites sections are omitted when empty so a fresh install shows
- * just the categories. Everything lives in one [LazyVerticalGrid] — the file rows are
- * full-span items so they span the adaptive columns.
+ * The granted-access dashboard, the FR-12.1 aggregate: storage volumes, the user's
+ * Recents (FR-9.2) and Favorites (FR-9.1) as horizontally scrolling rows, the seven
+ * category tiles, and the file-browser handoff. Each section is omitted when empty so
+ * a fresh install shows just storage + categories. Everything lives in one
+ * [LazyVerticalGrid] — the storage and file rows are full-span items so they span the
+ * adaptive columns.
  */
 @Composable
 private fun HomeDashboard(
     uiState: HomeUiState,
     onOpenCategory: (MediaCategory) -> Unit,
+    onOpenStorage: () -> Unit,
     onBrowse: () -> Unit,
     onOpenItem: (FileItem) -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val storageTitle = stringResource(R.string.home_section_storage)
     val recentTitle = stringResource(R.string.home_section_recent)
     val favoritesTitle = stringResource(R.string.home_section_favorites)
     val folderCaption = stringResource(R.string.home_chip_folder)
@@ -188,6 +205,10 @@ private fun HomeDashboard(
         horizontalArrangement = Arrangement.spacedBy(12.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
+        if (uiState.volumes.isNotEmpty()) {
+            sectionHeader(storageTitle, Icons.Outlined.Storage)
+            volumeCards(uiState.volumes, onOpenStorage)
+        }
         if (uiState.recents.isNotEmpty()) {
             sectionHeader(recentTitle, Icons.Outlined.History)
             fileChipRow(uiState.recents, folderCaption, fileCaption, onOpenItem)
@@ -257,6 +278,71 @@ private fun LazyGridScope.fileChipRow(
                             .clickable { onOpenItem(item) },
                 )
             }
+        }
+    }
+}
+
+/**
+ * Full-span storage summary: one capacity card per mounted volume (FR-12.1), each a
+ * used/free bar that taps through to the full storage breakdown ([onOpenStorage]).
+ */
+private fun LazyGridScope.volumeCards(
+    volumes: List<StorageVolume>,
+    onOpenStorage: () -> Unit,
+) {
+    volumes.forEach { volume ->
+        item(span = { GridItemSpan(maxLineSpan) }, key = "volume-${volume.id}") {
+            VolumeSummaryCard(volume = volume, onOpenStorage = onOpenStorage)
+        }
+    }
+}
+
+@Composable
+private fun VolumeSummaryCard(
+    volume: StorageVolume,
+    onOpenStorage: () -> Unit,
+) {
+    Card(
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .clickable { onOpenStorage() },
+    ) {
+        Column(modifier = Modifier.padding(16.dp)) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(12.dp),
+            ) {
+                Icon(
+                    imageVector = if (volume.isRemovable) Icons.Outlined.SdStorage else Icons.Outlined.Storage,
+                    contentDescription = null,
+                    modifier = Modifier.size(24.dp),
+                    tint = MaterialTheme.colorScheme.primary,
+                )
+                Text(
+                    text = volume.label,
+                    style = MaterialTheme.typography.titleMedium,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                )
+            }
+            val total = volume.totalBytes
+            val fraction = if (total > 0L) (volume.usedBytes.toFloat() / total).coerceIn(0f, 1f) else 0f
+            LinearProgressIndicator(
+                progress = { fraction },
+                modifier = Modifier.fillMaxWidth().padding(top = 12.dp),
+            )
+            Text(
+                text =
+                    stringResource(
+                        R.string.home_volume_usage,
+                        Formatters.formatSize(volume.usedBytes),
+                        Formatters.formatSize(total),
+                    ),
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.padding(top = 8.dp),
+            )
         }
     }
 }
