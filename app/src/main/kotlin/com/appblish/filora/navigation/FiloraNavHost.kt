@@ -1,6 +1,7 @@
 package com.appblish.filora.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -13,6 +14,7 @@ import com.appblish.filora.feature.media.MediaCategoryDetailScreen
 import com.appblish.filora.feature.media.MediaCategoryScreen
 import com.appblish.filora.feature.search.SearchScreen
 import com.appblish.filora.feature.settings.SettingsScreen
+import com.appblish.filora.feature.storage.LargestFilesScreen
 import com.appblish.filora.feature.storage.StorageScreen
 import com.appblish.filora.permission.PermissionRationaleScreen
 
@@ -26,10 +28,12 @@ import com.appblish.filora.permission.PermissionRationaleScreen
 fun FiloraNavHost(
     startDestination: Route = Route.Home,
     navController: NavHostController = rememberNavController(),
+    modifier: Modifier = Modifier,
 ) {
     NavHost(
         navController = navController,
         startDestination = startDestination,
+        modifier = modifier,
     ) {
         composable<Route.Permission> {
             PermissionRationaleScreen(
@@ -46,8 +50,15 @@ fun FiloraNavHost(
                 onOpenItem = { item -> navController.navigate(homeItemRoute(item)) },
             )
         }
-        composable<Route.Browser> { BrowserScreen() }
-        composable<Route.Search> { SearchScreen() }
+        composable<Route.Browser> { backStackEntry ->
+            BrowserScreen(
+                location = backStackEntry.toRoute<Route.Browser>().location,
+                onOpenDirectory = { path -> navController.navigate(Route.Browser(location = path)) },
+            )
+        }
+        composable<Route.Search> { backStackEntry ->
+            SearchScreen(scope = backStackEntry.toRoute<Route.Search>().scope)
+        }
         composable<Route.MediaHub> {
             MediaCategoryScreen(
                 onOpenCategory = { category -> navController.navigate(Route.Media(category.name)) },
@@ -62,7 +73,11 @@ fun FiloraNavHost(
                 // Volume-filtered hub lands when the media detail accepts a volume scope;
                 // for now a category tap opens that category's hub (FR-8.1 interaction).
                 onOpenCategory = { _, category -> navController.navigate(Route.Media(category.name)) },
+                onOpenLargestFiles = { navController.navigate(Route.LargestFiles()) },
             )
+        }
+        composable<Route.LargestFiles> { backStackEntry ->
+            LargestFilesScreen(volumeId = backStackEntry.toRoute<Route.LargestFiles>().volumeId)
         }
         composable<Route.Settings> { SettingsScreen() }
     }
