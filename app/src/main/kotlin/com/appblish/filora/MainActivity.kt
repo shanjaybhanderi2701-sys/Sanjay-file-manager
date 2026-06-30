@@ -4,7 +4,13 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.runtime.getValue
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.appblish.filora.core.data.storage.SafTreeAccess
+import com.appblish.filora.core.domain.model.ThemeMode
+import com.appblish.filora.core.domain.model.UserPreferences
+import com.appblish.filora.core.domain.repository.SettingsRepository
 import com.appblish.filora.core.ui.theme.FiloraTheme
 import com.appblish.filora.navigation.FiloraNavHost
 import com.appblish.filora.navigation.Route
@@ -17,6 +23,9 @@ import javax.inject.Inject
 class MainActivity : ComponentActivity() {
     @Inject
     lateinit var safTreeAccess: SafTreeAccess
+
+    @Inject
+    lateinit var settingsRepository: SettingsRepository
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -32,7 +41,22 @@ class MainActivity : ComponentActivity() {
         val startDestination = if (hasAccess) Route.Home else Route.Permission
 
         setContent {
-            FiloraTheme {
+            // FR-11.1: the theme follows the persisted preference and re-composes
+            // the instant the user changes it on the Settings screen, since both
+            // read the same DataStore-backed flow.
+            val preferences by settingsRepository.preferences
+                .collectAsStateWithLifecycle(initialValue = UserPreferences.Default)
+            val darkTheme =
+                when (preferences.themeMode) {
+                    ThemeMode.System -> isSystemInDarkTheme()
+                    ThemeMode.Light -> false
+                    ThemeMode.Dark -> true
+                }
+
+            FiloraTheme(
+                darkTheme = darkTheme,
+                dynamicColor = preferences.useDynamicColor,
+            ) {
                 FiloraNavHost(startDestination = startDestination)
             }
         }
