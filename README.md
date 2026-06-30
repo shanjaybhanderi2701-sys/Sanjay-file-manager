@@ -1,5 +1,7 @@
 # Filora
 
+[![CI](https://github.com/shanjaybhanderi2701-sys/Sanjay-file-manager/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/shanjaybhanderi2701-sys/Sanjay-file-manager/actions/workflows/ci.yml)
+
 An Android-native file manager (Jetpack Compose + Kotlin) by appblish.
 
 This is the engineering README — how to build, run, and contribute. Product and
