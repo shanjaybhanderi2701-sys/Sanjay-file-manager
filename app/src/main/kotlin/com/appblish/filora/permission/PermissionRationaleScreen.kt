@@ -25,6 +25,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -43,9 +44,17 @@ import com.appblish.filora.R
  *   grant survives restart, and then [onContinueWithLimitedAccess] proceeds to
  *   Home. Backing out of the picker leaves the user on the gate to retry or grant
  *   media access instead — never a dead end.
+ * - **Permanently denied** (T028) → once the OS stops showing the system dialog,
+ *   the denied state offers an "Open settings" deep link
+ *   ([AppSettings.appDetailsIntent]) so a grant is still reachable — never a dead end.
+ * - **All-files access** (T022) → only on the gated `fullaccess` build
+ *   ([AllFilesAccess.shouldOffer]); shows an explicit justification dialog before
+ *   routing to the system all-files toggle.
  *
- * The screen owns only the request UX; the granted/denied decision is surfaced
- * to the caller through the two callbacks so navigation stays in the host graph.
+ * This stateful wrapper owns the request UX (launchers + denied/justification
+ * state); the granted/denied decision is surfaced to the caller through the two
+ * callbacks so navigation stays in the host graph. Layout lives in the stateless
+ * [PermissionRationaleContent].
  */
 @Composable
 fun PermissionRationaleScreen(
@@ -55,6 +64,8 @@ fun PermissionRationaleScreen(
     viewModel: PermissionViewModel = hiltViewModel(),
 ) {
     var denied by rememberSaveable { mutableStateOf(false) }
+    var showFullAccessJustification by rememberSaveable { mutableStateOf(false) }
+    val context = LocalContext.current
 
     val launcher =
         rememberLauncherForActivityResult(
@@ -82,6 +93,42 @@ fun PermissionRationaleScreen(
             }
         }
 
+    PermissionRationaleContent(
+        denied = denied,
+        showFullAccessOptIn = AllFilesAccess.shouldOffer(),
+        onGrantClick = {
+            launcher.launch(StoragePermissions.requiredReadPermissions().toTypedArray())
+        },
+        onLimitedClick = { treePicker.launch(null) },
+        onOpenSettingsClick = {
+            context.startActivity(AppSettings.appDetailsIntent(context.packageName))
+        },
+        onFullAccessClick = { showFullAccessJustification = true },
+        modifier = modifier,
+    )
+
+    if (showFullAccessJustification) {
+        FullAccessJustificationDialog(
+            onConfirm = {
+                showFullAccessJustification = false
+                context.startActivity(AllFilesAccess.manageAccessIntent(context.packageName))
+            },
+            onDismiss = { showFullAccessJustification = false },
+        )
+    }
+}
+
+/** Stateless rationale layout; all decisions are routed through the callbacks. */
+@Composable
+private fun PermissionRationaleContent(
+    denied: Boolean,
+    showFullAccessOptIn: Boolean,
+    onGrantClick: () -> Unit,
+    onLimitedClick: () -> Unit,
+    onOpenSettingsClick: () -> Unit,
+    onFullAccessClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
     Scaffold(modifier = modifier) { padding ->
         Column(
             modifier =
@@ -110,11 +157,7 @@ fun PermissionRationaleScreen(
             Text(
                 text =
                     stringResource(
-                        if (denied) {
-                            R.string.permission_denied_body
-                        } else {
-                            R.string.permission_rationale_body
-                        },
+                        if (denied) R.string.permission_denied_body else R.string.permission_rationale_body,
                     ),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -124,31 +167,63 @@ fun PermissionRationaleScreen(
 
             if (!denied) {
                 Button(
-                    onClick = {
-                        launcher.launch(
-                            StoragePermissions.requiredReadPermissions().toTypedArray(),
-                        )
-                    },
-                    modifier =
-                        Modifier
-                            .fillMaxWidth()
-                            .padding(top = 32.dp),
+                    onClick = onGrantClick,
+                    modifier = Modifier.fillMaxWidth().padding(top = 32.dp),
                 ) {
                     Text(stringResource(R.string.permission_grant_button))
                 }
             }
 
-            TextButton(
-                // Launch the system document-tree picker; `null` opens at the
-                // picker's default root.
-                onClick = { treePicker.launch(null) },
-                modifier =
-                    Modifier
-                        .fillMaxWidth()
-                        .padding(top = if (denied) 32.dp else 8.dp),
-            ) {
-                Text(stringResource(R.string.permission_limited_button))
-            }
+            PermissionSecondaryActions(
+                denied = denied,
+                showFullAccessOptIn = showFullAccessOptIn,
+                onLimitedClick = onLimitedClick,
+                onOpenSettingsClick = onOpenSettingsClick,
+                onFullAccessClick = onFullAccessClick,
+            )
+        }
+    }
+}
+
+/**
+ * The always-available SAF path plus the conditional escape hatches: the
+ * permanent-denial settings deep link (T028) and the gated all-files opt-in (T022).
+ */
+@Composable
+private fun PermissionSecondaryActions(
+    denied: Boolean,
+    showFullAccessOptIn: Boolean,
+    onLimitedClick: () -> Unit,
+    onOpenSettingsClick: () -> Unit,
+    onFullAccessClick: () -> Unit,
+) {
+    TextButton(
+        // Launch the system document-tree picker; `null` opens at the picker's default root.
+        onClick = onLimitedClick,
+        modifier = Modifier.fillMaxWidth().padding(top = if (denied) 32.dp else 8.dp),
+    ) {
+        Text(stringResource(R.string.permission_limited_button))
+    }
+
+    // T028: after a denial the system dialog may no longer appear ("Don't ask
+    // again"), so the only path to a grant is App info — offer it as an escape hatch.
+    if (denied) {
+        TextButton(
+            onClick = onOpenSettingsClick,
+            modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
+        ) {
+            Text(stringResource(R.string.permission_open_settings_button))
+        }
+    }
+
+    // T022: all-files access opt-in — gated to the `fullaccess` build only, and
+    // always behind an explicit justification dialog.
+    if (showFullAccessOptIn) {
+        TextButton(
+            onClick = onFullAccessClick,
+            modifier = Modifier.fillMaxWidth().padding(top = 8.dp),
+        ) {
+            Text(stringResource(R.string.permission_full_access_button))
         }
     }
 }

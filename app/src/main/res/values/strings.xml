@@ -8,4 +8,12 @@
     <string name="permission_denied_body">No problem. You can still browse storage you pick yourself using your device\'s file picker. Grant media access any time from Settings to unlock photo, video, and audio categories.</string>
     <string name="permission_grant_button">Grant access</string>
     <string name="permission_limited_button">Continue with limited access</string>
+    <string name="permission_open_settings_button">Open settings</string>
+
+    <!-- T022 all-files access (MANAGE_EXTERNAL_STORAGE) opt-in — fullaccess build only -->
+    <string name="permission_full_access_button">Allow access to all files</string>
+    <string name="permission_full_access_title">Allow access to all files?</string>
+    <string name="permission_full_access_body">All-files access lets Filora manage every file on your device, including app folders and downloads. Only enable this if you need to browse or organize files outside your photos, videos, and audio. You can turn it off any time in system settings.</string>
+    <string name="permission_full_access_confirm">Continue to settings</string>
+    <string name="permission_dismiss">Not now</string>
 </resources>
