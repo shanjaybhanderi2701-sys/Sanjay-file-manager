@@ -4,6 +4,7 @@ import com.appblish.filora.core.common.result.OperationError
 import com.appblish.filora.core.common.result.Result
 import com.appblish.filora.core.common.result.asError
 import com.appblish.filora.core.common.result.asSuccess
+import com.appblish.filora.core.domain.model.DeleteOutcome
 import com.appblish.filora.core.domain.model.FileItem
 import com.appblish.filora.core.domain.model.SortOrder
 import com.appblish.filora.core.domain.repository.FileRepository
@@ -19,6 +20,10 @@ class FakeFileRepository(
     private val createResult: Result<FileItem> = sampleItem("New folder").asSuccess(),
     private val renameResult: Result<FileItem> = sampleItem("Renamed").asSuccess(),
     private val getFileResult: Result<FileItem> = sampleItem("Current").asSuccess(),
+    private val deleteResult: Result<DeleteOutcome> = DeleteOutcome(deletedCount = 1, movedToTrash = true).asSuccess(),
+    private val listing: Result<List<FileItem>> = emptyList<FileItem>().asSuccess(),
+    private val copyFailurePaths: Set<String> = emptySet(),
+    private val getFileByPath: ((String) -> Result<FileItem>)? = null,
 ) : FileRepository {
     var createFolderArgs: Pair<String, String>? = null
         private set
@@ -26,15 +31,20 @@ class FakeFileRepository(
         private set
     var getFileArg: String? = null
         private set
+    var deleteArgs: Pair<List<String>, Boolean>? = null
+        private set
+
+    /** Every [copy] call in order, for asserting resolved names and overwrite flags. */
+    val copyCalls = mutableListOf<CopyCall>()
 
     override fun listDirectory(
         path: String,
         sortOrder: SortOrder,
-    ): Flow<Result<List<FileItem>>> = flowOf(emptyList<FileItem>().asSuccess())
+    ): Flow<Result<List<FileItem>>> = flowOf(listing)
 
     override suspend fun getFile(path: String): Result<FileItem> {
         getFileArg = path
-        return getFileResult
+        return getFileByPath?.invoke(path) ?: getFileResult
     }
 
     override suspend fun createFolder(
@@ -53,25 +63,53 @@ class FakeFileRepository(
         return renameResult
     }
 
-    override suspend fun delete(paths: List<String>): Result<Unit> = Unit.asSuccess()
+    override suspend fun delete(
+        paths: List<String>,
+        toTrash: Boolean,
+    ): Result<DeleteOutcome> {
+        deleteArgs = paths to toTrash
+        return deleteResult
+    }
 
     override suspend fun copy(
-        sources: List<String>,
+        sourcePath: String,
         destinationDir: String,
-    ): Result<Unit> = OperationError.Unknown().asError()
+        destinationName: String,
+        overwrite: Boolean,
+    ): Result<FileItem> {
+        copyCalls += CopyCall(sourcePath, destinationDir, destinationName, overwrite)
+        return if (sourcePath in copyFailurePaths) {
+            OperationError.Io().asError()
+        } else {
+            FileItem(
+                name = destinationName,
+                path = "$destinationDir/$destinationName",
+                isDirectory = false,
+                sizeBytes = 0L,
+                lastModifiedEpochMillis = 0L,
+            ).asSuccess()
+        }
+    }
 
-    override suspend fun move(
-        sources: List<String>,
-        destinationDir: String,
-    ): Result<Unit> = OperationError.Unknown().asError()
+    /** A single recorded [copy] invocation. */
+    data class CopyCall(
+        val sourcePath: String,
+        val destinationDir: String,
+        val destinationName: String,
+        val overwrite: Boolean,
+    )
 
     companion object {
-        fun sampleItem(name: String): FileItem =
+        fun sampleItem(
+            name: String,
+            isDirectory: Boolean = true,
+            sizeBytes: Long = 0L,
+        ): FileItem =
             FileItem(
                 name = name,
                 path = "/storage/emulated/0/$name",
-                isDirectory = true,
-                sizeBytes = 0L,
+                isDirectory = isDirectory,
+                sizeBytes = sizeBytes,
                 lastModifiedEpochMillis = 0L,
             )
     }
