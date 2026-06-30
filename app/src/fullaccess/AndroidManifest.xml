@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Opt-in "fullaccess" flavor ONLY. Declares all-files access; this flavor is never
+  the Play-default build (A3). The standard flavor has no such permission so it can
+  never request all-files access. Use is gated by BuildConfig.FULL_ACCESS_SUPPORTED.
+-->
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE" />
+
+</manifest>

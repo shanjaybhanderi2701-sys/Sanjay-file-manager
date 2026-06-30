@@ -1,0 +1,82 @@
+## Filora detekt configuration.
+## buildUponDefaultConfig = true in the root build, so this only overrides the
+## defaults that are too noisy for an early-stage codebase. ktlint owns pure
+## formatting; detekt focuses on correctness/complexity smells.
+
+build:
+  maxIssues: 0
+  excludeCorrectable: false
+
+config:
+  validation: true
+  warningsAsErrors: false
+
+complexity:
+  active: true
+  LongMethod:
+    active: true
+    threshold: 80
+  LongParameterList:
+    active: true
+    functionThreshold: 8
+    constructorThreshold: 9
+    ignoreDefaultParameters: true
+    ignoreAnnotated: ['Composable']
+  TooManyFunctions:
+    active: false
+  CyclomaticComplexMethod:
+    active: true
+    threshold: 20
+
+style:
+  active: true
+  MagicNumber:
+    active: false
+  ReturnCount:
+    active: true
+    max: 6
+  UnusedPrivateMember:
+    active: true
+    # @Preview composables are entry points for tooling, not dead code.
+    ignoreAnnotated: ['Preview']
+  MaxLineLength:
+    active: false
+  ForbiddenComment:
+    active: false
+  UnusedParameter:
+    active: true
+    ignoreAnnotated: ['Composable']
+
+naming:
+  active: true
+  FunctionNaming:
+    active: true
+    ignoreAnnotated: ['Composable']
+  TopLevelPropertyNaming:
+    active: true
+    # Compose theme tokens (e.g. PrimaryLight, FiloraTypography) are PascalCase.
+    constantPattern: '[A-Z][_A-Za-z0-9]*'
+    propertyPattern: '[A-Za-z][A-Za-z0-9]*'
+  VariableNaming:
+    active: true
+    variablePattern: '[A-Za-z][A-Za-z0-9]*'
+    ignoreAnnotated: ['Composable']
+
+exceptions:
+  active: true
+  TooGenericExceptionCaught:
+    active: false
+  SwallowedException:
+    active: false
+  # Re-throwing CancellationException from a general `catch (t: Throwable)` via an
+  # `is` check is the correct coroutine idiom (see runCatchingResult). The
+  # "use multiple catch blocks" suggestion does not apply when the special-cased
+  # type must be re-thrown rather than handled.
+  InstanceOfCheckForException:
+    active: false
+
+empty-blocks:
+  active: true
+
+potential-bugs:
+  active: true

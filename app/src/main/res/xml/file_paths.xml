@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  FileProvider paths. Only the cache "shared/" subdir is exposed (A1): files staged
+  there for share/open. We never expose arbitrary external paths through the provider.
+-->
+<paths>
+    <cache-path name="shared" path="shared/" />
+</paths>

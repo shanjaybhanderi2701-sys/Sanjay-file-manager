@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Legacy fullBackupContent rules for API <= 30 (A5). Mirror the modern exclusions:
+  local index/grant state must not be backed up.
+-->
+<full-backup-content>
+    <exclude domain="database" path="filora.db" />
+    <exclude domain="sharedpref" path="saf_grants.xml" />
+    <exclude domain="file" path="datastore/" />
+</full-backup-content>

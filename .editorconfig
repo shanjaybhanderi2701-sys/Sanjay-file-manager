@@ -1,0 +1,31 @@
+root = true
+
+[*]
+charset = utf-8
+end_of_line = lf
+indent_style = space
+indent_size = 4
+insert_final_newline = true
+trim_trailing_whitespace = true
+
+[*.{kt,kts}]
+max_line_length = 120
+# Jetpack Compose @Composable functions are intentionally PascalCase.
+ktlint_function_naming_ignore_when_annotated_with = Composable
+# A Kotlin file may legitimately hold several top-level declarations (e.g. theme
+# tokens, Result helpers), so don't force file name == single top-level symbol.
+ktlint_standard_filename = disabled
+# Trailing commas are a matter of taste here; don't fail the build either way.
+ktlint_standard_trailing-comma-on-call-site = disabled
+ktlint_standard_trailing-comma-on-declaration-site = disabled
+# Don't force `val x =\n    expr(...)` wrapping for multiline call expressions; the
+# assigned-on-same-line form is clearer for theme tokens / builder-style composables.
+ktlint_standard_multiline-expression-wrapping = disabled
+# Allow an EOL section comment (e.g. `// Light scheme`) to follow a file-level KDoc.
+ktlint_standard_no-consecutive-comments = disabled
+
+[*.{yml,yaml,toml,json}]
+indent_size = 2
+
+[*.md]
+trim_trailing_whitespace = false

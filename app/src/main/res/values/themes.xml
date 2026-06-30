@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Base theme; Compose (FiloraTheme) drives actual colors. This only needs to
+         be a no-action-bar shell with a sensible window background. -->
+    <style name="Theme.Filora" parent="android:Theme.Material.Light.NoActionBar">
+        <item name="android:windowBackground">@color/filora_window_background</item>
+        <item name="android:statusBarColor">@android:color/transparent</item>
+        <item name="android:navigationBarColor">@android:color/transparent</item>
+    </style>
+</resources>
