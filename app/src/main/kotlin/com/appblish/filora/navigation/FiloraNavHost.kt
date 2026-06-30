@@ -57,7 +57,10 @@ fun FiloraNavHost(
             )
         }
         composable<Route.Search> { backStackEntry ->
-            SearchScreen(scope = backStackEntry.toRoute<Route.Search>().scope)
+            SearchScreen(
+                scope = backStackEntry.toRoute<Route.Search>().scope,
+                onOpenResult = { item -> navController.navigate(homeItemRoute(item)) },
+            )
         }
         composable<Route.MediaHub> {
             MediaCategoryScreen(

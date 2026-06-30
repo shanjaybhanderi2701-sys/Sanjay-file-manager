@@ -1,5 +1,6 @@
 package com.appblish.filora.feature.search
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -41,6 +42,7 @@ import com.appblish.filora.core.ui.component.FileRow
 @Composable
 fun SearchScreen(
     scope: String? = null,
+    onOpenResult: (FileItem) -> Unit = {},
     modifier: Modifier = Modifier,
     viewModel: SearchViewModel = hiltViewModel(),
 ) {
@@ -55,6 +57,7 @@ fun SearchScreen(
         onSelectSize = viewModel::selectSize,
         onSelectDate = viewModel::selectDate,
         onRemoveChip = viewModel::removeChip,
+        onOpenResult = onOpenResult,
         modifier = modifier,
     )
 }
@@ -67,6 +70,7 @@ internal fun SearchContent(
     onSelectSize: (SizeBucket?) -> Unit,
     onSelectDate: (DateBucket?) -> Unit,
     onRemoveChip: (ActiveFilterChip) -> Unit,
+    onOpenResult: (FileItem) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(modifier = modifier.fillMaxSize()) {
@@ -97,7 +101,7 @@ internal fun SearchContent(
             LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
         }
 
-        SearchResults(uiState = uiState)
+        SearchResults(uiState = uiState, onOpenResult = onOpenResult)
     }
 }
 
@@ -160,7 +164,10 @@ private fun ActiveChipRow(
 }
 
 @Composable
-private fun SearchResults(uiState: SearchUiState) {
+private fun SearchResults(
+    uiState: SearchUiState,
+    onOpenResult: (FileItem) -> Unit,
+) {
     if (uiState.isEmpty) {
         EmptyState(
             icon = Icons.Outlined.Search,
@@ -174,6 +181,7 @@ private fun SearchResults(uiState: SearchUiState) {
                     name = item.name,
                     subtitle = item.subtitle,
                     isDirectory = item.isDirectory,
+                    modifier = Modifier.clickable { onOpenResult(item) },
                 )
             }
         }
