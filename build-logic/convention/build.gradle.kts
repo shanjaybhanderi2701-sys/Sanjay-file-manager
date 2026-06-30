@@ -20,31 +20,31 @@ gradlePlugin {
     plugins {
         register("androidApplication") {
             id = "filora.android.application"
-            implementationClass = "com.appblish.filora.build.AndroidApplicationConventionPlugin"
+            implementationClass = "com.appblish.filora.buildlogic.AndroidApplicationConventionPlugin"
         }
         register("androidLibrary") {
             id = "filora.android.library"
-            implementationClass = "com.appblish.filora.build.AndroidLibraryConventionPlugin"
+            implementationClass = "com.appblish.filora.buildlogic.AndroidLibraryConventionPlugin"
         }
         register("androidCompose") {
             id = "filora.android.compose"
-            implementationClass = "com.appblish.filora.build.AndroidComposeConventionPlugin"
+            implementationClass = "com.appblish.filora.buildlogic.AndroidComposeConventionPlugin"
         }
         register("androidFeature") {
             id = "filora.android.feature"
-            implementationClass = "com.appblish.filora.build.AndroidFeatureConventionPlugin"
+            implementationClass = "com.appblish.filora.buildlogic.AndroidFeatureConventionPlugin"
         }
         register("androidHilt") {
             id = "filora.android.hilt"
-            implementationClass = "com.appblish.filora.build.HiltConventionPlugin"
+            implementationClass = "com.appblish.filora.buildlogic.HiltConventionPlugin"
         }
         register("androidRoom") {
             id = "filora.android.room"
-            implementationClass = "com.appblish.filora.build.RoomConventionPlugin"
+            implementationClass = "com.appblish.filora.buildlogic.RoomConventionPlugin"
         }
         register("kotlinLibrary") {
             id = "filora.kotlin.library"
-            implementationClass = "com.appblish.filora.build.KotlinLibraryConventionPlugin"
+            implementationClass = "com.appblish.filora.buildlogic.KotlinLibraryConventionPlugin"
         }
     }
 }
