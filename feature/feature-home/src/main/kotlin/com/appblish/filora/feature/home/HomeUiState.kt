@@ -1,5 +1,6 @@
 package com.appblish.filora.feature.home
 
+import androidx.annotation.StringRes
 import com.appblish.filora.core.domain.model.FileItem
 import com.appblish.filora.core.domain.model.MediaCategory
 import com.appblish.filora.core.domain.model.StorageVolume
@@ -20,14 +21,14 @@ data class HomeUiState(
     val categoryCounts: Map<MediaCategory, Int> = emptyMap(),
     val favorites: List<FileItem> = emptyList(),
     val recents: List<FileItem> = emptyList(),
-    val errorMessage: String? = null,
+    @StringRes val errorMessageRes: Int? = null,
 ) {
     /** True when a load completed with access but produced nothing to show. */
     val isEmpty: Boolean
         get() =
             !isLoading &&
                 !permissionRequired &&
-                errorMessage == null &&
+                errorMessageRes == null &&
                 volumes.isEmpty() &&
                 categoryCounts.values.all { it == 0 } &&
                 favorites.isEmpty() &&

@@ -1,15 +1,21 @@
 package com.appblish.filora.feature.home
 
+import androidx.annotation.StringRes
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.GridItemSpan
+import androidx.compose.foundation.lazy.grid.LazyGridScope
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.Android
 import androidx.compose.material.icons.outlined.Description
@@ -18,15 +24,19 @@ import androidx.compose.material.icons.outlined.Folder
 import androidx.compose.material.icons.outlined.FolderOff
 import androidx.compose.material.icons.outlined.FolderOpen
 import androidx.compose.material.icons.outlined.FolderZip
+import androidx.compose.material.icons.outlined.History
 import androidx.compose.material.icons.outlined.Image
+import androidx.compose.material.icons.outlined.InsertDriveFile
 import androidx.compose.material.icons.outlined.Lock
 import androidx.compose.material.icons.outlined.MusicNote
 import androidx.compose.material.icons.outlined.Settings
+import androidx.compose.material.icons.outlined.Star
 import androidx.compose.material.icons.outlined.Videocam
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -35,10 +45,13 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.pluralStringResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.LifecycleResumeEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.appblish.filora.core.domain.model.FileItem
 import com.appblish.filora.core.domain.model.MediaCategory
 import com.appblish.filora.core.ui.component.EmptyState
 import com.appblish.filora.core.ui.component.GridTile
@@ -63,6 +76,7 @@ fun HomeScreen(
     modifier: Modifier = Modifier,
     onOpenCategory: (MediaCategory) -> Unit = {},
     onBrowse: () -> Unit = {},
+    onOpenItem: (FileItem) -> Unit = {},
     viewModel: HomeViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -78,10 +92,13 @@ fun HomeScreen(
         modifier = modifier,
         topBar = {
             TopAppBar(
-                title = { Text("Filora") },
+                title = { Text(stringResource(R.string.home_title)) },
                 actions = {
                     IconButton(onClick = onOpenSettings) {
-                        Icon(Icons.Outlined.Settings, contentDescription = "Settings")
+                        Icon(
+                            Icons.Outlined.Settings,
+                            contentDescription = stringResource(R.string.home_action_settings),
+                        )
                     }
                 },
             )
@@ -91,6 +108,7 @@ fun HomeScreen(
             uiState = uiState,
             onOpenCategory = onOpenCategory,
             onBrowse = onBrowse,
+            onOpenItem = onOpenItem,
             modifier = Modifier.padding(padding),
         )
     }
@@ -102,6 +120,7 @@ internal fun HomeContent(
     onOpenCategory: (MediaCategory) -> Unit,
     onBrowse: () -> Unit,
     modifier: Modifier = Modifier,
+    onOpenItem: (FileItem) -> Unit = {},
 ) {
     when {
         uiState.isLoading ->
@@ -112,45 +131,56 @@ internal fun HomeContent(
         uiState.permissionRequired ->
             EmptyState(
                 icon = Icons.Outlined.Lock,
-                title = "Grant storage access",
-                description =
-                    "Filora needs access to your media to show your library. " +
-                        "Enable it in Settings, then return here.",
+                title = stringResource(R.string.home_permission_title),
+                description = stringResource(R.string.home_permission_body),
                 modifier = modifier,
             )
 
-        uiState.errorMessage != null ->
+        uiState.errorMessageRes != null ->
             EmptyState(
                 icon = Icons.Outlined.FolderOff,
-                title = uiState.errorMessage,
+                title = stringResource(uiState.errorMessageRes),
                 modifier = modifier,
             )
 
         uiState.isEmpty ->
             EmptyState(
                 icon = Icons.Outlined.FolderOpen,
-                title = "Welcome to Filora",
-                description = "Your files will appear here as you add them.",
+                title = stringResource(R.string.home_welcome_title),
+                description = stringResource(R.string.home_welcome_body),
                 modifier = modifier,
             )
 
         else ->
-            CategoryGrid(
-                counts = uiState.categoryCounts,
+            HomeDashboard(
+                uiState = uiState,
                 onOpenCategory = onOpenCategory,
                 onBrowse = onBrowse,
+                onOpenItem = onOpenItem,
                 modifier = modifier,
             )
     }
 }
 
+/**
+ * The granted-access dashboard: the user's Recents (FR-9.2) and Favorites (FR-9.1)
+ * as horizontally scrolling rows, above the seven category tiles and the file-browser
+ * handoff. Recents/favorites sections are omitted when empty so a fresh install shows
+ * just the categories. Everything lives in one [LazyVerticalGrid] — the file rows are
+ * full-span items so they span the adaptive columns.
+ */
 @Composable
-private fun CategoryGrid(
-    counts: Map<MediaCategory, Int>,
+private fun HomeDashboard(
+    uiState: HomeUiState,
     onOpenCategory: (MediaCategory) -> Unit,
     onBrowse: () -> Unit,
+    onOpenItem: (FileItem) -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val recentTitle = stringResource(R.string.home_section_recent)
+    val favoritesTitle = stringResource(R.string.home_section_favorites)
+    val folderCaption = stringResource(R.string.home_chip_folder)
+    val fileCaption = stringResource(R.string.home_chip_file)
     LazyVerticalGrid(
         columns = GridCells.Adaptive(minSize = 140.dp),
         modifier = modifier.fillMaxSize(),
@@ -158,10 +188,19 @@ private fun CategoryGrid(
         horizontalArrangement = Arrangement.spacedBy(12.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
+        if (uiState.recents.isNotEmpty()) {
+            sectionHeader(recentTitle, Icons.Outlined.History)
+            fileChipRow(uiState.recents, folderCaption, fileCaption, onOpenItem)
+        }
+        if (uiState.favorites.isNotEmpty()) {
+            sectionHeader(favoritesTitle, Icons.Outlined.Star)
+            fileChipRow(uiState.favorites, folderCaption, fileCaption, onOpenItem)
+        }
+
         items(HomeCategory.entries.toList(), key = { it.name }) { hub ->
-            val count = counts[hub.category]?.coerceAtLeast(0) ?: 0
+            val count = uiState.categoryCounts[hub.category]?.coerceAtLeast(0) ?: 0
             GridTile(
-                label = hub.label,
+                label = stringResource(hub.labelRes),
                 icon = hub.icon,
                 caption = captionFor(count),
                 modifier = Modifier.clickable { onOpenCategory(hub.category) },
@@ -170,20 +209,64 @@ private fun CategoryGrid(
         // Folder handoff to the M2 file browser, spanning its own row.
         item(span = { GridItemSpan(maxLineSpan) }) {
             GridTile(
-                label = "Browse files",
+                label = stringResource(R.string.home_browse_files),
                 icon = Icons.Outlined.Folder,
-                caption = "All folders",
+                caption = stringResource(R.string.home_browse_caption),
                 modifier = Modifier.clickable { onBrowse() },
             )
         }
     }
 }
 
+/** A full-span section label with a leading icon. */
+private fun LazyGridScope.sectionHeader(
+    title: String,
+    icon: ImageVector,
+) {
+    item(span = { GridItemSpan(maxLineSpan) }) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+        ) {
+            Icon(imageVector = icon, contentDescription = null)
+            Text(text = title, style = MaterialTheme.typography.titleMedium)
+        }
+    }
+}
+
+/** A full-span, horizontally scrolling strip of file/folder chips. */
+private fun LazyGridScope.fileChipRow(
+    items: List<FileItem>,
+    folderCaption: String,
+    fileCaption: String,
+    onOpenItem: (FileItem) -> Unit,
+) {
+    item(span = { GridItemSpan(maxLineSpan) }) {
+        Row(
+            modifier = Modifier.horizontalScroll(rememberScrollState()),
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
+        ) {
+            items.forEach { item ->
+                GridTile(
+                    label = item.name,
+                    icon = if (item.isDirectory) Icons.Outlined.Folder else Icons.Outlined.InsertDriveFile,
+                    caption = if (item.isDirectory) folderCaption else fileCaption,
+                    modifier =
+                        Modifier
+                            .width(120.dp)
+                            .clickable { onOpenItem(item) },
+                )
+            }
+        }
+    }
+}
+
+@Composable
 private fun captionFor(count: Int): String =
-    when (count) {
-        0 -> "Empty"
-        1 -> "1 item"
-        else -> "$count items"
+    if (count == 0) {
+        stringResource(R.string.home_caption_empty)
+    } else {
+        pluralStringResource(R.plurals.home_item_count, count, count)
     }
 
 /**
@@ -193,14 +276,14 @@ private fun captionFor(count: Int): String =
  */
 private enum class HomeCategory(
     val category: MediaCategory,
-    val label: String,
+    @StringRes val labelRes: Int,
     val icon: ImageVector,
 ) {
-    Images(MediaCategory.Images, "Images", Icons.Outlined.Image),
-    Video(MediaCategory.Video, "Video", Icons.Outlined.Videocam),
-    Audio(MediaCategory.Audio, "Audio", Icons.Outlined.MusicNote),
-    Docs(MediaCategory.Documents, "Docs", Icons.Outlined.Description),
-    Downloads(MediaCategory.Downloads, "Downloads", Icons.Outlined.Download),
-    Apks(MediaCategory.Apps, "APKs", Icons.Outlined.Android),
-    Archives(MediaCategory.Archives, "Archives", Icons.Outlined.FolderZip),
+    Images(MediaCategory.Images, R.string.home_cat_images, Icons.Outlined.Image),
+    Video(MediaCategory.Video, R.string.home_cat_video, Icons.Outlined.Videocam),
+    Audio(MediaCategory.Audio, R.string.home_cat_audio, Icons.Outlined.MusicNote),
+    Docs(MediaCategory.Documents, R.string.home_cat_docs, Icons.Outlined.Description),
+    Downloads(MediaCategory.Downloads, R.string.home_cat_downloads, Icons.Outlined.Download),
+    Apks(MediaCategory.Apps, R.string.home_cat_apks, Icons.Outlined.Android),
+    Archives(MediaCategory.Archives, R.string.home_cat_archives, Icons.Outlined.FolderZip),
 }

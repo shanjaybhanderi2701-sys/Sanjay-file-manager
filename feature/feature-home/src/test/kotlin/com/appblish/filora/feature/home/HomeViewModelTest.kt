@@ -4,12 +4,16 @@ import com.appblish.filora.core.common.result.OperationError
 import com.appblish.filora.core.common.result.Result
 import com.appblish.filora.core.domain.model.FileItem
 import com.appblish.filora.core.domain.model.MediaCategory
+import com.appblish.filora.core.domain.repository.FavoritesRepository
 import com.appblish.filora.core.domain.repository.MediaAccess
 import com.appblish.filora.core.domain.repository.MediaRepository
+import com.appblish.filora.core.domain.usecase.ObserveFavoritesUseCase
+import com.appblish.filora.core.domain.usecase.ObserveRecentsUseCase
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
@@ -21,10 +25,11 @@ import org.junit.Before
 import org.junit.Test
 
 /**
- * Unit tests for [HomeViewModel] — the M4 T4.6 integration surface. They pin the
- * permission gate (no access → prompt, never a MediaStore query), the loaded-count
- * path, the error path, and the `onResume` re-query that turns the prompt into
- * counts once access is granted.
+ * Unit tests for [HomeViewModel] — the M4 T4.6 integration surface plus the M6 T6.2
+ * favorites/recents wiring. They pin the permission gate (no access → prompt, never a
+ * MediaStore query), the loaded-count path, the error path, the `onResume` re-query
+ * that turns the prompt into counts once access is granted, and the persisted
+ * favorites/recents streams that flow into state independently of media access.
  */
 @OptIn(ExperimentalCoroutinesApi::class)
 class HomeViewModelTest {
@@ -41,7 +46,7 @@ class HomeViewModelTest {
     }
 
     private class FakeAccess(
-        var granted: Boolean
+        var granted: Boolean,
     ) : MediaAccess {
         override fun hasReadAccess(): Boolean = granted
     }
@@ -62,14 +67,56 @@ class HomeViewModelTest {
         override suspend fun categorySizes(): Result<Map<MediaCategory, Long>> = Result.Success(emptyMap())
     }
 
+    /** In-memory [FavoritesRepository] backing the two observe use cases under test. */
+    private class FakeFavorites : FavoritesRepository {
+        val favorites = MutableStateFlow<List<FileItem>>(emptyList())
+        val recents = MutableStateFlow<List<FileItem>>(emptyList())
+
+        override fun observeFavorites(): Flow<List<FileItem>> = favorites
+
+        override fun observeRecents(limit: Int): Flow<List<FileItem>> = recents
+
+        override suspend fun addFavorite(item: FileItem) {
+            favorites.value = favorites.value + item
+        }
+
+        override suspend fun removeFavorite(path: String) {
+            favorites.value = favorites.value.filterNot { it.path == path }
+        }
+
+        override suspend fun recordRecent(item: FileItem) {
+            recents.value = listOf(item) + recents.value.filterNot { it.path == item.path }
+        }
+    }
+
+    private fun viewModel(
+        repository: MediaRepository,
+        access: MediaAccess,
+        favorites: FavoritesRepository = FakeFavorites(),
+    ) = HomeViewModel(
+        mediaRepository = repository,
+        mediaAccess = access,
+        observeFavorites = ObserveFavoritesUseCase(favorites),
+        observeRecents = ObserveRecentsUseCase(favorites),
+    )
+
+    private fun file(path: String) =
+        FileItem(
+            name = path.substringAfterLast('/'),
+            path = path,
+            isDirectory = false,
+            sizeBytes = 0L,
+            lastModifiedEpochMillis = 0L
+        )
+
     @Test
     fun `without access it prompts and never queries`() =
         runTest(dispatcher) {
             val repo = FakeRepository(Result.Success(emptyMap()))
-            val viewModel = HomeViewModel(repo, FakeAccess(granted = false))
+            val vm = viewModel(repo, FakeAccess(granted = false))
             advanceUntilIdle()
 
-            val state = viewModel.uiState.value
+            val state = vm.uiState.value
             assertThat(state.permissionRequired).isTrue()
             assertThat(state.isLoading).isFalse()
             assertThat(state.categoryCounts).isEmpty()
@@ -80,13 +127,13 @@ class HomeViewModelTest {
     fun `with access it loads category counts`() =
         runTest(dispatcher) {
             val counts = mapOf(MediaCategory.Images to 3, MediaCategory.Audio to 0)
-            val viewModel = HomeViewModel(FakeRepository(Result.Success(counts)), FakeAccess(true))
+            val vm = viewModel(FakeRepository(Result.Success(counts)), FakeAccess(true))
             advanceUntilIdle()
 
-            val state = viewModel.uiState.value
+            val state = vm.uiState.value
             assertThat(state.permissionRequired).isFalse()
             assertThat(state.isLoading).isFalse()
-            assertThat(state.errorMessage).isNull()
+            assertThat(state.errorMessageRes).isNull()
             assertThat(state.categoryCounts).containsExactlyEntriesIn(counts)
         }
 
@@ -94,13 +141,13 @@ class HomeViewModelTest {
     fun `a count failure surfaces an error and clears counts`() =
         runTest(dispatcher) {
             val repo = FakeRepository(Result.Error(OperationError.Io(RuntimeException("boom"))))
-            val viewModel = HomeViewModel(repo, FakeAccess(true))
+            val vm = viewModel(repo, FakeAccess(true))
             advanceUntilIdle()
 
-            val state = viewModel.uiState.value
+            val state = vm.uiState.value
             assertThat(state.permissionRequired).isFalse()
             assertThat(state.categoryCounts).isEmpty()
-            assertThat(state.errorMessage).isNotNull()
+            assertThat(state.errorMessageRes).isNotNull()
         }
 
     @Test
@@ -108,17 +155,50 @@ class HomeViewModelTest {
         runTest(dispatcher) {
             val counts = mapOf(MediaCategory.Video to 2)
             val access = FakeAccess(granted = false)
-            val viewModel = HomeViewModel(FakeRepository(Result.Success(counts)), access)
+            val vm = viewModel(FakeRepository(Result.Success(counts)), access)
             advanceUntilIdle()
-            assertThat(viewModel.uiState.value.permissionRequired).isTrue()
+            assertThat(vm.uiState.value.permissionRequired).isTrue()
 
             // Simulate the user granting access in settings, then returning (onResume).
             access.granted = true
-            viewModel.refresh()
+            vm.refresh()
             advanceUntilIdle()
 
-            val state = viewModel.uiState.value
+            val state = vm.uiState.value
             assertThat(state.permissionRequired).isFalse()
             assertThat(state.categoryCounts).containsExactlyEntriesIn(counts)
+        }
+
+    @Test
+    fun `persisted favorites and recents flow into state without media access`() =
+        runTest(dispatcher) {
+            val favorites = FakeFavorites()
+            favorites.favorites.value = listOf(file("/a/pinned.txt"))
+            favorites.recents.value = listOf(file("/a/opened.txt"))
+
+            val vm = viewModel(FakeRepository(Result.Success(emptyMap())), FakeAccess(granted = false), favorites)
+            advanceUntilIdle()
+
+            val state = vm.uiState.value
+            assertThat(state.permissionRequired).isTrue()
+            assertThat(state.favorites.map { it.path }).containsExactly("/a/pinned.txt")
+            assertThat(state.recents.map { it.path }).containsExactly("/a/opened.txt")
+        }
+
+    @Test
+    fun `favorites updates re-emit into state`() =
+        runTest(dispatcher) {
+            val favorites = FakeFavorites()
+            val vm = viewModel(FakeRepository(Result.Success(emptyMap())), FakeAccess(true), favorites)
+            advanceUntilIdle()
+            assertThat(vm.uiState.value.favorites).isEmpty()
+
+            favorites.addFavorite(file("/b/star.txt"))
+            advanceUntilIdle()
+
+            assertThat(
+                vm.uiState.value.favorites
+                    .map { it.path }
+            ).containsExactly("/b/star.txt")
         }
 }

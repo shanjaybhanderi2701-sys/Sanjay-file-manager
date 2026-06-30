@@ -5,23 +5,31 @@ import androidx.lifecycle.viewModelScope
 import com.appblish.filora.core.common.result.Result
 import com.appblish.filora.core.domain.repository.MediaAccess
 import com.appblish.filora.core.domain.repository.MediaRepository
+import com.appblish.filora.core.domain.usecase.ObserveFavoritesUseCase
+import com.appblish.filora.core.domain.usecase.ObserveRecentsUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 /**
- * Home dashboard ViewModel (M4 T4.6). Loads the per-category counts that back the
- * Home media section, gated on [MediaAccess]: without read access it publishes a
- * permission-required state instead of querying MediaStore (which would otherwise
- * surface as a generic error). [refresh] is idempotent and re-run from `onResume`
- * so a grant the user toggled in system settings is reflected the moment they
- * return.
+ * Home dashboard ViewModel (M4 T4.6, extended in M6 T6.2). Loads the per-category
+ * counts that back the Home media section, gated on [MediaAccess]: without read
+ * access it publishes a permission-required state instead of querying MediaStore
+ * (which would otherwise surface as a generic error). [refresh] is idempotent and
+ * re-run from `onResume` so a grant the user toggled in system settings is reflected
+ * the moment they return.
  *
- * Volumes, favorites and recents stay empty here; they land with M6.
+ * Favorites (FR-9.1) and recents (FR-9.2) are persisted in Room and observed
+ * independently of the media permission, so the user's pins and recently-opened
+ * entries show even before media access is granted. The two streams update their
+ * own slice of [HomeUiState] as the user pins/unpins or opens files. Volumes stay
+ * empty here; they have their own screen (T6.3).
  */
 @HiltViewModel
 class HomeViewModel
@@ -29,12 +37,20 @@ class HomeViewModel
     constructor(
         private val mediaRepository: MediaRepository,
         private val mediaAccess: MediaAccess,
+        observeFavorites: ObserveFavoritesUseCase,
+        observeRecents: ObserveRecentsUseCase,
     ) : ViewModel() {
         private val _uiState = MutableStateFlow(HomeUiState())
         val uiState: StateFlow<HomeUiState> = _uiState.asStateFlow()
 
         init {
             refresh()
+            observeFavorites()
+                .onEach { favorites -> _uiState.update { it.copy(favorites = favorites) } }
+                .launchIn(viewModelScope)
+            observeRecents()
+                .onEach { recents -> _uiState.update { it.copy(recents = recents) } }
+                .launchIn(viewModelScope)
         }
 
         /** Reloads category counts; safe to call repeatedly (init + every onResume). */
@@ -45,14 +61,14 @@ class HomeViewModel
                         isLoading = false,
                         permissionRequired = true,
                         categoryCounts = emptyMap(),
-                        errorMessage = null,
+                        errorMessageRes = null,
                     )
                 }
                 return
             }
 
             _uiState.update {
-                it.copy(isLoading = true, permissionRequired = false, errorMessage = null)
+                it.copy(isLoading = true, permissionRequired = false, errorMessageRes = null)
             }
             viewModelScope.launch {
                 when (val result = mediaRepository.categoryCounts()) {
@@ -62,7 +78,7 @@ class HomeViewModel
                                 isLoading = false,
                                 permissionRequired = false,
                                 categoryCounts = result.data,
-                                errorMessage = null,
+                                errorMessageRes = null,
                             )
                         }
 
@@ -72,7 +88,7 @@ class HomeViewModel
                                 isLoading = false,
                                 permissionRequired = false,
                                 categoryCounts = emptyMap(),
-                                errorMessage = "Couldn't load your library. Pull to refresh.",
+                                errorMessageRes = R.string.home_error_load,
                             )
                         }
                 }
