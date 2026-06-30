@@ -5,6 +5,7 @@ import androidx.work.OneTimeWorkRequest
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkInfo
 import androidx.work.WorkManager
+import com.appblish.filora.core.domain.model.ArchiveProgress
 import com.appblish.filora.core.domain.model.ConflictStrategy
 import com.appblish.filora.core.domain.model.FileOperationKind
 import com.appblish.filora.core.domain.model.OperationProgress
@@ -84,6 +85,37 @@ class OperationScheduler
             return operationId
         }
 
+        /**
+         * Enqueues a background ZIP compression of [sources] into a new archive at
+         * [destinationArchivePath] (FR-7.1) and returns the operation id to observe
+         * with [compressProgress] / cancel with [cancel]. The destination is the
+         * SAF create-document location chosen by the UI; the compress worker is
+         * self-contained, so tree-walk, entry naming and partial-output cleanup all
+         * live in its [com.appblish.filora.core.data.archive.ZipCompressor].
+         */
+        fun enqueueCompress(
+            sources: List<String>,
+            destinationArchivePath: String,
+        ): String {
+            val operationId = idGenerator.newId()
+            val input = ArchiveCompressWorkData.encodeInput(
+                ArchiveCompressArgs(sources, destinationArchivePath),
+            )
+            val request = OneTimeWorkRequestBuilder<ArchiveCompressWorker>()
+            request
+                .setInputData(input)
+                .addTag(TAG_COMPRESS)
+            workManager.enqueueUniqueWork(operationId, ExistingWorkPolicy.REPLACE, request.build())
+            return operationId
+        }
+
+        /** Live compression progress for [operationId]; completes once the work terminates. */
+        fun compressProgress(operationId: String): Flow<ArchiveProgress> =
+            workManager.getWorkInfosForUniqueWorkFlow(operationId).map { infos ->
+                val info = infos.firstOrNull() ?: return@map ArchiveProgress.Pending
+                toArchiveProgress(info)
+            }
+
         /** Live progress for [operationId]; completes naturally once the work terminates. */
         fun progress(operationId: String): Flow<OperationProgress> =
             workManager.getWorkInfosForUniqueWorkFlow(operationId).map { infos ->
@@ -126,9 +158,20 @@ class OperationScheduler
             }
         }
 
+        private fun toArchiveProgress(info: WorkInfo): ArchiveProgress =
+            when (info.state) {
+                WorkInfo.State.ENQUEUED, WorkInfo.State.BLOCKED -> ArchiveProgress.Pending
+                WorkInfo.State.RUNNING -> ArchiveCompressWorkData.decodeProgress(info.progress)
+                WorkInfo.State.SUCCEEDED -> ArchiveCompressWorkData.decodeSuccess(info.outputData)
+                WorkInfo.State.CANCELLED -> ArchiveProgress.Cancelled
+                WorkInfo.State.FAILED ->
+                    ArchiveProgress.Failed(ArchiveCompressWorkData.decodeError(info.outputData))
+            }
+
         private companion object {
             const val TAG_PREFIX = "filora.op.kind:"
             const val TAG_EXTRACT = "filora.op.extract"
+            const val TAG_COMPRESS = "filora.op.compress"
 
             fun kindTag(kind: FileOperationKind): String = TAG_PREFIX + kind.name
 
