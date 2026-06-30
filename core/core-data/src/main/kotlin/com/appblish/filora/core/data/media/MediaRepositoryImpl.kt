@@ -10,8 +10,9 @@ import com.appblish.filora.core.domain.model.MediaCategory
 import com.appblish.filora.core.domain.repository.MediaRepository
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
@@ -24,6 +25,12 @@ import javax.inject.Inject
  * [categoryCounts] returns a dense map — every [MediaCategory] is present, with a
  * zero for categories that have no items — so Home tiles can render without
  * null-handling.
+ *
+ * [observeCategory] is a live view: it reads once on collection and then re-queries
+ * each time [MediaStoreSource.changes] signals the collection changed (FR-6.1).
+ * A revoked media permission surfaces as [OperationError.PermissionDenied] rather
+ * than a generic [OperationError.Io], so the UI can route the user back to the
+ * permission flow instead of showing a plain error.
  */
 class MediaRepositoryImpl
     @Inject
@@ -32,17 +39,18 @@ class MediaRepositoryImpl
         @IoDispatcher private val ioDispatcher: CoroutineDispatcher,
     ) : MediaRepository {
         override fun observeCategory(category: MediaCategory): Flow<Result<List<FileItem>>> =
-            flow {
-                emit(
-                    runCatchingResult({ OperationError.Io(it) }) {
+            source
+                .changes()
+                .onStart { emit(Unit) }
+                .map {
+                    runCatchingResult(::toOperationError) {
                         source.entriesIn(category).map { it.toFileItem() }
-                    },
-                )
-            }.flowOn(ioDispatcher)
+                    }
+                }.flowOn(ioDispatcher)
 
         override suspend fun categoryCounts(): Result<Map<MediaCategory, Int>> =
             withContext(ioDispatcher) {
-                runCatchingResult({ OperationError.Io(it) }) {
+                runCatchingResult(::toOperationError) {
                     val counts = source.countByCategory()
                     MediaCategory.entries.associateWith { counts[it] ?: 0 }
                 }
@@ -50,10 +58,21 @@ class MediaRepositoryImpl
 
         override suspend fun categorySizes(): Result<Map<MediaCategory, Long>> =
             withContext(ioDispatcher) {
-                runCatchingResult({ OperationError.Io(it) }) {
+                runCatchingResult(::toOperationError) {
                     val sizes = source.sizeByCategory()
                     MediaCategory.entries.associateWith { sizes[it] ?: 0L }
                 }
+            }
+
+        /**
+         * A revoked read-media permission throws [SecurityException] from the
+         * resolver; map it to [OperationError.PermissionDenied] so callers can
+         * re-prompt. Everything else is opaque platform I/O.
+         */
+        private fun toOperationError(t: Throwable): OperationError =
+            when (t) {
+                is SecurityException -> OperationError.PermissionDenied(t)
+                else -> OperationError.Io(t)
             }
     }
 

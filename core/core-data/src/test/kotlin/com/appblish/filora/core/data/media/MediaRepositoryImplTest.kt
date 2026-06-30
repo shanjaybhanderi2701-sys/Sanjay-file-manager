@@ -5,6 +5,8 @@ import com.appblish.filora.core.common.result.OperationError
 import com.appblish.filora.core.common.result.Result
 import com.appblish.filora.core.domain.model.MediaCategory
 import com.google.common.truth.Truth.assertThat
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.runTest
 import org.junit.Test
@@ -166,5 +168,86 @@ class MediaRepositoryImplTest {
                 assertThat((result as Result.Error).error).isInstanceOf(OperationError.Io::class.java)
                 awaitComplete()
             }
+        }
+
+    @Test
+    fun `observeCategory re-queries and re-emits each time the source signals a change`() =
+        runTest(dispatcher) {
+            // entriesIn flips its result after the first read so the two emissions differ.
+            val changes = MutableSharedFlow<Unit>()
+            var reads = 0
+            val source =
+                object : MediaStoreSource {
+                    override fun countByCategory() = emptyMap<MediaCategory, Int>()
+
+                    override fun sizeByCategory() = emptyMap<MediaCategory, Long>()
+
+                    override fun entriesIn(category: MediaCategory): List<RawMediaEntry> {
+                        reads++
+                        return if (reads == 1) {
+                            listOf(entry("first.jpg", mediaType = MediaClassifier.MEDIA_TYPE_IMAGE))
+                        } else {
+                            listOf(
+                                entry("first.jpg", mediaType = MediaClassifier.MEDIA_TYPE_IMAGE),
+                                entry("second.jpg", mediaType = MediaClassifier.MEDIA_TYPE_IMAGE),
+                            )
+                        }
+                    }
+
+                    override fun changes(): Flow<Unit> = changes
+                }
+
+            repository(source).observeCategory(MediaCategory.Images).test {
+                // Initial read happens on collection (onStart), before any change signal.
+                val first = awaitItem()
+                assertThat((first as Result.Success).data).hasSize(1)
+
+                // A change signal triggers a fresh query and a new emission.
+                changes.emit(Unit)
+                val second = awaitItem()
+                assertThat((second as Result.Success).data).hasSize(2)
+
+                cancelAndIgnoreRemainingEvents()
+            }
+            assertThat(reads).isEqualTo(2)
+        }
+
+    @Test
+    fun `observeCategory maps a revoked permission to PermissionDenied`() =
+        runTest(dispatcher) {
+            val source =
+                object : MediaStoreSource {
+                    override fun countByCategory() = emptyMap<MediaCategory, Int>()
+
+                    override fun sizeByCategory() = emptyMap<MediaCategory, Long>()
+
+                    override fun entriesIn(category: MediaCategory): List<RawMediaEntry> =
+                        throw SecurityException("read-media permission revoked")
+                }
+
+            repository(source).observeCategory(MediaCategory.Images).test {
+                val result = awaitItem()
+                assertThat((result as Result.Error).error).isInstanceOf(OperationError.PermissionDenied::class.java)
+                awaitComplete()
+            }
+        }
+
+    @Test
+    fun `categoryCounts maps a revoked permission to PermissionDenied`() =
+        runTest(dispatcher) {
+            val source =
+                object : MediaStoreSource {
+                    override fun countByCategory(): Map<MediaCategory, Int> =
+                        throw SecurityException("read-media permission revoked")
+
+                    override fun sizeByCategory() = emptyMap<MediaCategory, Long>()
+
+                    override fun entriesIn(category: MediaCategory) = emptyList<RawMediaEntry>()
+                }
+
+            val result = repository(source).categoryCounts()
+
+            assertThat(result).isInstanceOf(Result.Error::class.java)
+            assertThat((result as Result.Error).error).isInstanceOf(OperationError.PermissionDenied::class.java)
         }
 }

@@ -3,11 +3,15 @@ package com.appblish.filora.core.data.media
 import android.content.ContentResolver
 import android.content.ContentUris
 import android.content.Context
+import android.database.ContentObserver
 import android.database.Cursor
 import android.os.Build
 import android.provider.MediaStore
 import com.appblish.filora.core.domain.model.MediaCategory
 import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.callbackFlow
 import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 
@@ -47,6 +51,26 @@ class AndroidMediaStoreSource
             forEachEntry { entry -> if (entry.category == category) entries += entry }
             return entries
         }
+
+        /**
+         * Bridges the platform [ContentObserver] callback into a cold [Flow]. The
+         * observer is registered for the whole external collection (with
+         * descendants) on collection and torn down on cancellation via
+         * [awaitClose], so a category screen leaves no observer behind when it
+         * stops collecting. A null handler delivers callbacks on the resolver's
+         * worker thread, which is fine since we only signal.
+         */
+        override fun changes(): Flow<Unit> =
+            callbackFlow {
+                val observer =
+                    object : ContentObserver(null) {
+                        override fun onChange(selfChange: Boolean) {
+                            trySend(Unit)
+                        }
+                    }
+                contentResolver.registerContentObserver(COLLECTION, true, observer)
+                awaitClose { contentResolver.unregisterContentObserver(observer) }
+            }
 
         private inline fun forEachEntry(action: (RawMediaEntry) -> Unit) {
             contentResolver
