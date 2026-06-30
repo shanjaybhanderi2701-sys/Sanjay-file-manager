@@ -48,8 +48,7 @@ android {
     // CI) the release build falls back to the auto-generated debug keystore below,
     // so `assembleStandardRelease` / `bundleStandardRelease` still produce an
     // installable, minified artifact for the NFR-9.1 size check.
-    fun prop(name: String): String? =
-        providers.gradleProperty(name).orNull ?: System.getenv(name)
+    fun prop(name: String): String? = providers.gradleProperty(name).orNull ?: System.getenv(name)
 
     val releaseStoreFile = prop("FILORA_RELEASE_STORE_FILE")
     val hasReleaseKeystore = releaseStoreFile != null && file(releaseStoreFile).exists()
@@ -151,7 +150,10 @@ tasks.register("verifyStandardReleaseSizeBudget") {
     description = "Fails the build if the standard release APK exceeds the NFR-9.1 12 MB budget."
     dependsOn("assembleStandardRelease")
     doLast {
-        val apkDir = layout.buildDirectory.dir("outputs/apk/standard/release").get().asFile
+        val apkDir = layout.buildDirectory
+            .dir("outputs/apk/standard/release")
+            .get()
+            .asFile
         val apks = apkDir.listFiles { file -> file.extension == "apk" }?.toList().orEmpty()
         check(apks.isNotEmpty()) { "No release APK found in $apkDir — did assembleStandardRelease run?" }
         val apk = apks.maxByOrNull { it.length() }!!

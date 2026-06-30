@@ -55,7 +55,7 @@ internal object OperationWorkData {
         } else {
             base[KEY_SOURCES_REF] = args.sourcesRefKey
         }
-        return workDataOf(*base.entries.map { it.key to it.value }.toTypedArray())
+        return Data.Builder().putAll(base).build()
     }
 
     /**

@@ -6,7 +6,10 @@ import com.appblish.filora.core.domain.model.FileOperationKind
 import com.appblish.filora.core.domain.model.OperationProgress
 
 internal object OperationNotificationText {
-    fun title(context: Context, kind: FileOperationKind): String =
+    fun title(
+        context: Context,
+        kind: FileOperationKind
+    ): String =
         when (kind) {
             FileOperationKind.Copy -> context.getString(R.string.ops_title_copy)
             FileOperationKind.Move -> context.getString(R.string.ops_title_move)
@@ -14,13 +17,21 @@ internal object OperationNotificationText {
         }
 
     /** One-line status under the title, e.g. `3 of 12 · report.pdf`. */
-    fun status(context: Context, progress: OperationProgress): String =
+    fun status(
+        context: Context,
+        progress: OperationProgress
+    ): String =
         when (progress) {
             is OperationProgress.Pending -> context.getString(R.string.ops_status_pending)
             is OperationProgress.Running -> {
                 val index = progress.itemIndex + 1
                 if (progress.currentName.isNotBlank()) {
-                    context.getString(R.string.ops_status_progress_named, index, progress.itemCount, progress.currentName)
+                    context.getString(
+                        R.string.ops_status_progress_named,
+                        index,
+                        progress.itemCount,
+                        progress.currentName
+                    )
                 } else {
                     context.getString(R.string.ops_status_progress, index, progress.itemCount)
                 }

@@ -22,20 +22,20 @@ import org.junit.runner.RunWith
  */
 @RunWith(AndroidJUnit4::class)
 class BaselineProfileGenerator {
-
     @get:Rule
     val baselineProfileRule = BaselineProfileRule()
 
     @Test
-    fun generate() = baselineProfileRule.collect(
-        packageName = PACKAGE_NAME,
-        // Stable, since the home screen content is data-dependent across devices.
-        includeInStartupProfile = true,
-    ) {
-        pressHome()
-        startActivityAndWait()
-        // TODO(T6.5): once home/browse/search are wired, drive the critical journey here, e.g.
-        //   device.findObject(By.res(packageName, "home_hub_grid"))?.fling(Direction.DOWN)
-        //   device.waitForIdle()
-    }
+    fun generate() =
+        baselineProfileRule.collect(
+            packageName = PACKAGE_NAME,
+            // Stable, since the home screen content is data-dependent across devices.
+            includeInStartupProfile = true,
+        ) {
+            pressHome()
+            startActivityAndWait()
+            // TODO(T6.5): once home/browse/search are wired, drive the critical journey here, e.g.
+            //   device.findObject(By.res(packageName, "home_hub_grid"))?.fling(Direction.DOWN)
+            //   device.waitForIdle()
+        }
 }

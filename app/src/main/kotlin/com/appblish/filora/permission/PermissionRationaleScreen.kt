@@ -82,6 +82,28 @@ fun PermissionRationaleScreen(
             }
         }
 
+    PermissionRationaleContent(
+        denied = denied,
+        onGrantMediaAccess = {
+            launcher.launch(StoragePermissions.requiredReadPermissions().toTypedArray())
+        },
+        // Launch the system document-tree picker; `null` opens at the picker's default root.
+        onContinueWithLimitedAccess = { treePicker.launch(null) },
+        modifier = modifier,
+    )
+}
+
+/**
+ * Stateless permission-gate UI. Hoisting the launchers and [denied] state into
+ * [PermissionRationaleScreen] keeps this body small and previewable.
+ */
+@Composable
+private fun PermissionRationaleContent(
+    denied: Boolean,
+    onGrantMediaAccess: () -> Unit,
+    onContinueWithLimitedAccess: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
     Scaffold(modifier = modifier) { padding ->
         Column(
             modifier =
@@ -124,11 +146,7 @@ fun PermissionRationaleScreen(
 
             if (!denied) {
                 Button(
-                    onClick = {
-                        launcher.launch(
-                            StoragePermissions.requiredReadPermissions().toTypedArray(),
-                        )
-                    },
+                    onClick = onGrantMediaAccess,
                     modifier =
                         Modifier
                             .fillMaxWidth()
@@ -139,9 +157,7 @@ fun PermissionRationaleScreen(
             }
 
             TextButton(
-                // Launch the system document-tree picker; `null` opens at the
-                // picker's default root.
-                onClick = { treePicker.launch(null) },
+                onClick = onContinueWithLimitedAccess,
                 modifier =
                     Modifier
                         .fillMaxWidth()

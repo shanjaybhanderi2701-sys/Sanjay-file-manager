@@ -26,7 +26,6 @@ import org.junit.runner.RunWith
  */
 @RunWith(AndroidJUnit4::class)
 class StartupBenchmark {
-
     @get:Rule
     val benchmarkRule = MacrobenchmarkRule()
 
@@ -34,17 +33,17 @@ class StartupBenchmark {
     fun startupNoCompilation() = startup(CompilationMode.None())
 
     @Test
-    fun startupBaselineProfile() =
-        startup(CompilationMode.Partial(baselineProfileMode = BaselineProfileMode.Require))
+    fun startupBaselineProfile() = startup(CompilationMode.Partial(baselineProfileMode = BaselineProfileMode.Require))
 
-    private fun startup(compilationMode: CompilationMode) = benchmarkRule.measureRepeated(
-        packageName = PACKAGE_NAME,
-        metrics = listOf(StartupTimingMetric()),
-        iterations = 10,
-        startupMode = StartupMode.COLD,
-        compilationMode = compilationMode,
-    ) {
-        pressHome()
-        startActivityAndWait()
-    }
+    private fun startup(compilationMode: CompilationMode) =
+        benchmarkRule.measureRepeated(
+            packageName = PACKAGE_NAME,
+            metrics = listOf(StartupTimingMetric()),
+            iterations = 10,
+            startupMode = StartupMode.COLD,
+            compilationMode = compilationMode,
+        ) {
+            pressHome()
+            startActivityAndWait()
+        }
 }

@@ -18,7 +18,6 @@ import dagger.hilt.EntryPoint
 import dagger.hilt.InstallIn
 import dagger.hilt.android.EntryPointAccessors
 import dagger.hilt.components.SingletonComponent
-import kotlinx.coroutines.CancellationException
 import java.util.Optional
 import androidx.work.ListenableWorker.Result as WorkerResult
 import com.appblish.filora.core.common.result.Result as OpResult
@@ -97,11 +96,11 @@ internal abstract class FileOperationWorker(
                 FileOperationKind.Move ->
                     runTransfer(args, repository, MoveUseCase(CopyUseCase(repository), repository)::invoke)
             }
-        } catch (cancellation: CancellationException) {
-            // Cooperative cancel (user pressed cancel / WorkManager stopped us). Let
-            // WorkManager record the cancelled state; do not swallow it as success.
-            throw cancellation
         } finally {
+            // No catch here is intentional: a cooperative cancel (user pressed cancel /
+            // WorkManager stopped us) must propagate as CancellationException so WorkManager
+            // records the cancelled state instead of swallowing it as success. The cleanup
+            // below still runs on both the success and cancellation paths.
             args.sourcesRefKey?.let { store.remove(it) }
         }
     }
