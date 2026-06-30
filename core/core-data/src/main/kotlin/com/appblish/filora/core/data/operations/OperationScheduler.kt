@@ -60,6 +60,30 @@ class OperationScheduler
             return operationId
         }
 
+        /**
+         * Enqueues a background ZIP extraction of [archivePath] into
+         * [destinationDir] with the given [conflictStrategy] (FR-7.2) and returns
+         * the operation id to cancel with [cancel]. The extract worker is
+         * self-contained, so no source list is stashed and nested-path/zip-slip
+         * handling lives entirely in the worker's [ZipExtractor].
+         */
+        fun enqueueExtract(
+            archivePath: String,
+            destinationDir: String,
+            conflictStrategy: ConflictStrategy = ConflictStrategy.KeepBoth,
+        ): String {
+            val operationId = idGenerator.newId()
+            val input = ArchiveExtractWorkData.encodeInput(
+                ArchiveExtractArgs(archivePath, destinationDir, conflictStrategy),
+            )
+            val request = OneTimeWorkRequestBuilder<ArchiveExtractWorker>()
+            request
+                .setInputData(input)
+                .addTag(TAG_EXTRACT)
+            workManager.enqueueUniqueWork(operationId, ExistingWorkPolicy.REPLACE, request.build())
+            return operationId
+        }
+
         /** Live progress for [operationId]; completes naturally once the work terminates. */
         fun progress(operationId: String): Flow<OperationProgress> =
             workManager.getWorkInfosForUniqueWorkFlow(operationId).map { infos ->
@@ -104,6 +128,7 @@ class OperationScheduler
 
         private companion object {
             const val TAG_PREFIX = "filora.op.kind:"
+            const val TAG_EXTRACT = "filora.op.extract"
 
             fun kindTag(kind: FileOperationKind): String = TAG_PREFIX + kind.name
 
