@@ -1,8 +1,8 @@
 package com.appblish.filora.core.common.dispatcher
 
 import com.google.common.truth.Truth.assertThat
-import javax.inject.Qualifier
 import org.junit.Test
+import javax.inject.Qualifier
 
 class DispatchersTest {
     @Test
@@ -25,7 +25,6 @@ class DispatchersTest {
                 FiloraDispatcher.Io,
                 FiloraDispatcher.Default,
                 FiloraDispatcher.Main,
-            )
-            .inOrder()
+            ).inOrder()
     }
 }

@@ -41,7 +41,8 @@ class ResultTest {
 
     @Test
     fun `fold runs onError branch for Error`() {
-        val folded = OperationError.PermissionDenied()
+        val folded = OperationError
+            .PermissionDenied()
             .asError()
             .fold(onSuccess = { "ok" }, onError = { "err:${it::class.simpleName}" })
         assertThat(folded).isEqualTo("err:PermissionDenied")
