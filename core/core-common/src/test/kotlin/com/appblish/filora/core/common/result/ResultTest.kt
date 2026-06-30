@@ -50,7 +50,8 @@ class ResultTest {
     @Test
     fun `getOrNull returns data for Success and null for Error`() {
         assertThat("v".asSuccess().getOrNull()).isEqualTo("v")
-        assertThat(OperationError.Unknown().asError().getOrNull()).isNull()
+        val errored: Result<String> = OperationError.Unknown().asError()
+        assertThat(errored.getOrNull()).isNull()
     }
 
     @Test
