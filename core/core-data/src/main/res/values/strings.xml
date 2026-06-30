@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- File-operations notification channel (NFR-7) -->
+    <string name="ops_channel_name">File operations</string>
+    <string name="ops_channel_description">Progress for copy, move and delete operations running in the background.</string>
+
+    <!-- Operation notification titles -->
+    <string name="ops_title_copy">Copying files</string>
+    <string name="ops_title_move">Moving files</string>
+    <string name="ops_title_delete">Deleting files</string>
+
+    <!-- Operation notification status lines -->
+    <string name="ops_status_pending">Preparing…</string>
+    <string name="ops_status_progress">%1$d of %2$d</string>
+    <string name="ops_status_progress_named">%1$d of %2$d · %3$s</string>
+    <string name="ops_status_succeeded_one">Completed 1 item</string>
+    <string name="ops_status_succeeded_many">Completed %1$d items</string>
+    <string name="ops_status_failed">Couldn\'t complete the operation</string>
+    <string name="ops_status_cancelled">Cancelled</string>
+
+    <!-- Archive compress / extract notification titles -->
+    <string name="ops_title_compress">Compressing archive</string>
+    <string name="ops_title_extract">Extracting archive</string>
+</resources>

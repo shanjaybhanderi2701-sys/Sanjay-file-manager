@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Arabic (RTL) strings — scaffold for RTL layout verification (NFR-7).
+  Replace placeholder text with certified translations before release.
+-->
+<resources>
+    <string name="settings_section_appearance">المظهر</string>
+    <string name="settings_section_files">الملفات</string>
+
+    <string name="settings_theme">السمة</string>
+    <string name="settings_dynamic_color">الألوان الديناميكية</string>
+    <string name="settings_dynamic_color_desc_supported">استخدم الألوان من خلفية شاشتك (Material You).</string>
+    <string name="settings_dynamic_color_desc_unsupported">يتطلب Android 12 أو أحدث.</string>
+
+    <string name="settings_show_hidden">عرض الملفات المخفية</string>
+    <string name="settings_show_hidden_desc">عرض الملفات والمجلدات التي تبدأ بنقطة.</string>
+    <string name="settings_default_view">العرض الافتراضي</string>
+    <string name="settings_sort_by">الترتيب حسب</string>
+    <string name="settings_ascending_order">الترتيب التصاعدي</string>
+    <string name="settings_ascending_order_desc">الأصغر / أ→ي / الأقدم أولاً.</string>
+    <string name="settings_folders_first">المجلدات أولاً</string>
+    <string name="settings_folders_first_desc">تجميع المجلدات قبل الملفات.</string>
+
+    <string name="settings_theme_system">النظام</string>
+    <string name="settings_theme_light">فاتح</string>
+    <string name="settings_theme_dark">داكن</string>
+
+    <string name="settings_sortby_name">الاسم</string>
+    <string name="settings_sortby_size">الحجم</string>
+    <string name="settings_sortby_date">التاريخ</string>
+    <string name="settings_sortby_type">النوع</string>
+</resources>

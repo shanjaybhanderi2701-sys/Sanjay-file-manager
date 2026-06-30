@@ -1,22 +1,51 @@
 package com.appblish.filora.core.data.operations
 
+import android.content.Context
 import com.appblish.filora.core.common.result.OperationError
+import com.appblish.filora.core.data.R
 import com.appblish.filora.core.domain.model.FileOperationKind
 import com.appblish.filora.core.domain.model.OperationProgress
 import com.google.common.truth.Truth.assertThat
+import io.mockk.every
+import io.mockk.mockk
+import org.junit.Before
 import org.junit.Test
 
 class OperationNotificationTextTest {
+
+    private val context: Context = mockk()
+
+    @Before
+    fun setUp() {
+        every { context.getString(R.string.ops_title_copy) } returns "Copying files"
+        every { context.getString(R.string.ops_title_move) } returns "Moving files"
+        every { context.getString(R.string.ops_title_delete) } returns "Deleting files"
+        every { context.getString(R.string.ops_status_pending) } returns "Preparing…"
+        every { context.getString(R.string.ops_status_progress, any(), any()) } answers {
+            "${args[1]} of ${args[2]}"
+        }
+        every { context.getString(R.string.ops_status_progress_named, any(), any(), any()) } answers {
+            "${args[1]} of ${args[2]} · ${args[3]}"
+        }
+        every { context.getString(R.string.ops_status_succeeded_one) } returns "Completed 1 item"
+        every { context.getString(R.string.ops_status_succeeded_many, any()) } answers {
+            "Completed ${args[1]} items"
+        }
+        every { context.getString(R.string.ops_status_failed) } returns "Couldn't complete the operation"
+        every { context.getString(R.string.ops_status_cancelled) } returns "Cancelled"
+    }
+
     @Test
     fun `title reflects the operation kind`() {
-        assertThat(OperationNotificationText.title(FileOperationKind.Copy)).isEqualTo("Copying files")
-        assertThat(OperationNotificationText.title(FileOperationKind.Move)).isEqualTo("Moving files")
-        assertThat(OperationNotificationText.title(FileOperationKind.Delete)).isEqualTo("Deleting files")
+        assertThat(OperationNotificationText.title(context, FileOperationKind.Copy)).isEqualTo("Copying files")
+        assertThat(OperationNotificationText.title(context, FileOperationKind.Move)).isEqualTo("Moving files")
+        assertThat(OperationNotificationText.title(context, FileOperationKind.Delete)).isEqualTo("Deleting files")
     }
 
     @Test
     fun `running status shows one-based position and current name`() {
         val status = OperationNotificationText.status(
+            context,
             OperationProgress.Running(
                 kind = FileOperationKind.Copy,
                 itemIndex = 2,
@@ -31,6 +60,7 @@ class OperationNotificationTextTest {
     @Test
     fun `running status omits the separator when the name is blank`() {
         val status = OperationNotificationText.status(
+            context,
             OperationProgress.Running(
                 kind = FileOperationKind.Delete,
                 itemIndex = 0,
@@ -45,10 +75,10 @@ class OperationNotificationTextTest {
     @Test
     fun `succeeded status pluralises the item count`() {
         assertThat(
-            OperationNotificationText.status(OperationProgress.Succeeded(FileOperationKind.Copy, 1)),
+            OperationNotificationText.status(context, OperationProgress.Succeeded(FileOperationKind.Copy, 1)),
         ).isEqualTo("Completed 1 item")
         assertThat(
-            OperationNotificationText.status(OperationProgress.Succeeded(FileOperationKind.Copy, 4)),
+            OperationNotificationText.status(context, OperationProgress.Succeeded(FileOperationKind.Copy, 4)),
         ).isEqualTo("Completed 4 items")
     }
 
@@ -56,11 +86,12 @@ class OperationNotificationTextTest {
     fun `failed and cancelled have terminal copy`() {
         assertThat(
             OperationNotificationText.status(
+                context,
                 OperationProgress.Failed(FileOperationKind.Move, OperationError.Io()),
             ),
         ).isEqualTo("Couldn't complete the operation")
         assertThat(
-            OperationNotificationText.status(OperationProgress.Cancelled(FileOperationKind.Move)),
+            OperationNotificationText.status(context, OperationProgress.Cancelled(FileOperationKind.Move)),
         ).isEqualTo("Cancelled")
     }
 

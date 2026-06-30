@@ -6,6 +6,7 @@ import android.content.pm.ServiceInfo
 import android.os.Build
 import androidx.core.app.NotificationCompat
 import androidx.work.ForegroundInfo
+import com.appblish.filora.core.data.R
 
 /**
  * Foreground notification for the ZIP compress worker (FR-7.1). Reuses the shared
@@ -46,7 +47,7 @@ internal class ArchiveCompressNotifier(
         val builder = NotificationCompat
             .Builder(context, OperationNotifier.CHANNEL_ID)
             .setSmallIcon(android.R.drawable.stat_sys_upload)
-            .setContentTitle("Compressing archive")
+            .setContentTitle(context.getString(R.string.ops_title_compress))
             .setOngoing(true)
             .setOnlyAlertOnce(true)
             .setPriority(NotificationCompat.PRIORITY_LOW)

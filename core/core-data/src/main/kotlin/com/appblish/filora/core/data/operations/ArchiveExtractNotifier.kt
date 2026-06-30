@@ -6,6 +6,7 @@ import android.content.pm.ServiceInfo
 import android.os.Build
 import androidx.core.app.NotificationCompat
 import androidx.work.ForegroundInfo
+import com.appblish.filora.core.data.R
 
 /**
  * Foreground notification for the ZIP extract worker (FR-7.2). Reuses the shared
@@ -33,7 +34,7 @@ internal class ArchiveExtractNotifier(
         NotificationCompat
             .Builder(context, OperationNotifier.CHANNEL_ID)
             .setSmallIcon(android.R.drawable.stat_sys_download)
-            .setContentTitle("Extracting archive")
+            .setContentTitle(context.getString(R.string.ops_title_extract))
             .setOngoing(true)
             .setOnlyAlertOnce(true)
             .setPriority(NotificationCompat.PRIORITY_LOW)

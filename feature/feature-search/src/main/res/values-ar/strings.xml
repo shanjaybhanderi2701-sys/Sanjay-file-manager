@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Arabic (RTL) strings — scaffold for RTL layout verification (NFR-7).
+  Replace placeholder text with certified translations before release.
+-->
+<resources>
+    <string name="search_hint">ابحث في الملفات</string>
+    <string name="search_remove_filter">إزالة مرشح %1$s</string>
+    <string name="search_empty_title">لا توجد نتائج</string>
+    <string name="search_empty_body">جرّب اسمًا مختلفًا أو امسح بعض المرشحات.</string>
+
+    <string name="search_size_small">أقل من 1 ميغابايت</string>
+    <string name="search_size_medium">1–100 ميغابايت</string>
+    <string name="search_size_large">أكثر من 100 ميغابايت</string>
+
+    <string name="search_date_today">اليوم</string>
+    <string name="search_date_week">آخر 7 أيام</string>
+    <string name="search_date_month">آخر 30 يومًا</string>
+    <string name="search_date_year">السنة الماضية</string>
+
+    <string name="search_type_images">الصور</string>
+    <string name="search_type_video">الفيديو</string>
+    <string name="search_type_audio">الصوت</string>
+    <string name="search_type_docs">المستندات</string>
+    <string name="search_type_archives">الأرشيفات</string>
+    <string name="search_type_apks">تطبيقات APK</string>
+</resources>

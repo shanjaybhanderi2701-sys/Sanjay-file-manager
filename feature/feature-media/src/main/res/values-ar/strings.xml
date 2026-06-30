@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Arabic (RTL) strings — scaffold for RTL layout verification (NFR-7).
+  Replace placeholder text with certified translations before release.
+-->
+<resources>
+    <string name="media_hub_images">الصور</string>
+    <string name="media_hub_video">الفيديو</string>
+    <string name="media_hub_audio">الصوت</string>
+    <string name="media_hub_docs">المستندات</string>
+    <string name="media_hub_downloads">التنزيلات</string>
+    <string name="media_hub_apks">تطبيقات APK</string>
+    <string name="media_hub_archives">الأرشيفات</string>
+
+    <string name="media_caption_empty">فارغ</string>
+    <plurals name="media_item_count">
+        <item quantity="one">%d عنصر</item>
+        <item quantity="other">%d عناصر</item>
+    </plurals>
+
+    <string name="media_empty_title">لا يوجد شيء هنا بعد</string>
+    <string name="media_empty_body">ستظهر الملفات في هذه الفئة هنا.</string>
+    <string name="media_open_failed">لا يوجد تطبيق يمكنه فتح هذا الملف</string>
+    <string name="media_open_with">فتح باستخدام</string>
+    <string name="media_type_file">ملف</string>
+
+    <string name="media_share_with">مشاركة عبر</string>
+    <string name="media_share">مشاركة</string>
+    <string name="media_share_failed">تعذّر مشاركة هذا العنصر</string>
+
+    <string name="media_error_permission">امنح وصول التخزين لعرض وسائطك.</string>
+    <string name="media_error_load">تعذّر تحميل الفئات. اسحب للتحديث.</string>
+
+    <string name="media_detail_error_permission">امنح وصول التخزين لعرض هذه الملفات.</string>
+    <string name="media_detail_error_load">تعذّر تحميل هذه الفئة. اسحب للتحديث.</string>
+</resources>

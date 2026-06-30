@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Arabic (RTL) strings — scaffold for RTL layout verification (NFR-7).
+  Replace placeholder text with certified translations before release.
+-->
+<resources>
+    <string name="storage_title">التخزين</string>
+    <string name="storage_empty_title">لا توجد وحدات تخزين</string>
+    <string name="storage_empty_body">تعذّر العثور على أي تخزين مُثبَّت.</string>
+    <string name="storage_usage_summary">%1$s مستخدم · %2$s متاح من أصل %3$s</string>
+
+    <plurals name="storage_item_count">
+        <item quantity="one">%1$d عنصر</item>
+        <item quantity="other">%1$d عناصر</item>
+    </plurals>
+
+    <string name="storage_cat_images">الصور</string>
+    <string name="storage_cat_video">الفيديو</string>
+    <string name="storage_cat_audio">الصوت</string>
+    <string name="storage_cat_documents">المستندات</string>
+    <string name="storage_cat_archives">الأرشيفات</string>
+    <string name="storage_cat_apps">التطبيقات</string>
+    <string name="storage_cat_downloads">التنزيلات</string>
+    <string name="storage_cat_other">أخرى</string>
+
+    <string name="storage_largest_files_title">أكبر الملفات</string>
+    <string name="storage_largest_files_subtitle">ابحث عما يستهلك أكبر مساحة ونظّفه</string>
+
+    <string name="storage_largest_empty_title">لا توجد ملفات كبيرة</string>
+    <string name="storage_largest_empty_body">ستظهر الملفات هنا عند وجود شيء للتنظيف.</string>
+    <string name="storage_file_actions">إجراءات الملف</string>
+    <string name="storage_action_open">فتح</string>
+    <string name="storage_action_share">مشاركة</string>
+    <string name="storage_action_delete">حذف</string>
+    <string name="storage_action_cancel">إلغاء</string>
+    <string name="storage_delete_dialog_title">حذف الملف؟</string>
+    <string name="storage_delete_dialog_body">سيتم حذف «%1$s» (%2$s) نهائيًا.</string>
+
+    <string name="storage_open_no_app">لا يوجد تطبيق يمكنه فتح هذا الملف</string>
+    <string name="storage_share_failed">تعذّر مشاركة هذا الملف</string>
+    <string name="storage_delete_succeeded">تم حذف %1$s</string>
+    <string name="storage_delete_failed">تعذّر حذف %1$s</string>
+    <string name="storage_chooser_open_with">فتح باستخدام</string>
+    <string name="storage_chooser_share">مشاركة</string>
+
+    <string name="storage_error_load">تعذّر قراءة وحدات التخزين.</string>
+    <string name="storage_largest_error_permission">امنح وصول التخزين لفحص ملفاتك.</string>
+    <string name="storage_largest_error_not_found">تعذّر العثور على وحدة تخزين للفحص.</string>
+    <string name="storage_largest_error_generic">تعذّر قراءة ملفاتك. حاول مرة أخرى.</string>
+</resources>

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Arabic (RTL) strings — scaffold for RTL layout verification (NFR-7).
+  Replace placeholder text with certified translations before release.
+-->
+<resources>
+    <string name="app_name">فيلورا</string>
+
+    <string name="permission_title">الوصول إلى ملفاتك</string>
+    <string name="permission_rationale_body">تحتاج فيلورا إلى الوصول إلى صورك ومقاطع الفيديو والصوت والمستندات لعرض فئات الوسائط والسماح لك بتصفح ملفاتك وبحثها وتنظيمها. لا ترفع فيلورا ملفاتك أبدًا — كل شيء يبقى على جهازك.</string>
+    <string name="permission_denied_body">لا بأس. لا يزال بإمكانك تصفح التخزين الذي تختاره بنفسك باستخدام منتقي الملفات بجهازك. امنح وصول الوسائط في أي وقت من الإعدادات لفتح فئات الصور ومقاطع الفيديو والصوت.</string>
+    <string name="permission_grant_button">منح الوصول</string>
+    <string name="permission_limited_button">المتابعة بوصول محدود</string>
+</resources>

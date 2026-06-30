@@ -1,40 +1,38 @@
 package com.appblish.filora.core.data.operations
 
+import android.content.Context
+import com.appblish.filora.core.data.R
 import com.appblish.filora.core.domain.model.FileOperationKind
 import com.appblish.filora.core.domain.model.OperationProgress
 
-/**
- * Pure (Android-free) formatting of the foreground-notification copy for a file
- * operation, split out from [OperationNotifier] so the wording is unit-testable
- * without a `Context`. The strings are intentionally plain English here; once a
- * string-resource catalogue exists these move behind resource ids.
- */
 internal object OperationNotificationText {
-    fun title(kind: FileOperationKind): String =
+    fun title(context: Context, kind: FileOperationKind): String =
         when (kind) {
-            FileOperationKind.Copy -> "Copying files"
-            FileOperationKind.Move -> "Moving files"
-            FileOperationKind.Delete -> "Deleting files"
+            FileOperationKind.Copy -> context.getString(R.string.ops_title_copy)
+            FileOperationKind.Move -> context.getString(R.string.ops_title_move)
+            FileOperationKind.Delete -> context.getString(R.string.ops_title_delete)
         }
 
     /** One-line status under the title, e.g. `3 of 12 · report.pdf`. */
-    fun status(progress: OperationProgress): String =
+    fun status(context: Context, progress: OperationProgress): String =
         when (progress) {
-            is OperationProgress.Pending -> "Preparing…"
-            is OperationProgress.Running -> buildString {
-                append(progress.itemIndex + 1)
-                append(" of ")
-                append(progress.itemCount)
+            is OperationProgress.Pending -> context.getString(R.string.ops_status_pending)
+            is OperationProgress.Running -> {
+                val index = progress.itemIndex + 1
                 if (progress.currentName.isNotBlank()) {
-                    append(" · ")
-                    append(progress.currentName)
+                    context.getString(R.string.ops_status_progress_named, index, progress.itemCount, progress.currentName)
+                } else {
+                    context.getString(R.string.ops_status_progress, index, progress.itemCount)
                 }
             }
             is OperationProgress.Succeeded ->
-                "Completed ${progress.processedCount} item" +
-                    if (progress.processedCount == 1) "" else "s"
-            is OperationProgress.Failed -> "Couldn't complete the operation"
-            is OperationProgress.Cancelled -> "Cancelled"
+                if (progress.processedCount == 1) {
+                    context.getString(R.string.ops_status_succeeded_one)
+                } else {
+                    context.getString(R.string.ops_status_succeeded_many, progress.processedCount)
+                }
+            is OperationProgress.Failed -> context.getString(R.string.ops_status_failed)
+            is OperationProgress.Cancelled -> context.getString(R.string.ops_status_cancelled)
         }
 
     /** Progress as an integer percent in `0..100`, for the notification bar. */

@@ -9,6 +9,7 @@ import android.os.Build
 import androidx.core.app.NotificationCompat
 import androidx.core.content.getSystemService
 import androidx.work.ForegroundInfo
+import com.appblish.filora.core.data.R
 import com.appblish.filora.core.domain.model.FileOperationKind
 import com.appblish.filora.core.domain.model.OperationProgress
 
@@ -32,10 +33,10 @@ internal class OperationNotifier(
         if (mgr.getNotificationChannel(CHANNEL_ID) != null) return
         val channel = NotificationChannel(
             CHANNEL_ID,
-            "File operations",
+            context.getString(R.string.ops_channel_name),
             NotificationManager.IMPORTANCE_LOW,
         ).apply {
-            description = "Progress for copy, move and delete operations running in the background."
+            description = context.getString(R.string.ops_channel_description)
             setShowBadge(false)
         }
         mgr.createNotificationChannel(channel)
@@ -56,8 +57,8 @@ internal class OperationNotifier(
         val builder = NotificationCompat
             .Builder(context, CHANNEL_ID)
             .setSmallIcon(android.R.drawable.stat_sys_download)
-            .setContentTitle(OperationNotificationText.title(kind))
-            .setContentText(OperationNotificationText.status(progress))
+            .setContentTitle(OperationNotificationText.title(context, kind))
+            .setContentText(OperationNotificationText.status(context, progress))
             .setOngoing(progress is OperationProgress.Pending || progress is OperationProgress.Running)
             .setOnlyAlertOnce(true)
             .setPriority(NotificationCompat.PRIORITY_LOW)

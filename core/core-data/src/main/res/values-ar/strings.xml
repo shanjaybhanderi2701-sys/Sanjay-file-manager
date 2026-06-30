@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Arabic (RTL) strings — scaffold for RTL layout verification (NFR-7).
+  Replace placeholder text with certified translations before release.
+-->
+<resources>
+    <string name="ops_channel_name">عمليات الملفات</string>
+    <string name="ops_channel_description">تقدم عمليات النسخ والنقل والحذف التي تعمل في الخلفية.</string>
+
+    <string name="ops_title_copy">نسخ الملفات</string>
+    <string name="ops_title_move">نقل الملفات</string>
+    <string name="ops_title_delete">حذف الملفات</string>
+
+    <string name="ops_status_pending">جارٍ التحضير…</string>
+    <string name="ops_status_progress">%1$d من %2$d</string>
+    <string name="ops_status_progress_named">%1$d من %2$d · %3$s</string>
+    <string name="ops_status_succeeded_one">اكتمل عنصر واحد</string>
+    <string name="ops_status_succeeded_many">اكتملت %1$d عناصر</string>
+    <string name="ops_status_failed">تعذّر إكمال العملية</string>
+    <string name="ops_status_cancelled">ملغاة</string>
+
+    <string name="ops_title_compress">ضغط الأرشيف</string>
+    <string name="ops_title_extract">استخراج الأرشيف</string>
+</resources>

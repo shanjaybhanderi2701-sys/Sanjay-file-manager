@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Arabic (RTL) strings — scaffold for RTL layout verification (NFR-7).
+  Replace placeholder text with certified translations before release.
+-->
+<resources>
+    <string name="browser_title">المتصفح</string>
+    <string name="browser_coming_soon">قريبًا.</string>
+
+    <string name="browser_action_clear_selection">إلغاء التحديد</string>
+    <string name="browser_action_select_all">تحديد الكل</string>
+    <string name="browser_selected_count">%1$d محدد</string>
+
+    <string name="browser_action_move">نقل</string>
+    <string name="browser_action_copy">نسخ</string>
+    <string name="browser_action_delete">حذف</string>
+    <string name="browser_action_share">مشاركة</string>
+    <string name="browser_action_zip">ضغط</string>
+
+    <string name="browser_chooser_open_with">فتح باستخدام</string>
+    <string name="browser_chooser_share">مشاركة</string>
+
+    <string name="browser_dialog_cancel">إلغاء</string>
+    <string name="browser_dialog_new_folder_title">مجلد جديد</string>
+    <string name="browser_dialog_create_confirm">إنشاء</string>
+    <string name="browser_dialog_rename_title">إعادة تسمية</string>
+    <string name="browser_dialog_rename_confirm">إعادة تسمية</string>
+
+    <string name="browser_delete_trash_title">نقل إلى المهملات</string>
+    <string name="browser_delete_trash_confirm">نقل إلى المهملات</string>
+    <string name="browser_delete_trash_folder">نقل هذا المجلد إلى المهملات؟ يمكنك استعادته لاحقًا.</string>
+    <string name="browser_delete_trash_file">نقل هذا الملف إلى المهملات؟ يمكنك استعادته لاحقًا.</string>
+    <plurals name="browser_delete_trash_items">
+        <item quantity="one">نقل %d عنصر إلى المهملات؟ يمكنك استعادته لاحقًا.</item>
+        <item quantity="other">نقل %d عناصر إلى المهملات؟ يمكنك استعادتها لاحقًا.</item>
+    </plurals>
+    <string name="browser_delete_perm_title">حذف نهائي</string>
+    <string name="browser_delete_perm_confirm">حذف</string>
+    <string name="browser_delete_perm_folder">حذف هذا المجلد نهائيًا؟ لا يمكن التراجع عن هذا.</string>
+    <string name="browser_delete_perm_file">حذف هذا الملف نهائيًا؟ لا يمكن التراجع عن هذا.</string>
+    <plurals name="browser_delete_perm_items">
+        <item quantity="one">حذف %d عنصر نهائيًا؟ لا يمكن التراجع عن هذا.</item>
+        <item quantity="other">حذف %d عناصر نهائيًا؟ لا يمكن التراجع عن هذا.</item>
+    </plurals>
+
+    <string name="browser_name_error_blank">أدخل اسمًا</string>
+    <string name="browser_name_error_reserved">«.» و«..» أسماء محجوزة</string>
+    <string name="browser_name_error_too_long">الاسم طويل جدًا (الحد الأقصى 255 حرفًا)</string>
+    <string name="browser_name_error_duplicate">يوجد عنصر بهذا الاسم بالفعل</string>
+    <string name="browser_name_error_illegal_characters">لا يمكن احتواء: %1$s</string>
+</resources>

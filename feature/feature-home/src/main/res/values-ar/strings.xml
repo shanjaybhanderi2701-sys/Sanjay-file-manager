@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Arabic (RTL) strings — scaffold for RTL layout verification (NFR-7).
+  Replace placeholder text with certified translations before release.
+-->
+<resources>
+    <string name="home_title">فيلورا</string>
+    <string name="home_action_settings">الإعدادات</string>
+
+    <string name="home_permission_title">منح وصول التخزين</string>
+    <string name="home_permission_body">تحتاج فيلورا إلى الوصول إلى وسائطك لعرض مكتبتك. قم بتمكينه في الإعدادات ثم ارجع إلى هنا.</string>
+
+    <string name="home_welcome_title">مرحبًا بك في فيلورا</string>
+    <string name="home_welcome_body">ستظهر ملفاتك هنا عند إضافتها.</string>
+
+    <string name="home_error_load">تعذّر تحميل مكتبتك. اسحب للتحديث.</string>
+
+    <string name="home_section_recent">الأخيرة</string>
+    <string name="home_section_favorites">المفضلة</string>
+
+    <string name="home_chip_folder">مجلد</string>
+    <string name="home_chip_file">ملف</string>
+
+    <string name="home_browse_files">تصفح الملفات</string>
+    <string name="home_browse_caption">جميع المجلدات</string>
+
+    <string name="home_caption_empty">فارغ</string>
+
+    <string name="home_cat_images">الصور</string>
+    <string name="home_cat_video">الفيديو</string>
+    <string name="home_cat_audio">الصوت</string>
+    <string name="home_cat_docs">المستندات</string>
+    <string name="home_cat_downloads">التنزيلات</string>
+    <string name="home_cat_apks">تطبيقات APK</string>
+    <string name="home_cat_archives">الأرشيفات</string>
+
+    <plurals name="home_item_count">
+        <item quantity="one">%1$d عنصر</item>
+        <item quantity="other">%1$d عناصر</item>
+    </plurals>
+</resources>
