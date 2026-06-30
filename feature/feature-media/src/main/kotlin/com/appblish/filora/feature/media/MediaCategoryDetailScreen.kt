@@ -17,25 +17,30 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.appblish.filora.core.common.util.FileExtensions
 import com.appblish.filora.core.domain.model.FileItem
 import com.appblish.filora.core.domain.model.MediaCategory
 import com.appblish.filora.core.ui.component.EmptyState
 import com.appblish.filora.core.ui.component.FileRow
+import com.appblish.filora.feature.media.preview.ImagePreviewScreen
 import kotlinx.coroutines.launch
 
 /**
- * Detail list for one media [category] (FR-6.1). Streams the category's entries and,
- * on tap, opens the picked item in the system-associated app via [MediaIntents]; a
- * long-press shares it through the system share sheet (FR-10). When no installed app
- * can handle the action, a snackbar tells the user instead of failing silently.
+ * Detail list for one media [category] (FR-6.1). Streams the category's entries; a
+ * tap on an image opens the in-app zoom/pan [ImagePreviewScreen], while any other
+ * file is handed to the system-associated app via [MediaIntents]. A long-press shares
+ * the item through the system share sheet (FR-10). When no installed app can handle
+ * an action, a snackbar tells the user instead of failing silently.
  */
 @Composable
 fun MediaCategoryDetailScreen(
@@ -47,6 +52,15 @@ fun MediaCategoryDetailScreen(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
+    var previewItem by remember { mutableStateOf<FileItem?>(null) }
+
+    fun openExternally(item: FileItem) {
+        if (!MediaIntents.open(context, item)) {
+            scope.launch {
+                snackbarHostState.showSnackbar(context.getString(R.string.media_open_failed))
+            }
+        }
+    }
 
     LaunchedEffect(category) { viewModel.bind(category) }
 
@@ -57,10 +71,11 @@ fun MediaCategoryDetailScreen(
         MediaCategoryDetailContent(
             uiState = uiState,
             onOpen = { item ->
-                if (!MediaIntents.open(context, item)) {
-                    scope.launch {
-                        snackbarHostState.showSnackbar(context.getString(R.string.media_open_failed))
-                    }
+                // Images preview in-app (zoom/pan); everything else opens externally.
+                if (!item.isDirectory && FileExtensions.isImage(item.name)) {
+                    previewItem = item
+                } else {
+                    openExternally(item)
                 }
             },
             onShare = { item ->
@@ -71,6 +86,17 @@ fun MediaCategoryDetailScreen(
                 }
             },
             modifier = Modifier.padding(padding),
+        )
+    }
+
+    previewItem?.let { item ->
+        ImagePreviewScreen(
+            model = item.path,
+            onClose = { previewItem = null },
+            onOpenExternally = {
+                previewItem = null
+                openExternally(item)
+            },
         )
     }
 }

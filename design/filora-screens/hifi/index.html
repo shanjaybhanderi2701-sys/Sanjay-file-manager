@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Filora — Hi-Fi (Direction A-blend)</title>
+<style>
+  /* ---- Filora tokens (mirror core-ui/theme — light scheme) ---- */
+  :root{
+    --primary:#00696B; --on-primary:#fff;
+    --primary-container:#6FF6F6; --on-primary-container:#002020;
+    --secondary:#4A6360; --secondary-container:#CCE8E4; --on-secondary-container:#051F1D;
+    --tertiary:#3F5A8A; --tertiary-container:#D8E2FF; --on-tertiary-container:#001A41;
+    --error:#BA1A1A; --error-container:#FFDAD6; --on-error-container:#410002;
+    --background:#FAFDFB; --on-background:#191C1B;
+    --surface:#FAFDFB; --on-surface:#191C1B;
+    --surface-variant:#DAE5E2; --on-surface-variant:#3F4947;
+    --outline:#6F7977;
+    /* tonal elevation surfaces */
+    --surf1:#EFF6F3; --surf2:#E9F2EF; --surf3:#E3EEEA;
+    /* spacing */
+    --xs:4px; --sm:8px; --md:12px; --lg:16px; --xl:24px; --xxl:32px;
+    /* shape */
+    --r-sm:8px; --r-md:12px; --r-lg:16px; --r-xl:28px;
+    --font:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:var(--font);background:#0f1413;color:#cfe0db;padding:32px 16px 80px}
+  header.page{max-width:1180px;margin:0 auto 28px}
+  header.page h1{font-size:26px;color:#eafffb;font-weight:600;letter-spacing:-.4px}
+  header.page .sub{color:#8fa6a0;margin-top:6px;font-size:14px;line-height:1.55;max-width:780px}
+  header.page .pill{display:inline-block;background:#0e3a39;color:#6FF6F6;border:1px solid #14504e;
+    padding:3px 10px;border-radius:999px;font-size:12px;font-weight:600;margin-top:14px;margin-right:6px}
+  .gallery{max-width:1180px;margin:0 auto;display:flex;flex-wrap:wrap;gap:36px;align-items:flex-start}
+  .frame{display:flex;flex-direction:column;gap:10px}
+  .frame > .cap{color:#8fa6a0;font-size:13px;font-weight:600;text-align:center}
+  .frame > .cap span{display:block;color:#5f7570;font-weight:400;font-size:11.5px;margin-top:2px}
+
+  /* device shell */
+  .phone{width:300px;height:640px;background:var(--background);border-radius:34px;
+    border:9px solid #05100f;overflow:hidden;position:relative;color:var(--on-surface);
+    box-shadow:0 18px 50px rgba(0,0,0,.55)}
+  .tablet{width:560px;height:430px;background:var(--background);border-radius:22px;
+    border:9px solid #05100f;overflow:hidden;position:relative;color:var(--on-surface);
+    box-shadow:0 18px 50px rgba(0,0,0,.55);display:flex}
+  .scroll{position:absolute;inset:0 0 56px 0;overflow:hidden}
+  .tablet .scroll{position:relative;inset:auto}
+
+  /* app bar */
+  .appbar{padding:14px var(--lg) 8px;display:flex;align-items:center;justify-content:space-between}
+  .appbar .title{font-size:22px;line-height:28px}
+  .appbar.sel{background:var(--surf2);}
+  .appbar .ic{width:24px;height:24px;color:var(--on-surface-variant);display:flex;align-items:center}
+  .appbar .grp{display:flex;gap:14px;align-items:center}
+
+  /* generic */
+  .pad{padding:0 var(--lg)}
+  .sec{font-size:16px;font-weight:600;margin:18px var(--lg) 8px}
+  .row{display:flex;align-items:center;gap:var(--md);padding:10px var(--lg);min-height:56px}
+  .row .nm{font-size:16px;line-height:20px}
+  .row .mt{font-size:12px;line-height:16px;color:var(--on-surface-variant);margin-top:2px}
+  .row .gr{flex:1;min-width:0}
+  .row .nm,.row .mt{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .ov{color:var(--on-surface-variant)}
+  .ic-tile{width:40px;height:40px;border-radius:var(--r-md);display:flex;align-items:center;
+    justify-content:center;flex-shrink:0;font-size:18px}
+
+  .card{background:var(--surf1);border-radius:var(--r-lg);margin:var(--lg);padding:var(--lg)}
+  .chip{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--outline);
+    border-radius:var(--r-sm);padding:6px 10px;font-size:12px;font-weight:500;color:var(--on-surface-variant)}
+  .chip.on{background:var(--secondary-container);border-color:var(--secondary-container);color:var(--on-secondary-container)}
+  .chip .x{font-size:13px;opacity:.7}
+
+  /* bottom nav */
+  .bnav{position:absolute;left:0;right:0;bottom:0;height:56px;background:var(--surf2);
+    display:flex;justify-content:space-around;align-items:center;border-top:1px solid var(--surface-variant)}
+  .bnav .n{display:flex;flex-direction:column;align-items:center;gap:2px;font-size:11px;color:var(--on-surface-variant)}
+  .bnav .n.act{color:var(--primary)}
+  .bnav .n .b{width:48px;height:26px;border-radius:999px;display:flex;align-items:center;justify-content:center;font-size:16px}
+  .bnav .n.act .b{background:var(--secondary-container);color:var(--on-secondary-container)}
+
+  /* fab */
+  .fab{position:absolute;right:16px;bottom:72px;width:52px;height:52px;border-radius:var(--r-lg);
+    background:var(--primary-container);color:var(--on-primary-container);display:flex;align-items:center;
+    justify-content:center;font-size:24px;box-shadow:0 6px 16px rgba(0,0,0,.3)}
+
+  /* category tiles (tonal, NOT type-coded) */
+  .cats{display:flex;gap:var(--sm);overflow:hidden;padding:0 var(--lg)}
+  .cat{flex:0 0 auto;width:88px;background:var(--secondary-container);color:var(--on-secondary-container);
+    border-radius:var(--r-lg);padding:var(--md);display:flex;flex-direction:column;gap:8px}
+  .cat .ci{font-size:22px}
+  .cat .cl{font-size:14px;font-weight:600}
+  .cat .cc{font-size:11px;opacity:.8}
+
+  /* storage card / story */
+  .storybar{height:10px;border-radius:999px;display:flex;overflow:hidden;background:var(--surface-variant);margin-top:12px}
+  .storybar i{display:block;height:100%}
+  .hero{background:var(--tertiary-container);color:var(--on-tertiary-container);border-radius:var(--r-lg);
+    margin:var(--lg);padding:var(--xl) var(--lg)}
+  .hero .big{font-size:36px;line-height:44px;font-weight:500}
+  .hero .lbl{font-size:13px;opacity:.85;margin-top:2px}
+  .hero .moti{font-size:13px;margin-top:14px;font-weight:600}
+
+  /* grid (media) */
+  .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:var(--sm);padding:var(--lg)}
+  .grid .cell{aspect-ratio:1;border-radius:var(--r-md);background:var(--surface-variant);position:relative;overflow:hidden}
+  .grid .cell.v::after{content:"▶";position:absolute;right:6px;bottom:4px;color:#fff;font-size:11px;
+    text-shadow:0 1px 2px rgba(0,0,0,.6)}
+
+  /* skeleton */
+  .sk{background:linear-gradient(90deg,var(--surface-variant),#e7efec,var(--surface-variant));
+    border-radius:6px;height:12px}
+  .sk.av{height:40px;width:40px;border-radius:var(--r-md);flex-shrink:0}
+  .sk.t{height:14px;width:55%} .sk.s{height:10px;width:32%;margin-top:6px}
+
+  /* dialog */
+  .scrim{position:absolute;inset:0;background:rgba(0,0,0,.35);display:flex;align-items:center;justify-content:center;padding:20px}
+  .dlg{background:var(--surf3);border-radius:var(--r-xl);padding:var(--xl);width:100%}
+  .dlg h3{font-size:22px;font-weight:500;margin-bottom:10px}
+  .dlg p{font-size:14px;color:var(--on-surface-variant);line-height:1.5}
+  .dlg .field{background:var(--background);border:1px solid var(--outline);border-radius:var(--r-sm);
+    padding:12px;margin-top:16px;font-size:14px;color:var(--on-surface)}
+  .dlg .err{color:var(--error);font-size:12px;margin-top:6px}
+  .dlg .btns{display:flex;justify-content:flex-end;gap:8px;margin-top:22px}
+  .btn{font-size:14px;font-weight:600;padding:10px 16px;border-radius:999px}
+  .btn.text{color:var(--primary)} .btn.fill{background:var(--primary);color:var(--on-primary)}
+  .btn.tonal{background:var(--secondary-container);color:var(--on-secondary-container)}
+
+  /* sheet */
+  .sheet{position:absolute;left:0;right:0;bottom:0;background:var(--surf3);
+    border-radius:var(--r-xl) var(--r-xl) 0 0;padding:var(--xl) var(--lg) 28px}
+  .sheet h3{font-size:18px;font-weight:600;margin-bottom:4px}
+  .sheet p{font-size:13px;color:var(--on-surface-variant);margin-bottom:14px}
+  .sheet .opt{display:flex;align-items:center;gap:12px;padding:14px 4px;font-size:15px;border-top:1px solid var(--surface-variant)}
+  .sheet .opt .o-ic{width:24px;text-align:center}
+  .sheet .opt .o-s{display:block;font-size:12px;color:var(--on-surface-variant)}
+
+  /* empty / error states */
+  .state{position:absolute;inset:0 0 56px 0;display:flex;flex-direction:column;align-items:center;
+    justify-content:center;text-align:center;padding:32px;gap:6px}
+  .state .ill{font-size:44px;margin-bottom:8px}
+  .state h3{font-size:24px;font-weight:400}
+  .state p{font-size:14px;color:var(--on-surface-variant);line-height:1.5}
+  .state .act{margin-top:18px}
+
+  /* search bar */
+  .searchbar{margin:8px var(--lg);background:var(--surf2);border-radius:var(--r-xl);
+    padding:12px var(--lg);display:flex;align-items:center;gap:12px;font-size:15px;color:var(--on-surface-variant)}
+
+  /* breadcrumb */
+  .crumbs{padding:6px var(--lg);font-size:12px;color:var(--on-surface-variant);display:flex;gap:6px;align-items:center}
+  .crumbs b{color:var(--on-surface)}
+
+  /* batch bar */
+  .batch{background:var(--surf2);display:flex;align-items:center;gap:18px;padding:14px var(--lg)}
+  .batch .ct{font-size:16px;font-weight:600;flex:1}
+
+  /* nav rail (tablet) */
+  .rail{width:76px;background:var(--surf2);display:flex;flex-direction:column;align-items:center;
+    padding-top:16px;gap:8px;flex-shrink:0}
+  .rail .n{display:flex;flex-direction:column;align-items:center;gap:3px;font-size:10px;color:var(--on-surface-variant);width:100%;padding:6px 0}
+  .rail .n.act{color:var(--primary)}
+  .rail .n .b{width:48px;height:28px;border-radius:999px;display:flex;align-items:center;justify-content:center;font-size:17px}
+  .rail .n.act .b{background:var(--secondary-container);color:var(--on-secondary-container)}
+  .pane{flex:1;overflow:hidden;border-left:1px solid var(--surface-variant)}
+  .pane.list{flex:0 0 200px;border-left:none}
+  .selrow{background:var(--surf3)}
+
+  .divider{height:1px;background:var(--surface-variant);margin:0 var(--lg)}
+  .seg{margin-left:auto;display:flex;border:1px solid var(--outline);border-radius:999px;overflow:hidden}
+  .seg span{padding:4px 10px;font-size:12px}
+  .seg span.on{background:var(--secondary-container);color:var(--on-secondary-container)}
+</style>
+</head>
+<body>
+<header class="page">
+  <h1>Filora — High-Fidelity UI</h1>
+  <div class="sub">Approved direction <b>A-blend</b>: Calm Utility base · dual-pane on large screens (from B) · storage-story on Storage only (from C). Tokens mirror <code>core-ui/theme/</code> (teal seed #00696B, tertiary blue for insight). Spec: <code>docs/phase-1/design/05-hifi-spec.md</code>.</div>
+  <span class="pill">Calm Utility base</span><span class="pill">+ B dual-pane ≥600dp</span><span class="pill">+ C storage-story</span><span class="pill">M3 Expressive · dynamic color</span>
+</header>
+
+<div class="gallery">
+
+  <!-- HOME -->
+  <div class="frame"><div class="cap">Home<span>storage summary · categories · recents</span></div>
+  <div class="phone"><div class="scroll">
+    <div class="appbar"><div class="title">Filora</div><div class="grp"><div class="ic">⌕</div><div class="ic">⋮</div></div></div>
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:baseline">
+        <div style="font-size:16px;font-weight:600">Internal storage</div><div style="font-size:12px;color:var(--tertiary);font-weight:600">Details ›</div></div>
+      <div style="font-size:13px;color:var(--on-surface-variant);margin-top:4px">82.4 GB used · 45.6 GB free</div>
+      <div class="storybar"><i style="width:64%;background:var(--tertiary)"></i></div>
+    </div>
+    <div class="sec">Categories</div>
+    <div class="cats">
+      <div class="cat"><div class="ci">▦</div><div class="cl">Images</div><div class="cc">2,481</div></div>
+      <div class="cat"><div class="ci">♪</div><div class="cl">Audio</div><div class="cc">318</div></div>
+      <div class="cat"><div class="ci">▷</div><div class="cl">Video</div><div class="cc">96</div></div>
+    </div>
+    <div class="sec">Recent</div>
+    <div class="row"><div class="ic-tile" style="background:var(--secondary-container);color:var(--on-secondary-container)">▦</div><div class="gr"><div class="nm">Sunset_dunes.jpg</div><div class="mt">3.2 MB · 2h ago</div></div><div class="ov">⋮</div></div>
+    <div class="row"><div class="ic-tile" style="background:var(--secondary-container);color:var(--on-secondary-container)">⎙</div><div class="gr"><div class="nm">Q3_report.pdf</div><div class="mt">1.1 MB · Yesterday</div></div><div class="ov">⋮</div></div>
+  </div>
+    <div class="bnav"><div class="n act"><div class="b">⌂</div>Home</div><div class="n"><div class="b">▤</div>Browse</div><div class="n"><div class="b">◔</div>Storage</div><div class="n"><div class="b">⚙</div>Settings</div></div>
+  </div></div>
+
+  <!-- BROWSER -->
+  <div class="frame"><div class="cap">Browser<span>breadcrumb · list/grid · FAB</span></div>
+  <div class="phone"><div class="scroll">
+    <div class="appbar"><div class="ic">‹</div><div class="title" style="font-size:20px">Documents</div><div class="grp"><div class="ic">⌕</div><div class="ic">⋮</div></div></div>
+    <div class="crumbs">Internal › <b>Documents</b><div class="seg"><span class="on">▤</span><span>▦</span></div></div>
+    <div class="divider"></div>
+    <div class="row"><div class="ic-tile" style="background:var(--primary-container);color:var(--on-primary-container)">▣</div><div class="gr"><div class="nm">Work</div><div class="mt">14 items</div></div><div class="ov">⋮</div></div>
+    <div class="row"><div class="ic-tile" style="background:var(--primary-container);color:var(--on-primary-container)">▣</div><div class="gr"><div class="nm">Receipts</div><div class="mt">8 items</div></div><div class="ov">⋮</div></div>
+    <div class="row"><div class="ic-tile" style="background:var(--secondary-container);color:var(--on-secondary-container)">⎙</div><div class="gr"><div class="nm">Q3_report.pdf</div><div class="mt">1.1 MB · Jun 28</div></div><div class="ov">⋮</div></div>
+    <div class="row"><div class="ic-tile" style="background:var(--secondary-container);color:var(--on-secondary-container)">⊞</div><div class="gr"><div class="nm">budget.xlsx</div><div class="mt">240 KB · Jun 20</div></div><div class="ov">⋮</div></div>
+    <div class="row"><div class="ic-tile" style="background:var(--secondary-container);color:var(--on-secondary-container)">≡</div><div class="gr"><div class="nm">notes.txt</div><div class="mt">2 KB · Jun 12</div></div><div class="ov">⋮</div></div>
+  </div>
+    <div class="fab">＋</div>
+    <div class="bnav"><div class="n"><div class="b">⌂</div>Home</div><div class="n act"><div class="b">▤</div>Browse</div><div class="n"><div class="b">◔</div>Storage</div><div class="n"><div class="b">⚙</div>Settings</div></div>
+  </div></div>
+
+  <!-- BROWSER multi-select -->
+  <div class="frame"><div class="cap">Browser · multi-select<span>batch-action bar (principle #2/#4)</span></div>
+  <div class="phone"><div class="scroll">
+    <div class="batch"><div class="ic">✕</div><div class="ct">3 selected</div><div class="ic">⎘</div><div class="ic">✂</div><div class="ic" style="opacity:.35">⤴</div><div class="ic">🗑</div></div>
+    <div class="divider"></div>
+    <div class="row selrow" style="background:var(--secondary-container)"><div class="ic-tile" style="background:var(--primary);color:#fff">✓</div><div class="gr"><div class="nm">Work</div><div class="mt">14 items</div></div></div>
+    <div class="row"><div class="ic-tile" style="background:var(--primary-container);color:var(--on-primary-container)">▣</div><div class="gr"><div class="nm">Receipts</div><div class="mt">8 items</div></div></div>
+    <div class="row selrow" style="background:var(--secondary-container)"><div class="ic-tile" style="background:var(--primary);color:#fff">✓</div><div class="gr"><div class="nm">Q3_report.pdf</div><div class="mt">1.1 MB · Jun 28</div></div></div>
+    <div class="row selrow" style="background:var(--secondary-container)"><div class="ic-tile" style="background:var(--primary);color:#fff">✓</div><div class="gr"><div class="nm">budget.xlsx</div><div class="mt">240 KB · Jun 20</div></div></div>
+    <div class="row"><div class="ic-tile" style="background:var(--secondary-container);color:var(--on-secondary-container)">≡</div><div class="gr"><div class="nm">notes.txt</div><div class="mt">2 KB · Jun 12</div></div></div>
+    <div style="font-size:11px;color:var(--on-surface-variant);padding:10px var(--lg)">Share disabled — a folder is in the selection.</div>
+  </div>
+    <div class="bnav"><div class="n"><div class="b">⌂</div>Home</div><div class="n act"><div class="b">▤</div>Browse</div><div class="n"><div class="b">◔</div>Storage</div><div class="n"><div class="b">⚙</div>Settings</div></div>
+  </div></div>
+
+  <!-- SEARCH -->
+  <div class="frame"><div class="cap">Search<span>persistent bar · removable filter chips</span></div>
+  <div class="phone"><div class="scroll">
+    <div class="searchbar"><span>⌕</span><span style="color:var(--on-surface)">invoice</span><span style="margin-left:auto">✕</span></div>
+    <div style="display:flex;gap:8px;padding:4px var(--lg) 8px;flex-wrap:wrap">
+      <span class="chip on">PDF <span class="x">✕</span></span>
+      <span class="chip on">&gt; 1 MB <span class="x">✕</span></span>
+      <span class="chip">Date</span><span class="chip">Type</span>
+    </div>
+    <div class="divider"></div>
+    <div class="row"><div class="ic-tile" style="background:var(--secondary-container);color:var(--on-secondary-container)">⎙</div><div class="gr"><div class="nm">invoice_0425.pdf</div><div class="mt">1.4 MB · Documents/Work</div></div></div>
+    <div class="row"><div class="ic-tile" style="background:var(--secondary-container);color:var(--on-secondary-container)">⎙</div><div class="gr"><div class="nm">invoice_0312.pdf</div><div class="mt">1.2 MB · Documents/Work</div></div></div>
+    <!-- streaming skeleton tail -->
+    <div class="row"><div class="sk av"></div><div class="gr"><div class="sk t"></div><div class="sk s"></div></div></div>
+    <div style="text-align:center;font-size:11px;color:var(--on-surface-variant);padding:6px">searching…</div>
+  </div>
+    <div class="bnav"><div class="n"><div class="b">⌂</div>Home</div><div class="n act"><div class="b">▤</div>Browse</div><div class="n"><div class="b">◔</div>Storage</div><div class="n"><div class="b">⚙</div>Settings</div></div>
+  </div></div>
+
+  <!-- MEDIA HUB -->
+  <div class="frame"><div class="cap">Media hub<span>7 tonal category tiles (not type-coded)</span></div>
+  <div class="phone"><div class="scroll">
+    <div class="appbar"><div class="title" style="font-size:22px">Media</div><div class="grp"><div class="ic">⌕</div></div></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--sm);padding:var(--lg)">
+      <div class="cat" style="width:auto"><div class="ci">▦</div><div class="cl">Images</div><div class="cc">2,481 · 6.2 GB</div></div>
+      <div class="cat" style="width:auto"><div class="ci">▷</div><div class="cl">Video</div><div class="cc">96 · 18.4 GB</div></div>
+      <div class="cat" style="width:auto"><div class="ci">♪</div><div class="cl">Audio</div><div class="cc">318 · 2.1 GB</div></div>
+      <div class="cat" style="width:auto"><div class="ci">⎙</div><div class="cl">Documents</div><div class="cc">142 · 0.9 GB</div></div>
+      <div class="cat" style="width:auto"><div class="ci">▤</div><div class="cl">Archives</div><div class="cc">23 · 1.4 GB</div></div>
+      <div class="cat" style="width:auto"><div class="ci">⬇</div><div class="cl">Downloads</div><div class="cc">61 · 3.0 GB</div></div>
+    </div>
+  </div>
+    <div class="bnav"><div class="n act"><div class="b">▦</div>Media</div><div class="n"><div class="b">▤</div>Browse</div><div class="n"><div class="b">◔</div>Storage</div><div class="n"><div class="b">⚙</div>Settings</div></div>
+  </div></div>
+
+  <!-- MEDIA DETAIL -->
+  <div class="frame"><div class="cap">Media detail<span>thumbnail grid · tap open / long-press share</span></div>
+  <div class="phone"><div class="scroll">
+    <div class="appbar"><div class="ic">‹</div><div class="title" style="font-size:20px">Images</div><div class="grp"><div class="ic">⇅</div><div class="ic">⋮</div></div></div>
+    <div class="grid">
+      <div class="cell" style="background:#bcd6cf"></div><div class="cell" style="background:#cfd9ea"></div><div class="cell v" style="background:#9fb6af"></div>
+      <div class="cell" style="background:#d8cfc0"></div><div class="cell" style="background:#c6d3cd"></div><div class="cell" style="background:#cbd8e6"></div>
+      <div class="cell" style="background:#b9c9c3"></div><div class="cell v" style="background:#d2c7d6"></div><div class="cell" style="background:#c9d6cf"></div>
+      <div class="cell" style="background:#d6d0c2"></div><div class="cell" style="background:#bdd0c9"></div><div class="cell" style="background:#cdd7e3"></div>
+    </div>
+  </div>
+    <div class="bnav"><div class="n act"><div class="b">▦</div>Media</div><div class="n"><div class="b">▤</div>Browse</div><div class="n"><div class="b">◔</div>Storage</div><div class="n"><div class="b">⚙</div>Settings</div></div>
+  </div></div>
+
+  <!-- STORAGE + STORY -->
+  <div class="frame"><div class="cap">Storage Insights<span>the C borrowing — calm storage-story hero</span></div>
+  <div class="phone"><div class="scroll">
+    <div class="appbar"><div class="title" style="font-size:22px">Storage</div></div>
+    <div class="hero">
+      <div class="lbl">Free on this device</div>
+      <div class="big">45.6 GB</div>
+      <div class="storybar" style="margin-top:16px">
+        <i style="width:34%;background:var(--tertiary)"></i><i style="width:22%;background:#6E84B4"></i>
+        <i style="width:14%;background:#9AAAD0"></i><i style="width:8%;background:#C0CBE6"></i>
+      </div>
+      <div style="display:flex;gap:14px;margin-top:10px;font-size:11px">
+        <span>● Video 18 GB</span><span>● Images 6 GB</span><span>● Apps 9 GB</span></div>
+      <div class="moti">You freed 1.2 GB this month ✦</div>
+    </div>
+    <div class="sec">By category</div>
+    <div class="row"><div class="ic-tile" style="background:var(--tertiary-container);color:var(--on-tertiary-container)">▷</div><div class="gr"><div class="nm">Video</div><div class="mt">18.4 GB</div></div><div class="ov">›</div></div>
+    <div class="row"><div class="ic-tile" style="background:var(--tertiary-container);color:var(--on-tertiary-container)">▦</div><div class="gr"><div class="nm">Images</div><div class="mt">6.2 GB</div></div><div class="ov">›</div></div>
+    <div class="row"><div class="ic-tile" style="background:var(--tertiary-container);color:var(--on-tertiary-container)">⌖</div><div class="gr"><div class="nm">Largest files</div><div class="mt">Find space to reclaim</div></div><div class="ov">›</div></div>
+  </div>
+    <div class="bnav"><div class="n"><div class="b">⌂</div>Home</div><div class="n"><div class="b">▤</div>Browse</div><div class="n act"><div class="b">◔</div>Storage</div><div class="n"><div class="b">⚙</div>Settings</div></div>
+  </div></div>
+
+  <!-- SETTINGS -->
+  <div class="frame"><div class="cap">Settings<span>no upsells, no nags (principle #6)</span></div>
+  <div class="phone"><div class="scroll">
+    <div class="appbar"><div class="ic">‹</div><div class="title" style="font-size:20px">Settings</div></div>
+    <div style="font-size:13px;font-weight:600;color:var(--primary);padding:14px var(--lg) 4px">Appearance</div>
+    <div class="row"><div class="gr"><div class="nm">Theme</div><div class="mt">System default</div></div></div>
+    <div class="row"><div class="gr"><div class="nm">Dynamic color</div><div class="mt">Use wallpaper colors</div></div><div style="width:40px;height:22px;background:var(--primary);border-radius:999px;position:relative"><span style="position:absolute;right:3px;top:3px;width:16px;height:16px;background:#fff;border-radius:50%"></span></div></div>
+    <div style="font-size:13px;font-weight:600;color:var(--primary);padding:14px var(--lg) 4px">View</div>
+    <div class="row"><div class="gr"><div class="nm">Default layout</div><div class="mt">List</div></div></div>
+    <div class="row"><div class="gr"><div class="nm">Show hidden files</div><div class="mt">Off</div></div><div style="width:40px;height:22px;background:var(--surface-variant);border-radius:999px;position:relative"><span style="position:absolute;left:3px;top:3px;width:16px;height:16px;background:var(--outline);border-radius:50%"></span></div></div>
+    <div class="row"><div class="gr"><div class="nm">Reduce motion</div><div class="mt">Follow system</div></div></div>
+  </div>
+    <div class="bnav"><div class="n"><div class="b">⌂</div>Home</div><div class="n"><div class="b">▤</div>Browse</div><div class="n"><div class="b">◔</div>Storage</div><div class="n act"><div class="b">⚙</div>Settings</div></div>
+  </div></div>
+
+  <!-- RENAME DIALOG -->
+  <div class="frame"><div class="cap">Dialog · rename<span>inline validation (principle #4)</span></div>
+  <div class="phone">
+    <div class="scroll" style="filter:saturate(.6) brightness(.97)">
+      <div class="appbar"><div class="ic">‹</div><div class="title" style="font-size:20px">Documents</div></div>
+      <div class="row"><div class="ic-tile" style="background:var(--secondary-container)">⎙</div><div class="gr"><div class="nm">Q3_report.pdf</div></div></div>
+      <div class="row"><div class="ic-tile" style="background:var(--secondary-container)">⊞</div><div class="gr"><div class="nm">budget.xlsx</div></div></div>
+    </div>
+    <div class="scrim"><div class="dlg">
+      <h3>Rename</h3>
+      <div class="field">Q3_report/final.pdf</div>
+      <div class="err">⚠ Name can't contain “/”.</div>
+      <div class="btns"><span class="btn text">Cancel</span><span class="btn fill">Rename</span></div>
+    </div></div>
+  </div></div>
+
+  <!-- CONFLICT SHEET -->
+  <div class="frame"><div class="cap">Conflict sheet<span>explicit overwrite/skip/keep-both (principle #4)</span></div>
+  <div class="phone">
+    <div class="scroll" style="filter:saturate(.6) brightness(.97)">
+      <div class="appbar"><div class="title">Filora</div></div>
+      <div class="row"><div class="ic-tile" style="background:var(--secondary-container)">▣</div><div class="gr"><div class="nm">Receipts</div></div></div>
+    </div>
+    <div class="scrim" style="align-items:flex-end;padding:0"><div class="sheet">
+      <h3>“report.pdf” already exists</h3>
+      <p>Choose what to do with this item.</p>
+      <div class="opt"><span class="o-ic">⊕</span><div>Keep both<span class="o-s">Adds “(2)” to the new file</span></div></div>
+      <div class="opt"><span class="o-ic">⤳</span><div>Skip<span class="o-s">Leave the existing file</span></div></div>
+      <div class="opt"><span class="o-ic">⟳</span><div>Overwrite<span class="o-s">Replace the existing file</span></div></div>
+    </div></div>
+  </div></div>
+
+  <!-- EMPTY STATE -->
+  <div class="frame"><div class="cap">Empty state<span>designed, with a next action (principle #5)</span></div>
+  <div class="phone"><div class="scroll">
+    <div class="appbar"><div class="ic">‹</div><div class="title" style="font-size:20px">Receipts</div></div>
+    <div class="state"><div class="ill">🗀</div><h3>This folder is empty</h3><p>Create a folder or add files to get started.</p><div class="act"><span class="btn tonal">＋ Create folder</span></div></div>
+  </div>
+    <div class="bnav"><div class="n"><div class="b">⌂</div>Home</div><div class="n act"><div class="b">▤</div>Browse</div><div class="n"><div class="b">◔</div>Storage</div><div class="n"><div class="b">⚙</div>Settings</div></div>
+  </div></div>
+
+  <!-- ERROR / PERMISSION STATE -->
+  <div class="frame"><div class="cap">Permission · reason-first<span>trust visible before asking (principle #6)</span></div>
+  <div class="phone"><div class="scroll">
+    <div class="state">
+      <div class="ill" style="color:var(--primary)">🛡</div>
+      <h3>Show your media</h3>
+      <p>Filora needs access to photos &amp; videos to group them into albums. We never upload your files — everything stays on your device.</p>
+      <div class="act" style="display:flex;flex-direction:column;gap:8px"><span class="btn fill">Allow access</span><span class="btn text">Not now</span></div>
+    </div>
+  </div></div></div>
+
+  <!-- LOADING SKELETON -->
+  <div class="frame"><div class="cap">Loading skeleton<span>skeletons over spinners (principle #3)</span></div>
+  <div class="phone"><div class="scroll">
+    <div class="appbar"><div class="ic">‹</div><div class="title" style="font-size:20px">Documents</div></div>
+    <div class="crumbs"><div class="sk" style="width:120px;height:11px"></div></div>
+    <div class="divider"></div>
+    <div class="row"><div class="sk av"></div><div class="gr"><div class="sk t"></div><div class="sk s"></div></div></div>
+    <div class="row"><div class="sk av"></div><div class="gr"><div class="sk t" style="width:70%"></div><div class="sk s"></div></div></div>
+    <div class="row"><div class="sk av"></div><div class="gr"><div class="sk t" style="width:48%"></div><div class="sk s"></div></div></div>
+    <div class="row"><div class="sk av"></div><div class="gr"><div class="sk t" style="width:62%"></div><div class="sk s"></div></div></div>
+    <div class="row"><div class="sk av"></div><div class="gr"><div class="sk t" style="width:55%"></div><div class="sk s"></div></div></div>
+  </div>
+    <div class="bnav"><div class="n"><div class="b">⌂</div>Home</div><div class="n act"><div class="b">▤</div>Browse</div><div class="n"><div class="b">◔</div>Storage</div><div class="n"><div class="b">⚙</div>Settings</div></div>
+  </div></div>
+
+  <!-- TABLET DUAL-PANE -->
+  <div class="frame"><div class="cap">Tablet ≥600dp · dual-pane (the B borrowing)<span>nav rail · list pane + detail pane, selection in place</span></div>
+  <div class="tablet">
+    <div class="rail">
+      <div class="n"><div class="b">⌂</div>Home</div><div class="n act"><div class="b">▤</div>Browse</div><div class="n"><div class="b">◔</div>Storage</div><div class="n"><div class="b">⚙</div>Settings</div>
+    </div>
+    <div class="pane list">
+      <div class="appbar" style="padding-bottom:6px"><div class="title" style="font-size:17px">Documents</div></div>
+      <div class="row" style="padding:8px var(--md)"><div class="ic-tile" style="width:30px;height:30px;background:var(--primary-container)">▣</div><div class="gr"><div class="nm" style="font-size:14px">Work</div></div></div>
+      <div class="row selrow" style="padding:8px var(--md);background:var(--secondary-container)"><div class="ic-tile" style="width:30px;height:30px;background:var(--primary);color:#fff">▣</div><div class="gr"><div class="nm" style="font-size:14px">Receipts</div></div></div>
+      <div class="row" style="padding:8px var(--md)"><div class="ic-tile" style="width:30px;height:30px;background:var(--secondary-container)">⎙</div><div class="gr"><div class="nm" style="font-size:14px">Q3_report.pdf</div></div></div>
+      <div class="row" style="padding:8px var(--md)"><div class="ic-tile" style="width:30px;height:30px;background:var(--secondary-container)">⊞</div><div class="gr"><div class="nm" style="font-size:14px">budget.xlsx</div></div></div>
+    </div>
+    <div class="pane">
+      <div class="crumbs">Internal › Documents › <b>Receipts</b></div>
+      <div class="divider"></div>
+      <div class="row"><div class="ic-tile" style="background:var(--secondary-container)">⎙</div><div class="gr"><div class="nm">apr_invoice.pdf</div><div class="mt">1.4 MB · Apr 25</div></div><div class="ov">⋮</div></div>
+      <div class="row"><div class="ic-tile" style="background:var(--secondary-container)">⎙</div><div class="gr"><div class="nm">mar_invoice.pdf</div><div class="mt">1.2 MB · Mar 12</div></div><div class="ov">⋮</div></div>
+      <div class="row"><div class="ic-tile" style="background:var(--secondary-container)">▦</div><div class="gr"><div class="nm">receipt_scan.jpg</div><div class="mt">820 KB · Mar 02</div></div><div class="ov">⋮</div></div>
+    </div>
+  </div></div>
+
+</div>
+</body>
+</html>

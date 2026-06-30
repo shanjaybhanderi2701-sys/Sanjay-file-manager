@@ -33,4 +33,9 @@
 
     <string name="media_detail_error_permission">امنح وصول التخزين لعرض هذه الملفات.</string>
     <string name="media_detail_error_load">تعذّر تحميل هذه الفئة. اسحب للتحديث.</string>
+
+    <!-- Image preview (zoom/pan) — FR-6.1 -->
+    <string name="media_preview_image">معاينة الصورة</string>
+    <string name="media_preview_close">إغلاق المعاينة</string>
+    <string name="media_preview_open_external">فتح في تطبيق آخر</string>
 </resources>
