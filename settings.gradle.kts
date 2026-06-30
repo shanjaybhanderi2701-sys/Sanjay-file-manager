@@ -39,3 +39,6 @@ include(":feature:feature-search")
 include(":feature:feature-media")
 include(":feature:feature-storage")
 include(":feature:feature-settings")
+
+// M7 performance hardening: baseline-profile producer + startup macrobenchmark (NFR-1.1).
+include(":baselineprofile")

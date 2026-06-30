@@ -3,6 +3,8 @@ plugins {
     alias(libs.plugins.filora.android.compose)
     alias(libs.plugins.filora.android.hilt)
     alias(libs.plugins.kotlin.serialization)
+    // M7 (NFR-1.1): consumes the generated baseline profile and bakes it into the AAB.
+    alias(libs.plugins.androidx.baselineprofile)
 }
 
 android {
@@ -82,6 +84,15 @@ dependencies {
     implementation(libs.androidx.hilt.navigation.compose)
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.kotlinx.coroutines.android)
+
+    // Performance & memory hardening (M7)
+    // NFR-1.1: applies the baseline profile at first run for faster cold start.
+    implementation(libs.androidx.profileinstaller)
+    // NFR-9.2: automatic memory-leak detection in debug builds only. Auto-installs
+    // via its own ContentProvider — no init code required.
+    debugImplementation(libs.leakcanary.android)
+    // Producer of the baseline profile baked in above (see :baselineprofile module).
+    baselineProfile(project(":baselineprofile"))
 
     // Test
     testImplementation(libs.junit4)
