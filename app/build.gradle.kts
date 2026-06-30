@@ -116,6 +116,8 @@ dependencies {
     implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.navigation.compose)
     implementation(libs.androidx.hilt.navigation.compose)
+    // T050 bottom-nav destination icons (FolderOpen, PieChart) live in the extended set.
+    implementation(libs.androidx.compose.material.icons.extended)
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.kotlinx.coroutines.android)
 
@@ -140,6 +142,10 @@ dependencies {
     androidTestImplementation(libs.androidx.test.rules)
     androidTestImplementation(libs.hilt.android.testing)
     kspAndroidTest(libs.hilt.compiler)
+
+    // T054 navigation integration tests: TestNavHostController drives the real Route
+    // graph contract (back stack, multi-back-stack restoration, typed-arg deep links).
+    androidTestImplementation(libs.androidx.navigation.testing)
 }
 
 // NFR-9.1: enforce the ≤ 12 MB release size budget in CI. The minified standard

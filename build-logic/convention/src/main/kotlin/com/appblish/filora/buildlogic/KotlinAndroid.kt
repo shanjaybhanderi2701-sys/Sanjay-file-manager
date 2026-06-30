@@ -34,6 +34,12 @@ internal fun Project.configureKotlinAndroid(
             abortOnError = false
             warningsAsErrors = false
             checkDependencies = true
+            // NFR-7 (T7.3): no hardcoded user-facing strings. Promote the relevant
+            // i18n/RTL checks to error severity so a stray literal or a left/right
+            // (non-RTL-aware) gravity shows up red in the lint report and the CI
+            // lint job, instead of being lost in warning noise. The global
+            // abortOnError gate stays deferred to the baseline follow-up above.
+            error += setOf("HardcodedText", "SetTextI18n", "RtlHardcoded", "RtlEnabled")
         }
     }
 

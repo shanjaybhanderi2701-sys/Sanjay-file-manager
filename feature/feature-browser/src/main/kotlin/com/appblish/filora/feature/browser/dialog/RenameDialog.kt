@@ -1,6 +1,8 @@
 package com.appblish.filora.feature.browser.dialog
 
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.res.stringResource
+import com.appblish.filora.feature.browser.R
 
 /**
  * Dialog for renaming the item named [currentName] (FR-3.2). The field is
@@ -18,8 +20,8 @@ fun RenameDialog(
     submitError: String? = null,
 ) {
     NameInputDialog(
-        title = "Rename",
-        confirmLabel = "Rename",
+        title = stringResource(R.string.browser_dialog_rename_title),
+        confirmLabel = stringResource(R.string.browser_dialog_rename_confirm),
         initialName = currentName,
         existingNames = siblingNames,
         onConfirm = onConfirm,

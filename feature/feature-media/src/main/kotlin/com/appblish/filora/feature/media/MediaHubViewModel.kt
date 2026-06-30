@@ -1,5 +1,6 @@
 package com.appblish.filora.feature.media
 
+import androidx.annotation.StringRes
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.appblish.filora.core.common.result.OperationError
@@ -16,7 +17,7 @@ import javax.inject.Inject
 /**
  * Drives the Media category-hub screen (FR-6.1). Loads per-category counts from
  * [MediaRepository] and maps them onto the fixed seven-hub grid. On failure it still
- * publishes the seven hubs (zero counts) plus a user-facing [MediaHubUiState.errorMessage].
+ * publishes the seven hubs (zero counts) plus a user-facing [MediaHubUiState.errorMessageRes].
  */
 @HiltViewModel
 class MediaHubViewModel
@@ -33,7 +34,7 @@ class MediaHubViewModel
 
         /** Reloads counts; safe to call again from a retry affordance. */
         fun refresh() {
-            _uiState.update { it.copy(isLoading = true, errorMessage = null) }
+            _uiState.update { it.copy(isLoading = true, errorMessageRes = null) }
             viewModelScope.launch {
                 when (val result = mediaRepository.categoryCounts()) {
                     is Result.Success ->
@@ -41,7 +42,7 @@ class MediaHubViewModel
                             it.copy(
                                 isLoading = false,
                                 tiles = buildHubTiles(result.data),
-                                errorMessage = null,
+                                errorMessageRes = null,
                             )
                         }
 
@@ -50,7 +51,7 @@ class MediaHubViewModel
                             it.copy(
                                 isLoading = false,
                                 tiles = buildHubTiles(emptyMap()),
-                                errorMessage = result.error.toUserMessage(),
+                                errorMessageRes = result.error.toUserMessageRes(),
                             )
                         }
                 }
@@ -58,8 +59,9 @@ class MediaHubViewModel
         }
     }
 
-private fun OperationError.toUserMessage(): String =
+@StringRes
+private fun OperationError.toUserMessageRes(): Int =
     when (this) {
-        is OperationError.PermissionDenied -> "Grant storage access to see your media."
-        else -> "Couldn't load categories. Pull to refresh."
+        is OperationError.PermissionDenied -> R.string.media_error_permission
+        else -> R.string.media_error_load
     }

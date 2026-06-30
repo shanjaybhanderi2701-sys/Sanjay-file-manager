@@ -8,6 +8,7 @@ import androidx.compose.material.icons.automirrored.filled.DriveFileMove
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.ContentCopy
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.DriveFileRenameOutline
 import androidx.compose.material.icons.filled.FolderZip
 import androidx.compose.material.icons.filled.SelectAll
 import androidx.compose.material.icons.filled.Share
@@ -20,7 +21,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.appblish.filora.feature.browser.R
 
 /**
  * Batch action bar shown while a multi-selection is active (FR-4.1). Renders the
@@ -48,24 +51,33 @@ fun BatchActionBar(
             verticalAlignment = Alignment.CenterVertically,
         ) {
             IconButton(onClick = onClearSelection) {
-                Icon(imageVector = Icons.Filled.Close, contentDescription = "Clear selection")
+                Icon(
+                    imageVector = Icons.Filled.Close,
+                    contentDescription = stringResource(R.string.browser_action_clear_selection),
+                )
             }
             Text(
-                text = "${state.count} selected",
+                text = stringResource(R.string.browser_selected_count, state.count),
                 style = MaterialTheme.typography.titleMedium,
                 modifier = Modifier
                     .weight(1f)
                     .padding(start = 4.dp),
             )
             IconButton(onClick = onSelectAll) {
-                Icon(imageVector = Icons.Filled.SelectAll, contentDescription = "Select all")
+                Icon(
+                    imageVector = Icons.Filled.SelectAll,
+                    contentDescription = stringResource(R.string.browser_action_select_all),
+                )
             }
             BatchAction.entries.forEach { action ->
                 IconButton(
                     onClick = { onAction(action) },
                     enabled = action in state.enabledActions,
                 ) {
-                    Icon(imageVector = action.icon, contentDescription = action.label)
+                    Icon(
+                        imageVector = action.icon,
+                        contentDescription = stringResource(action.labelRes),
+                    )
                 }
             }
         }
@@ -74,6 +86,7 @@ fun BatchActionBar(
 
 private val BatchAction.icon: ImageVector
     get() = when (this) {
+        BatchAction.RENAME -> Icons.Filled.DriveFileRenameOutline
         BatchAction.MOVE -> Icons.AutoMirrored.Filled.DriveFileMove
         BatchAction.COPY -> Icons.Filled.ContentCopy
         BatchAction.DELETE -> Icons.Filled.Delete

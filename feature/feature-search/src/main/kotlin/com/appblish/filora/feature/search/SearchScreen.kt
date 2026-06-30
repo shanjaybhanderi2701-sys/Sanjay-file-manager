@@ -25,6 +25,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -79,7 +80,7 @@ internal fun SearchContent(
             onValueChange = onQueryChange,
             singleLine = true,
             leadingIcon = { Icon(Icons.Outlined.Search, contentDescription = null) },
-            placeholder = { Text("Search files") },
+            placeholder = { Text(stringResource(R.string.search_hint)) },
             modifier =
                 Modifier
                     .fillMaxWidth()
@@ -117,7 +118,7 @@ private fun FilterChipRows(
             FilterChip(
                 selected = type in uiState.filter.types,
                 onClick = { onToggleType(type) },
-                label = { Text(type.chipLabel) },
+                label = { Text(stringResource(type.chipLabelRes)) },
             )
         }
     }
@@ -126,7 +127,7 @@ private fun FilterChipRows(
             FilterChip(
                 selected = bucket == uiState.selectedSize,
                 onClick = { onSelectSize(bucket) },
-                label = { Text(bucket.label) },
+                label = { Text(stringResource(bucket.labelRes)) },
             )
         }
     }
@@ -135,7 +136,7 @@ private fun FilterChipRows(
             FilterChip(
                 selected = bucket == uiState.selectedDate,
                 onClick = { onSelectDate(bucket) },
-                label = { Text(bucket.label) },
+                label = { Text(stringResource(bucket.labelRes)) },
             )
         }
     }
@@ -148,14 +149,15 @@ private fun ActiveChipRow(
 ) {
     ChipScrollRow {
         chips.forEach { chip ->
+            val chipLabel = stringResource(chip.labelRes)
             InputChip(
                 selected = true,
                 onClick = { onRemoveChip(chip) },
-                label = { Text(chip.label) },
+                label = { Text(chipLabel) },
                 trailingIcon = {
                     Icon(
                         imageVector = Icons.Outlined.Close,
-                        contentDescription = "Remove ${chip.label} filter",
+                        contentDescription = stringResource(R.string.search_remove_filter, chipLabel),
                     )
                 },
             )
@@ -171,8 +173,8 @@ private fun SearchResults(
     if (uiState.isEmpty) {
         EmptyState(
             icon = Icons.Outlined.Search,
-            title = "No matches",
-            description = "Try a different name or clear some filters.",
+            title = stringResource(R.string.search_empty_title),
+            description = stringResource(R.string.search_empty_body),
         )
     } else {
         LazyColumn(modifier = Modifier.fillMaxSize()) {

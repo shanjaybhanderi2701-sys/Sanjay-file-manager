@@ -7,6 +7,7 @@ import android.content.Intent
 import android.net.Uri
 import com.appblish.filora.core.domain.model.FileItem
 import com.appblish.filora.core.domain.usecase.ShareIntentPlanner
+import com.appblish.filora.feature.browser.R
 
 /**
  * Builds and dispatches open/share intents for files (FR-10.1, FR-10.2).
@@ -37,7 +38,7 @@ object FileShareLauncher {
                 addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
                 clipData = ClipData.newRawUri(item.name, uri)
             }
-        return dispatch(context, intent, title = "Open with")
+        return dispatch(context, intent, title = context.getString(R.string.browser_chooser_open_with))
     }
 
     /**
@@ -57,7 +58,7 @@ object FileShareLauncher {
         val intent = if (plan.isMultiple) multiSend(uris, plan.mimeType) else singleSend(uris.first(), plan.mimeType)
         intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
         intent.clipData = clipDataFor(files, uris)
-        return dispatch(context, intent, title = "Share")
+        return dispatch(context, intent, title = context.getString(R.string.browser_chooser_share))
     }
 
     private fun singleSend(

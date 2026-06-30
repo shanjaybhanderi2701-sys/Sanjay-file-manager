@@ -29,6 +29,12 @@
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 
+    <!--
+      android:enableOnBackInvokedCallback (T051) opts the app into the predictive-back
+      system gesture on API 34+. Navigation Compose then renders the cross-destination
+      predictive-back animation automatically; on older APIs the flag is ignored and
+      back falls back to the standard pop.
+    -->
     <application
         android:name=".FiloraApplication"
         android:allowBackup="true"
@@ -38,6 +44,7 @@
         android:roundIcon="@drawable/ic_launcher"
         android:label="@string/app_name"
         android:supportsRtl="true"
+        android:enableOnBackInvokedCallback="true"
         android:theme="@style/Theme.Filora">
 
         <activity
@@ -47,6 +54,16 @@
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+            <!-- T053: deep links into a folder path / category hub. The single
+                 `filora://` scheme routes here; Navigation Compose matches the URI
+                 (e.g. filora://browser?location=… / filora://category?category=…) to
+                 the right destination via the typed navDeepLink builders. -->
+            <intent-filter android:autoVerify="false">
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="filora" />
             </intent-filter>
         </activity>
 

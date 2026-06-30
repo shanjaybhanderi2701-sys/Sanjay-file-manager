@@ -61,6 +61,7 @@ fun EmptyState(
 }
 
 @Preview
+@Suppress("HardcodedText") // Preview-only sample copy; never shipped to users.
 @Composable
 private fun EmptyStatePreview() {
     FiloraTheme {

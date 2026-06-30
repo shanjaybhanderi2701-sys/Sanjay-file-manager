@@ -40,22 +40,37 @@ acceptance evidence for closing APP-84; run them once T6.5 lands and attach resu
    file operations), background/rotate at each. Acceptance: **zero** retained-instance leaks reported.
    Fix any leak (common culprits: ViewModel-held Context, un-cancelled coroutine scope, registered
    listeners not removed in `onCleared`/`DisposableEffect`).
-2. **Baseline profile (NFR-1.1)** — extend `BaselineProfileGenerator.generate {}` with the real
-   critical journey, then:
+2. **Baseline profile (NFR-1.1)** — the Home critical journey is now wired in
+   `BaselineProfileGenerator.generate {}` (launch → Home → scroll dashboard). Generate with:
    `./gradlew :baselineprofile:generateBaselineProfile`
    Commit the generated `app/src/standard/generated/baselineProfiles/baseline-prof.txt`.
-3. **Startup budget (NFR-1.1)** — `./gradlew :baselineprofile:connectedBenchmarkAndroidTest`
+3. **Startup budget (NFR-1.1)** — `./gradlew :baselineprofile:connectedStandardBenchmarkAndroidTest`
    Compare `startupBaselineProfile` `timeToInitialDisplayMs` against the 1.5 s budget on a
    Pixel 6a-class device.
 4. **Scroll jank (NFR-1.3)** and **large-directory first frame (NFR-1.2)** — add a
    `FrameTimingMetric` macrobenchmark over the browse/media lists with a 10k-entry fixture.
 5. **APK/AAB size (NFR-9.1)** — `./gradlew :app:bundleStandardRelease`; assert base module ≤ 12 MB.
 
-## Unblock owner / action
+## Automation (CI)
 
-Blocked on **T6.5 (feature-complete)**. Unblock owner: whoever lands T6.5. Action: once the app is
-feature-complete and launchable, run steps 1–5 above, attach LeakCanary results + benchmark numbers
-+ the committed baseline profile, then close APP-84.
+Steps 2–3 are automated by the **`baseline-profile`** job in `.github/workflows/ci.yml`: on push to
+`main` (or manual `workflow_dispatch`) it boots an API-34 `pixel_6` emulator
+(`reactivecircus/android-emulator-runner`), runs `:baselineprofile:generateBaselineProfile` and the
+cold-start macrobenchmark, and uploads the generated profile + benchmark results as artifacts. This
+is the agent-owned, reproducible path to the on-device NFR-1.1 evidence — it executes once the repo
+has GitHub Actions write access (the standing org-level CI blocker, APP-52). Step 1 (LeakCanary) and
+step 4 (jank/10k-frame) still need a manual/instrumented device pass.
+
+## Status
+
+- **Gate lifted:** T6.5 (feature-complete, APP-80) is **done** — the dependency is resolved.
+- **Landed:** hardening infra + Home baseline-profile journey + `testTagsAsResourceId` + CI emulator
+  job. All turnkey.
+- **Remaining (needs execution hardware):** run the `baseline-profile` CI job (or a local device) to
+  capture the LeakCanary-clean sweep, the committed baseline profile, and the ≤ 1.5 s cold-start
+  number, then attach them and close APP-84. This requires a CI Android-emulator runner, gated on the
+  GitHub Actions write-access blocker (APP-52 / the board GitHub-access approval). No device/emulator
+  is available in the headless agent workspace.
 
 ---
 

@@ -91,7 +91,7 @@ class StorageViewModelTest {
 
             val state = vm.uiState.value
             assertThat(state.isLoading).isFalse()
-            assertThat(state.errorMessage).isNull()
+            assertThat(state.errorMessageRes).isNull()
             assertThat(state.breakdown?.volumes).hasSize(1)
             val only = state.breakdown?.volumes?.single()
             assertThat(only?.categories?.single()?.category).isEqualTo(MediaCategory.Images)
@@ -109,7 +109,7 @@ class StorageViewModelTest {
 
             val state = vm.uiState.value
             assertThat(state.isLoading).isFalse()
-            assertThat(state.errorMessage).isNotNull()
+            assertThat(state.errorMessageRes).isNotNull()
         }
 
     @Test
@@ -123,7 +123,7 @@ class StorageViewModelTest {
             advanceUntilIdle()
 
             val state = vm.uiState.value
-            assertThat(state.errorMessage).isNull()
+            assertThat(state.errorMessageRes).isNull()
             val only = state.breakdown?.volumes?.single()
             assertThat(only?.categories).isEmpty()
             assertThat(only?.volume?.usedBytes).isEqualTo(600L)

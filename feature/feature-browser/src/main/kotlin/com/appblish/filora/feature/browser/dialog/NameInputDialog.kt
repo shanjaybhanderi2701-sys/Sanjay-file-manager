@@ -11,11 +11,13 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.TextFieldValue
 import com.appblish.filora.core.domain.usecase.FileNameValidation
 import com.appblish.filora.core.domain.usecase.FileNameValidator
+import com.appblish.filora.feature.browser.R
 
 /**
  * Reusable single-field name dialog shared by the create-folder and rename flows.
@@ -45,11 +47,17 @@ internal fun NameInputDialog(
     var edited by remember { mutableStateOf(false) }
 
     val validation = FileNameValidator.validate(field.text, existingNames)
-    val validationError =
+    val validationMessage =
         (validation as? FileNameValidation.Invalid)
             ?.takeIf { edited }
             ?.error
             ?.toMessage()
+    val validationError =
+        if (validationMessage != null) {
+            stringResource(validationMessage.resId, *validationMessage.formatArgs.toTypedArray())
+        } else {
+            null
+        }
     // A fresh edit clears the stale server-side error; otherwise show it.
     val errorText = validationError ?: submitError?.takeUnless { edited }
     val confirmEnabled = validation is FileNameValidation.Valid
@@ -80,7 +88,7 @@ internal fun NameInputDialog(
             TextButton(onClick = confirm, enabled = confirmEnabled) { Text(confirmLabel) }
         },
         dismissButton = {
-            TextButton(onClick = onDismiss) { Text("Cancel") }
+            TextButton(onClick = onDismiss) { Text(stringResource(R.string.browser_dialog_cancel)) }
         },
     )
 }

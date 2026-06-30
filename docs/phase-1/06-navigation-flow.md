@@ -51,13 +51,28 @@ Home  ─────────────┬─► Browser(path|treeUri)
   dialogs/bottom sheets, **not** nav destinations — they don't alter the back stack.
 - **Argument passing:** small args via typed route params; complex selections held
   in the owning ViewModel / `SavedStateHandle`, not serialized through routes.
-- **Deep links:** none in v1 (reserved). External "open with Filora" intents resolve
-  to `browser` at the requested location.
+- **Top-level navigation (T050):** a bottom `NavigationBar` exposes the five top-level
+  destinations — Home / Browser / Search / Storage / Settings. Tab switches use the
+  multi-back-stack pattern (`popUpTo(start){saveState=true}` + `restoreState=true` +
+  `launchSingleTop`) so each tab keeps its own back stack and scroll. The bar is hidden
+  on the permission gate. (`FiloraBottomBar` / `navigateToTopLevel`.)
+- **Deep links (T053):** the single `filora://` scheme is registered on `MainActivity`;
+  typed `navDeepLink` builders expand each base into the route template —
+  `filora://browser?location={location}` (a folder path / tree URI),
+  `filora://category?category={category}` (a category hub), and `filora://categories`
+  (the hub grid). Constants live in `FiloraDeepLinks`.
+- **Predictive back (T051):** `android:enableOnBackInvokedCallback="true"` opts the app
+  into the API-34+ predictive-back gesture; Navigation Compose renders the cross-screen
+  predictive animation automatically. Older APIs fall back to a standard pop.
 
 ## 4. State preservation
 
 - Each screen's ViewModel is scoped to its nav back-stack entry; scroll position and
   selection survive config changes via `SavedStateHandle`/`rememberSaveable`.
+- **Process death (T052):** typed `@Serializable` routes are saved to the bundle by
+  Navigation Compose, so the back stack (e.g. nested `browser` locations) is recreated
+  after process death; `MainActivity` re-evaluates the permission gate on each cold start.
+  The bottom-bar `saveState`/`restoreState` keeps per-tab back stacks across tab switches.
 - Returning from a background long-operation re-syncs the affected directory.
 
 ## 5. Back behavior

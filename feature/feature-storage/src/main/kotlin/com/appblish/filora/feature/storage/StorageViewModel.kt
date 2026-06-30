@@ -1,5 +1,6 @@
 package com.appblish.filora.feature.storage
 
+import androidx.annotation.StringRes
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.appblish.filora.core.common.result.Result
@@ -17,13 +18,13 @@ import javax.inject.Inject
 data class StorageUiState(
     val isLoading: Boolean = true,
     val breakdown: StorageBreakdown? = null,
-    val errorMessage: String? = null,
+    @StringRes val errorMessageRes: Int? = null,
 )
 
 /**
  * Drives the storage breakdown screen (FR-8.1). Collects
  * [GetStorageBreakdownUseCase] and publishes per-volume used/free with by-category
- * slices. A volume-enumeration failure surfaces as [StorageUiState.errorMessage]
+ * slices. A volume-enumeration failure surfaces as [StorageUiState.errorMessageRes]
  * while the screen stays renderable; missing media access simply yields volumes with
  * no category slices (the use case degrades it), so used/free always shows.
  */
@@ -42,14 +43,14 @@ class StorageViewModel
                     when (result) {
                         is Result.Success ->
                             _uiState.update {
-                                it.copy(isLoading = false, breakdown = result.data, errorMessage = null)
+                                it.copy(isLoading = false, breakdown = result.data, errorMessageRes = null)
                             }
 
                         is Result.Error ->
                             _uiState.update {
                                 it.copy(
                                     isLoading = false,
-                                    errorMessage = "Couldn't read storage volumes.",
+                                    errorMessageRes = R.string.storage_error_load,
                                 )
                             }
                     }

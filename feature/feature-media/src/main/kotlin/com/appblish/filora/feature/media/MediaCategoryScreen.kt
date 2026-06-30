@@ -22,6 +22,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.pluralStringResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -69,10 +71,16 @@ internal fun MediaCategoryContent(
         verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
         items(uiState.tiles, key = { it.hub.name }) { tile ->
+            val caption =
+                if (tile.count == 0) {
+                    stringResource(R.string.media_caption_empty)
+                } else {
+                    pluralStringResource(R.plurals.media_item_count, tile.count, tile.count)
+                }
             GridTile(
-                label = tile.label,
+                label = stringResource(tile.hub.labelRes),
                 icon = tile.hub.icon,
-                caption = tile.caption,
+                caption = caption,
                 modifier = Modifier.clickable { onOpenCategory(tile.hub.category) },
             )
         }

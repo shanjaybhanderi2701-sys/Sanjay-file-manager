@@ -2,6 +2,13 @@
 <resources>
     <string name="app_name">Filora</string>
 
+    <!-- T050 bottom navigation: top-level destination labels -->
+    <string name="nav_home">Home</string>
+    <string name="nav_browse">Browse</string>
+    <string name="nav_search">Search</string>
+    <string name="nav_storage">Storage</string>
+    <string name="nav_settings">Settings</string>
+
     <!-- FR-1.1 permission rationale + request flow -->
     <string name="permission_title">Access your files</string>
     <string name="permission_rationale_body">Filora needs access to your photos, videos, audio, and documents so it can show your media categories and let you browse, search, and organize your files. Filora never uploads your files — everything stays on your device.</string>

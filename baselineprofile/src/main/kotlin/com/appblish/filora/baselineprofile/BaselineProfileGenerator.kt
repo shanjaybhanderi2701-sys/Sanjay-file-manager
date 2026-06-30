@@ -2,6 +2,9 @@ package com.appblish.filora.baselineprofile
 
 import androidx.benchmark.macro.junit4.BaselineProfileRule
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.uiautomator.By
+import androidx.test.uiautomator.Direction
+import androidx.test.uiautomator.Until
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -15,10 +18,10 @@ import org.junit.runner.RunWith
  * The resulting `baseline-prof.txt` is copied into `:app/src/<flavor>/generated/baselineProfiles/`
  * by the AndroidX Baseline Profile plugin and baked into the release AAB.
  *
- * The critical user journey below is intentionally minimal (launch -> first interactive frame).
- * Extend `collect {}` with the real home/browse interactions once the app is feature-complete
- * (T6.5): scroll the home hubs, open a directory, run a search. Each step that runs here gets
- * its hot classes/methods precompiled.
+ * The critical user journey drives launch -> Home -> scroll the dashboard, so the hot Compose
+ * classes/methods for the startup surface (Home hubs, volume cards, recents/favorites strips)
+ * get precompiled. MainActivity exposes Compose `testTag`s as resource-ids, so nodes are
+ * addressable via `By.res(packageName, tag)`.
  */
 @RunWith(AndroidJUnit4::class)
 class BaselineProfileGenerator {
@@ -34,8 +37,14 @@ class BaselineProfileGenerator {
     ) {
         pressHome()
         startActivityAndWait()
-        // TODO(T6.5): once home/browse/search are wired, drive the critical journey here, e.g.
-        //   device.findObject(By.res(packageName, "home_hub_grid"))?.fling(Direction.DOWN)
-        //   device.waitForIdle()
+        // Wait for the app content to be present, then scroll the dashboard so the Home
+        // list composables are exercised (and thus included in the profile).
+        device.wait(Until.hasObject(By.res(PACKAGE_NAME, "filora_app_root")), 5_000)
+        device.findObject(By.scrollable(true))?.apply {
+            setGestureMargin(device.displayWidth / 5)
+            fling(Direction.DOWN)
+            fling(Direction.UP)
+        }
+        device.waitForIdle()
     }
 }

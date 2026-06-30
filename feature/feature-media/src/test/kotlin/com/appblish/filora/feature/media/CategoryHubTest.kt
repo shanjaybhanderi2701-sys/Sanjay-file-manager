@@ -64,15 +64,18 @@ class CategoryHubTest {
     }
 
     @Test
-    fun `caption pluralises around zero one and many`() {
-        assertThat(CategoryHubTile(CategoryHub.Images, 0).caption).isEqualTo("Empty")
-        assertThat(CategoryHubTile(CategoryHub.Images, 1).caption).isEqualTo("1 item")
-        assertThat(CategoryHubTile(CategoryHub.Images, 42).caption).isEqualTo("42 items")
+    fun `tile carries the resolved count that drives its caption`() {
+        // The caption text (Empty / N item(s)) is now a string/plurals resource
+        // resolved at the Composable render site (NFR-7); the pure tile just carries
+        // the clamped count the caption is built from.
+        assertThat(CategoryHubTile(CategoryHub.Images, 0).count).isEqualTo(0)
+        assertThat(CategoryHubTile(CategoryHub.Images, 1).count).isEqualTo(1)
+        assertThat(CategoryHubTile(CategoryHub.Images, 42).count).isEqualTo(42)
     }
 
     @Test
-    fun `tile label mirrors the hub label`() {
-        assertThat(CategoryHubTile(CategoryHub.Apks, 0).label).isEqualTo("APKs")
-        assertThat(CategoryHubTile(CategoryHub.Docs, 0).label).isEqualTo("Docs")
+    fun `hub label resource maps to the right category copy`() {
+        assertThat(CategoryHub.Apks.labelRes).isEqualTo(R.string.media_hub_apks)
+        assertThat(CategoryHub.Docs.labelRes).isEqualTo(R.string.media_hub_docs)
     }
 }

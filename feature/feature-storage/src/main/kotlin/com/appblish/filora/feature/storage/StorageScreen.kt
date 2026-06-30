@@ -13,7 +13,9 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.outlined.KeyboardArrowRight
 import androidx.compose.material.icons.outlined.Android
+import androidx.compose.material.icons.outlined.Assessment
 import androidx.compose.material.icons.outlined.Description
 import androidx.compose.material.icons.outlined.Download
 import androidx.compose.material.icons.outlined.FolderZip
@@ -29,11 +31,14 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.annotation.StringRes
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.pluralStringResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -55,16 +60,23 @@ import com.appblish.filora.core.ui.component.EmptyState
 fun StorageScreen(
     modifier: Modifier = Modifier,
     onOpenCategory: (StorageVolume, MediaCategory) -> Unit = { _, _ -> },
+    onOpenLargestFiles: () -> Unit = {},
     viewModel: StorageViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    StorageContent(uiState = uiState, onOpenCategory = onOpenCategory, modifier = modifier)
+    StorageContent(
+        uiState = uiState,
+        onOpenCategory = onOpenCategory,
+        onOpenLargestFiles = onOpenLargestFiles,
+        modifier = modifier,
+    )
 }
 
 @Composable
 internal fun StorageContent(
     uiState: StorageUiState,
     onOpenCategory: (StorageVolume, MediaCategory) -> Unit,
+    onOpenLargestFiles: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val volumes = uiState.breakdown?.volumes.orEmpty()
@@ -74,19 +86,19 @@ internal fun StorageContent(
                 CircularProgressIndicator()
             }
 
-        uiState.errorMessage != null ->
+        uiState.errorMessageRes != null ->
             EmptyState(
                 icon = Icons.Outlined.Storage,
-                title = "Storage",
-                description = uiState.errorMessage,
+                title = stringResource(R.string.storage_title),
+                description = stringResource(uiState.errorMessageRes),
                 modifier = modifier,
             )
 
         volumes.isEmpty() ->
             EmptyState(
                 icon = Icons.Outlined.Storage,
-                title = "No storage volumes",
-                description = "Couldn't find any mounted storage.",
+                title = stringResource(R.string.storage_empty_title),
+                description = stringResource(R.string.storage_empty_body),
                 modifier = modifier,
             )
 
@@ -96,10 +108,47 @@ internal fun StorageContent(
                 contentPadding = PaddingValues(16.dp),
                 verticalArrangement = Arrangement.spacedBy(16.dp),
             ) {
+                item(key = "largest-files") {
+                    LargestFilesCard(onClick = onOpenLargestFiles)
+                }
                 items(volumes, key = { it.volume.id }) { volume ->
                     VolumeCard(volume = volume, onOpenCategory = onOpenCategory)
                 }
             }
+    }
+}
+
+/** Entry tile that drills into the largest-files view (FR-8.2). */
+@Composable
+private fun LargestFilesCard(onClick: () -> Unit) {
+    Card(modifier = Modifier.fillMaxWidth().clickable(onClick = onClick)) {
+        Row(
+            modifier = Modifier.fillMaxWidth().padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Icon(
+                imageVector = Icons.Outlined.Assessment,
+                contentDescription = null,
+                modifier = Modifier.size(28.dp),
+                tint = MaterialTheme.colorScheme.primary,
+            )
+            Column(modifier = Modifier.weight(1f).padding(start = 12.dp)) {
+                Text(
+                    text = stringResource(R.string.storage_largest_files_title),
+                    style = MaterialTheme.typography.titleMedium,
+                )
+                Text(
+                    text = stringResource(R.string.storage_largest_files_subtitle),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
+            Icon(
+                imageVector = Icons.AutoMirrored.Outlined.KeyboardArrowRight,
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        }
     }
 }
 
@@ -134,9 +183,12 @@ private fun VolumeCard(
             )
             Text(
                 text =
-                    "${Formatters.formatSize(volume.volume.usedBytes)} used · " +
-                        "${Formatters.formatSize(volume.volume.availableBytes)} free of " +
+                    stringResource(
+                        R.string.storage_usage_summary,
+                        Formatters.formatSize(volume.volume.usedBytes),
+                        Formatters.formatSize(volume.volume.availableBytes),
                         Formatters.formatSize(total),
+                    ),
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.padding(top = 8.dp),
@@ -170,11 +222,11 @@ private fun CategoryRow(
         )
         Column(modifier = Modifier.weight(1f).padding(start = 12.dp)) {
             Text(
-                text = usage.category.label,
+                text = stringResource(usage.category.labelRes),
                 style = MaterialTheme.typography.bodyLarge,
             )
             Text(
-                text = "${usage.itemCount} ${if (usage.itemCount == 1) "item" else "items"}",
+                text = pluralStringResource(R.plurals.storage_item_count, usage.itemCount, usage.itemCount),
                 style = MaterialTheme.typography.labelMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
@@ -187,17 +239,18 @@ private fun CategoryRow(
 }
 
 /** Display label for each category on the breakdown rows. */
-private val MediaCategory.label: String
+@get:StringRes
+private val MediaCategory.labelRes: Int
     get() =
         when (this) {
-            MediaCategory.Images -> "Images"
-            MediaCategory.Video -> "Video"
-            MediaCategory.Audio -> "Audio"
-            MediaCategory.Documents -> "Documents"
-            MediaCategory.Archives -> "Archives"
-            MediaCategory.Apps -> "Apps"
-            MediaCategory.Downloads -> "Downloads"
-            MediaCategory.Other -> "Other"
+            MediaCategory.Images -> R.string.storage_cat_images
+            MediaCategory.Video -> R.string.storage_cat_video
+            MediaCategory.Audio -> R.string.storage_cat_audio
+            MediaCategory.Documents -> R.string.storage_cat_documents
+            MediaCategory.Archives -> R.string.storage_cat_archives
+            MediaCategory.Apps -> R.string.storage_cat_apps
+            MediaCategory.Downloads -> R.string.storage_cat_downloads
+            MediaCategory.Other -> R.string.storage_cat_other
         }
 
 /** Outlined icon for each category. Kept in the Compose layer so the model stays pure. */

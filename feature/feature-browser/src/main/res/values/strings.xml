@@ -4,6 +4,9 @@
     <string name="browser_title">Browser</string>
     <string name="browser_coming_soon">Coming soon.</string>
 
+    <!-- Breadcrumb trail (FR-2.2): label for the storage-root crumb -->
+    <string name="browser_breadcrumb_root">Internal storage</string>
+
     <!-- Directory listing states (FR-2.1) -->
     <string name="browser_empty_title">Empty folder</string>
     <string name="browser_empty_description">There\'s nothing here yet.</string>
@@ -34,6 +37,7 @@
     <string name="browser_selected_count">%1$d selected</string>
 
     <!-- Batch action labels -->
+    <string name="browser_action_rename">Rename</string>
     <string name="browser_action_move">Move</string>
     <string name="browser_action_copy">Copy</string>
     <string name="browser_action_delete">Delete</string>
@@ -43,6 +47,11 @@
     <!-- Share / open chooser titles (FR-10.1, FR-10.2) -->
     <string name="browser_chooser_open_with">Open with</string>
     <string name="browser_chooser_share">Share</string>
+    <string name="browser_share_no_app">No app can share these files.</string>
+
+    <!-- New folder + operation results (FR-3.1, FR-3.5) -->
+    <string name="browser_action_new_folder">New folder</string>
+    <string name="browser_deleted">Deleted.</string>
 
     <!-- Name input dialog (create folder / rename) -->
     <string name="browser_dialog_cancel">Cancel</string>

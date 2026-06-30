@@ -14,6 +14,7 @@
     <string name="browser_action_select_all">تحديد الكل</string>
     <string name="browser_selected_count">%1$d محدد</string>
 
+    <string name="browser_action_rename">إعادة تسمية</string>
     <string name="browser_action_move">نقل</string>
     <string name="browser_action_copy">نسخ</string>
     <string name="browser_action_delete">حذف</string>
@@ -22,6 +23,10 @@
 
     <string name="browser_chooser_open_with">فتح باستخدام</string>
     <string name="browser_chooser_share">مشاركة</string>
+    <string name="browser_share_no_app">لا يوجد تطبيق يمكنه مشاركة هذه الملفات.</string>
+
+    <string name="browser_action_new_folder">مجلد جديد</string>
+    <string name="browser_deleted">تم الحذف.</string>
 
     <string name="browser_dialog_cancel">إلغاء</string>
     <string name="browser_dialog_new_folder_title">مجلد جديد</string>

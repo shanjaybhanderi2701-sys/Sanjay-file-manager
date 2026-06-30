@@ -1,5 +1,6 @@
 package com.appblish.filora.feature.media
 
+import androidx.annotation.StringRes
 import com.appblish.filora.core.domain.model.MediaCategory
 
 /**
@@ -7,20 +8,23 @@ import com.appblish.filora.core.domain.model.MediaCategory
  * display order: Images, Video, Audio, Docs, Downloads, APKs, Archives. Each maps
  * to a domain [MediaCategory] whose count comes from `MediaRepository.categoryCounts`.
  *
+ * [labelRes] is the string resource for the hub's user-facing label, resolved at the
+ * Composable render site (NFR-7).
+ *
  * [MediaCategory.Other] is intentionally absent — it is a classifier fallback
  * bucket, not a user-facing hub.
  */
 enum class CategoryHub(
     val category: MediaCategory,
-    val label: String,
+    @StringRes val labelRes: Int,
 ) {
-    Images(MediaCategory.Images, "Images"),
-    Video(MediaCategory.Video, "Video"),
-    Audio(MediaCategory.Audio, "Audio"),
-    Docs(MediaCategory.Documents, "Docs"),
-    Downloads(MediaCategory.Downloads, "Downloads"),
-    Apks(MediaCategory.Apps, "APKs"),
-    Archives(MediaCategory.Archives, "Archives"),
+    Images(MediaCategory.Images, R.string.media_hub_images),
+    Video(MediaCategory.Video, R.string.media_hub_video),
+    Audio(MediaCategory.Audio, R.string.media_hub_audio),
+    Docs(MediaCategory.Documents, R.string.media_hub_docs),
+    Downloads(MediaCategory.Downloads, R.string.media_hub_downloads),
+    Apks(MediaCategory.Apps, R.string.media_hub_apks),
+    Archives(MediaCategory.Archives, R.string.media_hub_archives),
     ;
 
     companion object {
@@ -30,23 +34,13 @@ enum class CategoryHub(
 }
 
 /**
- * View data for one hub tile: the [hub] and its resolved item [count]. [caption] is
- * the human-readable count line rendered under the tile label.
+ * View data for one hub tile: the [hub] and its resolved item [count]. The label and
+ * count caption are string resources resolved at the Composable render site (NFR-7).
  */
 data class CategoryHubTile(
     val hub: CategoryHub,
     val count: Int,
-) {
-    val label: String get() = hub.label
-
-    val caption: String
-        get() =
-            when (count) {
-                0 -> "Empty"
-                1 -> "1 item"
-                else -> "$count items"
-            }
-}
+)
 
 /**
  * Builds the ordered seven-hub tile list from category [counts]. Categories absent

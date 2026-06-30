@@ -79,6 +79,7 @@ androidx-compose-material-icons-extended = { group = "androidx.compose.material"
 
 # Navigation
 androidx-navigation-compose = { group = "androidx.navigation", name = "navigation-compose", version.ref = "navigationCompose" }
+androidx-navigation-testing = { group = "androidx.navigation", name = "navigation-testing", version.ref = "navigationCompose" }
 
 # Coil (image/video thumbnail loading with bounded mem+disk cache)
 coil-compose = { group = "io.coil-kt", name = "coil-compose", version.ref = "coil" }
