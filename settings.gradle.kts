@@ -33,6 +33,9 @@ include(":core:core-ui")
 include(":core:core-data")
 include(":core:core-database")
 
+// Shared JVM test fixtures (fake repositories + file-tree builder DSL) — T169 (M16).
+include(":core:core-testing")
+
 include(":feature:feature-home")
 include(":feature:feature-browser")
 include(":feature:feature-search")
