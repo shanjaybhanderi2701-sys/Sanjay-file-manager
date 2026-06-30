@@ -40,11 +40,19 @@
 
 ## 6. Store listing assets (prepared during M7)
 
-- Original app icon + feature graphic (Filora branding).
-- Screenshots (phone + tablet, light/dark).
-- Short & full description; privacy policy URL; data-safety form
-  (declares: no data collected / no data shared in v1).
-- Content rating questionnaire.
+Authored deliverables (APP-87 / T7.7) live in [`release-assets/`](release-assets/):
+
+- **Store listing & assets** — [`release-assets/store-listing.md`](release-assets/store-listing.md):
+  original app icon + feature graphic specs, phone/tablet light-dark screenshot
+  set, ready-to-paste short & full description, content-rating questionnaire.
+- **Privacy policy** — [`release-assets/privacy-policy.md`](release-assets/privacy-policy.md):
+  canonical text to host at the declared privacy-policy URL.
+- **Data-safety form** — [`release-assets/data-safety-form.md`](release-assets/data-safety-form.md):
+  Play Console answers, **declares no data collected / no data shared in v1**,
+  aligned with the NFR-3 / APP-17 security sign-off.
+
+Graphics (icon, feature graphic, screenshots) are produced during the M7 design
+pass against the specs above; all copy and form answers are final.
 
 ## 7. Rollout strategy
 
@@ -67,7 +75,8 @@
 
 - [ ] All milestones M0–M7 complete and verified.
 - [ ] NFRs measured and passing.
-- [ ] Store listing, privacy policy, data-safety form complete.
+- [x] Store listing, privacy policy, data-safety form complete (text/answers
+      final in `release-assets/`; only M7 graphics production remains).
 - [ ] Signed AAB uploaded; staged rollout configured.
 - [ ] Monitoring/alerting on Play vitals in place.
 - [ ] Original-IP review signed off (R10).
