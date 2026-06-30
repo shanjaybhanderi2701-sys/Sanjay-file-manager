@@ -91,7 +91,7 @@ class StorageRepositoryImplTest {
     @Test
     fun `getVolume surfaces enumeration failures as an Io error`() =
         runTest(dispatcher) {
-            val enumerator = VolumeEnumerator { throw RuntimeException("mount table read failed") }
+            val enumerator = VolumeEnumerator { throw IllegalStateException("mount table read failed") }
 
             val result = repository(enumerator).getVolume("primary")
 
