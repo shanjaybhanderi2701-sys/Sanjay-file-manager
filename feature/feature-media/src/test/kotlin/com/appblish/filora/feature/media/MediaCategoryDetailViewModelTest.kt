@@ -69,7 +69,7 @@ class MediaCategoryDetailViewModelTest {
 
             val state = viewModel.uiState.value
             assertThat(state.isLoading).isFalse()
-            assertThat(state.errorMessage).isNull()
+            assertThat(state.errorMessageRes).isNull()
             assertThat(state.items.map { it.name }).containsExactly("a.jpg", "b.png").inOrder()
         }
 
@@ -88,7 +88,7 @@ class MediaCategoryDetailViewModelTest {
             val state = viewModel.uiState.value
             assertThat(state.isLoading).isFalse()
             assertThat(state.items).isEmpty()
-            assertThat(state.errorMessage).contains("storage access")
+            assertThat(state.errorMessageRes).isEqualTo(R.string.media_detail_error_permission)
         }
 
     @Test

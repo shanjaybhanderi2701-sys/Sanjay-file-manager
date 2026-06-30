@@ -1,5 +1,6 @@
 package com.appblish.filora.feature.media
 
+import androidx.annotation.StringRes
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.appblish.filora.core.common.result.OperationError
@@ -40,7 +41,7 @@ class MediaCategoryDetailViewModel
             boundCategory = category
             observeJob?.cancel()
             _uiState.update {
-                it.copy(isLoading = true, items = emptyList(), errorMessage = null)
+                it.copy(isLoading = true, items = emptyList(), errorMessageRes = null)
             }
             observeJob =
                 viewModelScope.launch {
@@ -51,14 +52,14 @@ class MediaCategoryDetailViewModel
                                     it.copy(
                                         isLoading = false,
                                         items = result.data,
-                                        errorMessage = null,
+                                        errorMessageRes = null,
                                     )
 
                                 is Result.Error ->
                                     it.copy(
                                         isLoading = false,
                                         items = emptyList(),
-                                        errorMessage = result.error.toDetailMessage(),
+                                        errorMessageRes = result.error.toDetailMessageRes(),
                                     )
                             }
                         }
@@ -67,8 +68,9 @@ class MediaCategoryDetailViewModel
         }
     }
 
-private fun OperationError.toDetailMessage(): String =
+@StringRes
+private fun OperationError.toDetailMessageRes(): Int =
     when (this) {
-        is OperationError.PermissionDenied -> "Grant storage access to see these files."
-        else -> "Couldn't load this category. Pull to refresh."
+        is OperationError.PermissionDenied -> R.string.media_detail_error_permission
+        else -> R.string.media_detail_error_load
     }
