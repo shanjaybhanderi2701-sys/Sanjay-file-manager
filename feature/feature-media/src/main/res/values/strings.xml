@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Category hub tile labels (FR-6.1) -->
+    <string name="media_hub_images">Images</string>
+    <string name="media_hub_video">Video</string>
+    <string name="media_hub_audio">Audio</string>
+    <string name="media_hub_docs">Docs</string>
+    <string name="media_hub_downloads">Downloads</string>
+    <string name="media_hub_apks">APKs</string>
+    <string name="media_hub_archives">Archives</string>
+
+    <!-- Hub tile count captions -->
+    <string name="media_caption_empty">Empty</string>
+    <plurals name="media_item_count">
+        <item quantity="one">%d item</item>
+        <item quantity="other">%d items</item>
+    </plurals>
+
+    <!-- Category detail empty/open states -->
+    <string name="media_empty_title">Nothing here yet</string>
+    <string name="media_empty_body">Files in this category will show up here.</string>
+    <string name="media_open_failed">No app can open this file</string>
+    <string name="media_open_with">Open with</string>
+    <string name="media_type_file">File</string>
+
+    <!-- Share intents (FR-10) -->
+    <string name="media_share_with">Share via</string>
+    <string name="media_share">Share</string>
+    <string name="media_share_failed">Can\'t share this item</string>
+
+    <!-- Hub count-load error messages -->
+    <string name="media_error_permission">Grant storage access to see your media.</string>
+    <string name="media_error_load">Couldn\'t load categories. Pull to refresh.</string>
+
+    <!-- Category detail error messages -->
+    <string name="media_detail_error_permission">Grant storage access to see these files.</string>
+    <string name="media_detail_error_load">Couldn\'t load this category. Pull to refresh.</string>
+</resources>
