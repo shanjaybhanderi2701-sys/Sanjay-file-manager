@@ -41,7 +41,10 @@ fun FiloraNavHost(
         }
         composable<Route.Browser> { BrowserScreen() }
         composable<Route.Search> { SearchScreen() }
-        composable<Route.Media> { MediaCategoryScreen() }
+        composable<Route.Media> {
+            // Category file lists land in a later M4 task; the hub renders counts now.
+            MediaCategoryScreen(onOpenCategory = {})
+        }
         composable<Route.Storage> { StorageScreen() }
         composable<Route.Settings> { SettingsScreen() }
     }
