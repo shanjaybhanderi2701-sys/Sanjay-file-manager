@@ -47,4 +47,10 @@
     <string name="storage_largest_error_permission">امنح وصول التخزين لفحص ملفاتك.</string>
     <string name="storage_largest_error_not_found">تعذّر العثور على وحدة تخزين للفحص.</string>
     <string name="storage_largest_error_generic">تعذّر قراءة ملفاتك. حاول مرة أخرى.</string>
+
+    <!-- Storage-story hero band (hi-fi spec §3.5) -->
+    <string name="storage_story_free_caption">متاح من أصل %1$s</string>
+    <string name="storage_story_top_category">%1$s يستهلك أكبر مساحة</string>
+    <string name="storage_story_used_summary">%1$s مستخدم من أصل %2$s</string>
+    <string name="storage_story_bar_a11y">%1$s مستخدم من أصل %2$s</string>
 </resources>
