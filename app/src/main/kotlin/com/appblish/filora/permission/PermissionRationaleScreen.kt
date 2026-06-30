@@ -28,6 +28,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.appblish.filora.R
 
 /**
@@ -36,9 +37,12 @@ import com.appblish.filora.R
  * read permissions.
  *
  * - **Grant** → [onGranted] (proceeds to Home).
- * - **Deny** (or "continue with limited access") → [onContinueWithLimitedAccess],
- *   the SAF-scoped browsing path. SAF needs no runtime permission, so the app
- *   stays usable; the tree picker itself is wired in T1.3.
+ * - **Deny / "continue with limited access"** → launches the SAF tree picker
+ *   ([ActivityResultContracts.OpenDocumentTree], T1.3). SAF needs no runtime
+ *   permission; the chosen tree is persisted via [PermissionViewModel] so the
+ *   grant survives restart, and then [onContinueWithLimitedAccess] proceeds to
+ *   Home. Backing out of the picker leaves the user on the gate to retry or grant
+ *   media access instead — never a dead end.
  *
  * The screen owns only the request UX; the granted/denied decision is surfaced
  * to the caller through the two callbacks so navigation stays in the host graph.
@@ -48,6 +52,7 @@ fun PermissionRationaleScreen(
     onGranted: () -> Unit,
     onContinueWithLimitedAccess: () -> Unit,
     modifier: Modifier = Modifier,
+    viewModel: PermissionViewModel = hiltViewModel(),
 ) {
     var denied by rememberSaveable { mutableStateOf(false) }
 
@@ -61,6 +66,19 @@ fun PermissionRationaleScreen(
                 onGranted()
             } else {
                 denied = true
+            }
+        }
+
+    // SAF tree picker (T1.3): the user grants a directory; we take a persistable
+    // grant on it so it outlives this process, then proceed. A null result means
+    // the picker was dismissed — stay on the gate so the choice can be made again.
+    val treePicker =
+        rememberLauncherForActivityResult(
+            ActivityResultContracts.OpenDocumentTree(),
+        ) { treeUri ->
+            if (treeUri != null) {
+                viewModel.onTreeGranted(treeUri)
+                onContinueWithLimitedAccess()
             }
         }
 
@@ -121,7 +139,9 @@ fun PermissionRationaleScreen(
             }
 
             TextButton(
-                onClick = onContinueWithLimitedAccess,
+                // Launch the system document-tree picker; `null` opens at the
+                // picker's default root.
+                onClick = { treePicker.launch(null) },
                 modifier =
                     Modifier
                         .fillMaxWidth()
