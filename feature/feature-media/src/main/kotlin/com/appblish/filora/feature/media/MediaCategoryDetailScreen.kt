@@ -10,10 +10,17 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.outlined.FolderOff
 import androidx.compose.material.icons.outlined.SearchOff
+import androidx.compose.material.icons.outlined.Share
+import androidx.compose.material.icons.outlined.Star
+import androidx.compose.material.icons.outlined.StarBorder
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -37,10 +44,11 @@ import kotlinx.coroutines.launch
 
 /**
  * Detail list for one media [category] (FR-6.1). Streams the category's entries; a
- * tap on an image opens the in-app zoom/pan [ImagePreviewScreen], while any other
- * file is handed to the system-associated app via [MediaIntents]. A long-press shares
- * the item through the system share sheet (FR-10). When no installed app can handle
- * an action, a snackbar tells the user instead of failing silently.
+ * tap on an image opens the in-app zoom/pan [ImagePreviewScreen], while any other file
+ * is handed to the system-associated app via [MediaIntents]. A long-press opens a
+ * context menu (FR-9.1, T094) offering Share — through the system share sheet (FR-10) —
+ * and pin/unpin to favorites. When no installed app can handle an action, a snackbar
+ * tells the user instead of failing silently.
  */
 @Composable
 fun MediaCategoryDetailScreen(
@@ -85,6 +93,7 @@ fun MediaCategoryDetailScreen(
                     }
                 }
             },
+            onToggleFavorite = viewModel::toggleFavorite,
             modifier = Modifier.padding(padding),
         )
     }
@@ -101,12 +110,12 @@ fun MediaCategoryDetailScreen(
     }
 }
 
-@OptIn(ExperimentalFoundationApi::class)
 @Composable
 internal fun MediaCategoryDetailContent(
     uiState: MediaCategoryDetailUiState,
     onOpen: (FileItem) -> Unit,
     onShare: (FileItem) -> Unit,
+    onToggleFavorite: (FileItem) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     when {
@@ -134,18 +143,74 @@ internal fun MediaCategoryDetailContent(
             LazyColumn(modifier = modifier.fillMaxSize()) {
                 items(uiState.items, key = { it.path }) { item ->
                     val unknownType = stringResource(R.string.media_type_file)
-                    FileRow(
-                        name = item.name,
+                    MediaItemRow(
+                        item = item,
                         subtitle = item.subtitle(unknownType),
-                        isDirectory = item.isDirectory,
-                        modifier =
-                            Modifier.combinedClickable(
-                                onClick = { onOpen(item) },
-                                onLongClick = { onShare(item) },
-                            ),
+                        isFavorite = item.path in uiState.favoritePaths,
+                        onOpen = onOpen,
+                        onShare = onShare,
+                        onToggleFavorite = onToggleFavorite,
                     )
                 }
             }
+    }
+}
+
+/**
+ * One media entry: tap opens it, long-press anchors a [DropdownMenu] (FR-9.1, T094)
+ * with Share and pin/unpin actions. The pin label and star icon reflect [isFavorite].
+ */
+@OptIn(ExperimentalFoundationApi::class)
+@Composable
+private fun MediaItemRow(
+    item: FileItem,
+    subtitle: String,
+    isFavorite: Boolean,
+    onOpen: (FileItem) -> Unit,
+    onShare: (FileItem) -> Unit,
+    onToggleFavorite: (FileItem) -> Unit,
+) {
+    var menuExpanded by remember { mutableStateOf(false) }
+    Box {
+        FileRow(
+            name = item.name,
+            subtitle = subtitle,
+            isDirectory = item.isDirectory,
+            modifier =
+                Modifier.combinedClickable(
+                    onClick = { onOpen(item) },
+                    onLongClick = { menuExpanded = true },
+                ),
+        )
+        DropdownMenu(expanded = menuExpanded, onDismissRequest = { menuExpanded = false }) {
+            DropdownMenuItem(
+                text = { Text(stringResource(R.string.media_share)) },
+                leadingIcon = { Icon(Icons.Outlined.Share, contentDescription = null) },
+                onClick = {
+                    onShare(item)
+                    menuExpanded = false
+                },
+            )
+            DropdownMenuItem(
+                text = {
+                    Text(
+                        stringResource(
+                            if (isFavorite) R.string.media_action_unpin else R.string.media_action_pin,
+                        ),
+                    )
+                },
+                leadingIcon = {
+                    Icon(
+                        imageVector = if (isFavorite) Icons.Outlined.Star else Icons.Outlined.StarBorder,
+                        contentDescription = null,
+                    )
+                },
+                onClick = {
+                    onToggleFavorite(item)
+                    menuExpanded = false
+                },
+            )
+        }
     }
 }
 

@@ -10,11 +10,15 @@ import com.appblish.filora.core.domain.model.SortOrder
 import com.appblish.filora.core.domain.model.ViewLayout
 import com.appblish.filora.core.domain.repository.SettingsRepository
 import com.appblish.filora.core.domain.usecase.ListDirectoryUseCase
+import com.appblish.filora.core.domain.usecase.ObserveFavoritesUseCase
+import com.appblish.filora.core.domain.usecase.ToggleFavoriteUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -29,6 +33,11 @@ import javax.inject.Inject
  * it never costs a directory read. Layout, sort, and show-hidden persist through
  * [SettingsRepository] (T038/T040/T042) so a write re-emits preferences and this VM
  * reacts to its own change, keeping the toolbar and store in lockstep.
+ *
+ * Favorites (FR-9.1, T094): the pinned-path set is observed from the Room-backed
+ * [ObserveFavoritesUseCase] and exposed on the state so each row knows whether to
+ * offer "pin" or "unpin" in its context menu. [toggleFavorite] flips the pin via
+ * [ToggleFavoriteUseCase]; the observed stream re-emits and refreshes the affordance.
  */
 @HiltViewModel
 class BrowserViewModel
@@ -36,6 +45,8 @@ class BrowserViewModel
     constructor(
         private val listDirectory: ListDirectoryUseCase,
         private val settingsRepository: SettingsRepository,
+        private val toggleFavoriteUseCase: ToggleFavoriteUseCase,
+        observeFavorites: ObserveFavoritesUseCase,
     ) : ViewModel() {
         private val _uiState = MutableStateFlow(BrowserUiState())
         val uiState: StateFlow<BrowserUiState> = _uiState.asStateFlow()
@@ -45,6 +56,14 @@ class BrowserViewModel
         private var hasLoaded = false
         private var listJob: Job? = null
         private var preferencesStarted = false
+
+        init {
+            observeFavorites()
+                .onEach { favorites ->
+                    val paths = favorites.mapTo(mutableSetOf(), FileItem::path)
+                    _uiState.update { it.copy(favoritePaths = paths) }
+                }.launchIn(viewModelScope)
+        }
 
         /** Binds the directory to browse; a blank location resolves to primary storage. */
         fun bindLocation(location: String) {
@@ -56,6 +75,11 @@ class BrowserViewModel
             _uiState.update { it.copy(location = resolved, phase = BrowserUiState.Phase.Loading) }
             startPreferences()
             reload()
+        }
+
+        /** Pins or unpins [item] (FR-9.1); the observed favorites stream updates the UI. */
+        fun toggleFavorite(item: FileItem) {
+            viewModelScope.launch { toggleFavoriteUseCase(item) }
         }
 
         fun refresh() {

@@ -28,6 +28,9 @@
     <string name="media_share">مشاركة</string>
     <string name="media_share_failed">تعذّر مشاركة هذا العنصر</string>
 
+    <string name="media_action_pin">إضافة إلى المفضلة</string>
+    <string name="media_action_unpin">إزالة من المفضلة</string>
+
     <string name="media_error_permission">امنح وصول التخزين لعرض وسائطك.</string>
     <string name="media_error_load">تعذّر تحميل الفئات. اسحب للتحديث.</string>
 

@@ -3,7 +3,8 @@ package com.appblish.filora.feature.browser
 import android.content.Context
 import android.text.format.DateUtils
 import android.text.format.Formatter
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -19,6 +20,8 @@ import androidx.compose.material.icons.automirrored.outlined.ViewList
 import androidx.compose.material.icons.outlined.Folder
 import androidx.compose.material.icons.outlined.GridView
 import androidx.compose.material.icons.outlined.Sort
+import androidx.compose.material.icons.outlined.Star
+import androidx.compose.material.icons.outlined.StarBorder
 import androidx.compose.material.icons.outlined.Visibility
 import androidx.compose.material.icons.outlined.VisibilityOff
 import androidx.compose.material.icons.outlined.WarningAmber
@@ -71,6 +74,7 @@ fun BrowserScreen(
     BrowserContent(
         uiState = uiState,
         onOpenItem = { item -> if (item.isDirectory) onOpenDirectory(item.path) },
+        onToggleFavorite = viewModel::toggleFavorite,
         onToggleLayout = viewModel::toggleLayout,
         onSortBy = viewModel::setSortBy,
         onToggleHidden = { viewModel.setShowHidden(!uiState.showHidden) },
@@ -84,6 +88,7 @@ fun BrowserScreen(
 internal fun BrowserContent(
     uiState: BrowserUiState,
     onOpenItem: (FileItem) -> Unit,
+    onToggleFavorite: (FileItem) -> Unit,
     onToggleLayout: () -> Unit,
     onSortBy: (SortOrder.By) -> Unit,
     onToggleHidden: () -> Unit,
@@ -126,9 +131,9 @@ internal fun BrowserContent(
 
                 else ->
                     if (uiState.layout == ViewLayout.Grid) {
-                        BrowserGrid(uiState.entries, onOpenItem)
+                        BrowserGrid(uiState.entries, uiState.favoritePaths, onOpenItem, onToggleFavorite)
                     } else {
-                        BrowserList(uiState.entries, onOpenItem)
+                        BrowserList(uiState.entries, uiState.favoritePaths, onOpenItem, onToggleFavorite)
                     }
             }
         }
@@ -216,17 +221,26 @@ private fun SortMenu(
 @Composable
 private fun BrowserList(
     entries: List<FileItem>,
+    favoritePaths: Set<String>,
     onOpenItem: (FileItem) -> Unit,
+    onToggleFavorite: (FileItem) -> Unit,
 ) {
     val context = LocalContext.current
     LazyColumn(modifier = Modifier.fillMaxSize()) {
         items(entries, key = FileItem::path) { item ->
-            FileRow(
-                name = item.name,
-                subtitle = item.subtitle(context),
-                isDirectory = item.isDirectory,
-                modifier = Modifier.clickable { onOpenItem(item) },
-            )
+            FileEntryContextMenu(
+                item = item,
+                isFavorite = item.path in favoritePaths,
+                onOpenItem = onOpenItem,
+                onToggleFavorite = onToggleFavorite,
+            ) { onOpen, onLongPress ->
+                FileRow(
+                    name = item.name,
+                    subtitle = item.subtitle(context),
+                    isDirectory = item.isDirectory,
+                    modifier = rowGestures(onOpen, onLongPress),
+                )
+            }
         }
     }
 }
@@ -234,7 +248,9 @@ private fun BrowserList(
 @Composable
 private fun BrowserGrid(
     entries: List<FileItem>,
+    favoritePaths: Set<String>,
     onOpenItem: (FileItem) -> Unit,
+    onToggleFavorite: (FileItem) -> Unit,
 ) {
     val context = LocalContext.current
     LazyVerticalGrid(
@@ -242,15 +258,74 @@ private fun BrowserGrid(
         modifier = Modifier.fillMaxSize().padding(horizontal = 8.dp),
     ) {
         gridItems(entries, key = FileItem::path) { item ->
-            GridTile(
-                label = item.name,
-                icon = fileIcon(item),
-                caption = item.subtitle(context),
-                modifier = Modifier.padding(4.dp).clickable { onOpenItem(item) },
+            FileEntryContextMenu(
+                item = item,
+                isFavorite = item.path in favoritePaths,
+                onOpenItem = onOpenItem,
+                onToggleFavorite = onToggleFavorite,
+            ) { onOpen, onLongPress ->
+                GridTile(
+                    label = item.name,
+                    icon = fileIcon(item),
+                    caption = item.subtitle(context),
+                    modifier = Modifier.padding(4.dp).then(rowGestures(onOpen, onLongPress)),
+                )
+            }
+        }
+    }
+}
+
+/**
+ * Wraps a list/grid entry with a long-press context menu carrying the pin/unpin action
+ * (FR-9.1, T094). Tap still opens the item; a long-press anchors a [DropdownMenu] over
+ * the entry whose single action toggles the favorite, with the label and star icon
+ * reflecting [isFavorite]. [content] receives the open and long-press callbacks so the
+ * caller can attach them to either a [FileRow] or a [GridTile].
+ */
+@Composable
+private fun FileEntryContextMenu(
+    item: FileItem,
+    isFavorite: Boolean,
+    onOpenItem: (FileItem) -> Unit,
+    onToggleFavorite: (FileItem) -> Unit,
+    content: @Composable (onOpen: () -> Unit, onLongPress: () -> Unit) -> Unit,
+) {
+    var menuExpanded by remember { mutableStateOf(false) }
+    Box {
+        content({ onOpenItem(item) }, { menuExpanded = true })
+        DropdownMenu(expanded = menuExpanded, onDismissRequest = { menuExpanded = false }) {
+            DropdownMenuItem(
+                text = {
+                    Text(
+                        stringResource(
+                            if (isFavorite) {
+                                R.string.browser_action_unpin
+                            } else {
+                                R.string.browser_action_pin
+                            },
+                        ),
+                    )
+                },
+                leadingIcon = {
+                    Icon(
+                        imageVector = if (isFavorite) Icons.Outlined.Star else Icons.Outlined.StarBorder,
+                        contentDescription = null,
+                    )
+                },
+                onClick = {
+                    onToggleFavorite(item)
+                    menuExpanded = false
+                },
             )
         }
     }
 }
+
+@OptIn(ExperimentalFoundationApi::class)
+private fun rowGestures(
+    onOpen: () -> Unit,
+    onLongPress: () -> Unit,
+): Modifier = Modifier.combinedClickable(onClick = onOpen, onLongClick = onLongPress)
 
 private fun sortLabel(by: SortOrder.By): Int =
     when (by) {

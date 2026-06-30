@@ -7,15 +7,19 @@ import com.appblish.filora.core.domain.model.FileItem
 import com.appblish.filora.core.domain.model.SortOrder
 import com.appblish.filora.core.domain.model.UserPreferences
 import com.appblish.filora.core.domain.model.ViewLayout
+import com.appblish.filora.core.domain.repository.FavoritesRepository
 import com.appblish.filora.core.domain.repository.FileRepository
 import com.appblish.filora.core.domain.repository.SettingsRepository
 import com.appblish.filora.core.domain.usecase.ListDirectoryUseCase
+import com.appblish.filora.core.domain.usecase.ObserveFavoritesUseCase
+import com.appblish.filora.core.domain.usecase.ToggleFavoriteUseCase
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
@@ -111,15 +115,49 @@ class BrowserViewModelTest {
         }
     }
 
+    /** In-memory favorites keyed by path, exposed as an observable set (FR-9.1). */
+    private class FakeFavoritesRepository : FavoritesRepository {
+        val favorites = MutableStateFlow<List<FileItem>>(emptyList())
+
+        override fun observeFavorites(): Flow<List<FileItem>> = favorites
+
+        override fun observeRecents(limit: Int): Flow<List<FileItem>> =
+            favorites.map { emptyList() }
+
+        override suspend fun addFavorite(item: FileItem) {
+            favorites.update { current -> if (current.any { it.path == item.path }) current else current + item }
+        }
+
+        override suspend fun removeFavorite(path: String) {
+            favorites.update { current -> current.filterNot { it.path == path } }
+        }
+
+        override suspend fun recordRecent(item: FileItem) = Unit
+    }
+
     private fun viewModel(
         snapshot: Result<List<FileItem>> = Result.Success(emptyList()),
         prefs: UserPreferences = UserPreferences.Default,
-    ): Triple<BrowserViewModel, FakeFileRepository, FakeSettingsRepository> {
+        favorites: FakeFavoritesRepository = FakeFavoritesRepository(),
+    ): BrowserFixture {
         val repo = FakeFileRepository().apply { this.snapshot = snapshot }
         val settings = FakeSettingsRepository(prefs)
-        val vm = BrowserViewModel(ListDirectoryUseCase(repo), settings)
-        return Triple(vm, repo, settings)
+        val vm =
+            BrowserViewModel(
+                ListDirectoryUseCase(repo),
+                settings,
+                ToggleFavoriteUseCase(favorites),
+                ObserveFavoritesUseCase(favorites),
+            )
+        return BrowserFixture(vm, repo, settings, favorites)
     }
+
+    private data class BrowserFixture(
+        val vm: BrowserViewModel,
+        val repo: FakeFileRepository,
+        val settings: FakeSettingsRepository,
+        val favorites: FakeFavoritesRepository,
+    )
 
     @Test
     fun `successful listing moves to content`() =
@@ -228,5 +266,36 @@ class BrowserViewModelTest {
 
             assertThat(repo.requestedSorts.size).isGreaterThan(readsBefore)
             assertThat(vm.uiState.value.isRefreshing).isFalse()
+        }
+
+    @Test
+    fun `toggling favorite pins then unpins, reflected in favoritePaths`() =
+        runTest(dispatcher) {
+            val (vm, _, _, favorites) = viewModel(Result.Success(listOf(file("a.txt"))))
+            vm.bindLocation("/root")
+            advanceUntilIdle()
+            val item = file("a.txt")
+            assertThat(vm.uiState.value.favoritePaths).doesNotContain(item.path)
+
+            vm.toggleFavorite(item)
+            advanceUntilIdle()
+            assertThat(vm.uiState.value.favoritePaths).contains(item.path)
+            assertThat(favorites.favorites.value.map { it.path }).containsExactly(item.path)
+
+            vm.toggleFavorite(item)
+            advanceUntilIdle()
+            assertThat(vm.uiState.value.favoritePaths).doesNotContain(item.path)
+            assertThat(favorites.favorites.value).isEmpty()
+        }
+
+    @Test
+    fun `pre-existing favorites surface in favoritePaths on bind`() =
+        runTest(dispatcher) {
+            val seeded = FakeFavoritesRepository().apply { favorites.value = listOf(file("a.txt")) }
+            val (vm, _, _, _) = viewModel(Result.Success(listOf(file("a.txt"))), favorites = seeded)
+            vm.bindLocation("/root")
+            advanceUntilIdle()
+
+            assertThat(vm.uiState.value.favoritePaths).contains("/root/a.txt")
         }
 }

@@ -21,6 +21,9 @@
     <string name="home_chip_folder">Folder</string>
     <string name="home_chip_file">File</string>
 
+    <!-- Favorites strip unpin action (FR-9.1, T095) -->
+    <string name="home_action_unpin">Remove from favorites</string>
+
     <string name="home_browse_files">Browse files</string>
     <string name="home_browse_caption">All folders</string>
 

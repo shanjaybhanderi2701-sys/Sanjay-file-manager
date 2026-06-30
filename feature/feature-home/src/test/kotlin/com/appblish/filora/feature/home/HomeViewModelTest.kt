@@ -12,6 +12,7 @@ import com.appblish.filora.core.domain.repository.StorageRepository
 import com.appblish.filora.core.domain.usecase.ObserveFavoritesUseCase
 import com.appblish.filora.core.domain.usecase.ObserveRecentsUseCase
 import com.appblish.filora.core.domain.usecase.ObserveStorageVolumesUseCase
+import com.appblish.filora.core.domain.usecase.ToggleFavoriteUseCase
 import com.google.common.truth.Truth.assertThat
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -116,6 +117,7 @@ class HomeViewModelTest {
     ) = HomeViewModel(
         mediaRepository = repository,
         mediaAccess = access,
+        toggleFavorite = ToggleFavoriteUseCase(favorites),
         observeFavorites = ObserveFavoritesUseCase(favorites),
         observeRecents = ObserveRecentsUseCase(favorites),
         observeStorageVolumes = ObserveStorageVolumesUseCase(storage),
@@ -269,5 +271,21 @@ class HomeViewModelTest {
                 vm.uiState.value.favorites
                     .map { it.path }
             ).containsExactly("/b/star.txt")
+        }
+
+    @Test
+    fun `unpinFavorite removes the item from the favorites strip`() =
+        runTest(dispatcher) {
+            val favorites = FakeFavorites()
+            favorites.favorites.value = listOf(file("/a/pinned.txt"))
+            val vm = viewModel(FakeRepository(Result.Success(emptyMap())), FakeAccess(true), favorites)
+            advanceUntilIdle()
+            assertThat(vm.uiState.value.favorites.map { it.path }).containsExactly("/a/pinned.txt")
+
+            vm.unpinFavorite(file("/a/pinned.txt"))
+            advanceUntilIdle()
+
+            assertThat(vm.uiState.value.favorites).isEmpty()
+            assertThat(favorites.favorites.value).isEmpty()
         }
 }

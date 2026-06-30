@@ -7,6 +7,9 @@
     <string name="browser_title">المتصفح</string>
     <string name="browser_coming_soon">قريبًا.</string>
 
+    <string name="browser_action_pin">إضافة إلى المفضلة</string>
+    <string name="browser_action_unpin">إزالة من المفضلة</string>
+
     <string name="browser_action_clear_selection">إلغاء التحديد</string>
     <string name="browser_action_select_all">تحديد الكل</string>
     <string name="browser_selected_count">%1$d محدد</string>

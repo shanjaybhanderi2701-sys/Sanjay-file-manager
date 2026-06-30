@@ -3,11 +3,13 @@ package com.appblish.filora.feature.home
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.appblish.filora.core.common.result.Result
+import com.appblish.filora.core.domain.model.FileItem
 import com.appblish.filora.core.domain.repository.MediaAccess
 import com.appblish.filora.core.domain.repository.MediaRepository
 import com.appblish.filora.core.domain.usecase.ObserveFavoritesUseCase
 import com.appblish.filora.core.domain.usecase.ObserveRecentsUseCase
 import com.appblish.filora.core.domain.usecase.ObserveStorageVolumesUseCase
+import com.appblish.filora.core.domain.usecase.ToggleFavoriteUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -43,12 +45,18 @@ class HomeViewModel
     constructor(
         private val mediaRepository: MediaRepository,
         private val mediaAccess: MediaAccess,
+        private val toggleFavorite: ToggleFavoriteUseCase,
         observeFavorites: ObserveFavoritesUseCase,
         observeRecents: ObserveRecentsUseCase,
         observeStorageVolumes: ObserveStorageVolumesUseCase,
     ) : ViewModel() {
         private val _uiState = MutableStateFlow(HomeUiState())
         val uiState: StateFlow<HomeUiState> = _uiState.asStateFlow()
+
+        /** Unpins [item] from favorites (FR-9.1, T095); the observed stream drops it from the strip. */
+        fun unpinFavorite(item: FileItem) {
+            viewModelScope.launch { toggleFavorite(item) }
+        }
 
         init {
             refresh()

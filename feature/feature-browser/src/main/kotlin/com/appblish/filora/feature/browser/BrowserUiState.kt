@@ -10,7 +10,8 @@ import com.appblish.filora.core.domain.model.ViewLayout
  * ordered-and-hidden-filtered list the UI draws; [phase] is the single source of truth
  * for which of the loading/empty/error/content surfaces shows (T044). Layout, sort, and
  * show-hidden mirror the persisted preferences so the toolbar reflects them without a
- * second read.
+ * second read. [favoritePaths] is the set of currently-pinned paths (FR-9.1, T094) so a
+ * row's context menu can show "pin" or "unpin".
  */
 data class BrowserUiState(
     val location: String = "",
@@ -20,6 +21,7 @@ data class BrowserUiState(
     val sortOrder: SortOrder = SortOrder.Default,
     val showHidden: Boolean = false,
     val isRefreshing: Boolean = false,
+    val favoritePaths: Set<String> = emptySet(),
     @StringRes val errorMessageRes: Int? = null,
 ) {
     enum class Phase { Loading, Content, Empty, Error }

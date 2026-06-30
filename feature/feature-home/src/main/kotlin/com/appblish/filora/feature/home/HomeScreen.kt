@@ -1,7 +1,9 @@
 package com.appblish.filora.feature.home
 
 import androidx.annotation.StringRes
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -37,8 +39,11 @@ import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material.icons.outlined.Star
 import androidx.compose.material.icons.outlined.Storage
 import androidx.compose.material.icons.outlined.Videocam
+import androidx.compose.material.icons.outlined.StarBorder
 import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -49,6 +54,9 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -121,6 +129,7 @@ fun HomeScreen(
             onOpenStorage = onOpenStorage,
             onBrowse = onBrowse,
             onOpenItem = onOpenItem,
+            onUnpinFavorite = viewModel::unpinFavorite,
             modifier = Modifier.padding(padding),
         )
     }
@@ -134,6 +143,7 @@ internal fun HomeContent(
     modifier: Modifier = Modifier,
     onOpenStorage: () -> Unit = {},
     onOpenItem: (FileItem) -> Unit = {},
+    onUnpinFavorite: (FileItem) -> Unit = {},
 ) {
     when {
         uiState.isLoading ->
@@ -171,6 +181,7 @@ internal fun HomeContent(
                 onOpenStorage = onOpenStorage,
                 onBrowse = onBrowse,
                 onOpenItem = onOpenItem,
+                onUnpinFavorite = onUnpinFavorite,
                 modifier = modifier,
             )
     }
@@ -191,6 +202,7 @@ private fun HomeDashboard(
     onOpenStorage: () -> Unit,
     onBrowse: () -> Unit,
     onOpenItem: (FileItem) -> Unit,
+    onUnpinFavorite: (FileItem) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val storageTitle = stringResource(R.string.home_section_storage)
@@ -215,7 +227,7 @@ private fun HomeDashboard(
         }
         if (uiState.favorites.isNotEmpty()) {
             sectionHeader(favoritesTitle, Icons.Outlined.Star)
-            fileChipRow(uiState.favorites, folderCaption, fileCaption, onOpenItem)
+            fileChipRow(uiState.favorites, folderCaption, fileCaption, onOpenItem, onUnpin = onUnpinFavorite)
         }
 
         items(HomeCategory.entries.toList(), key = { it.name }) { hub ->
@@ -255,12 +267,17 @@ private fun LazyGridScope.sectionHeader(
     }
 }
 
-/** A full-span, horizontally scrolling strip of file/folder chips. */
+/**
+ * A full-span, horizontally scrolling strip of file/folder chips. Tap opens an item.
+ * When [onUnpin] is supplied (the Favorites strip, FR-9.1 T095) a long-press anchors a
+ * context menu with a "Remove from favorites" action; the Recents strip passes null.
+ */
 private fun LazyGridScope.fileChipRow(
     items: List<FileItem>,
     folderCaption: String,
     fileCaption: String,
     onOpenItem: (FileItem) -> Unit,
+    onUnpin: ((FileItem) -> Unit)? = null,
 ) {
     item(span = { GridItemSpan(maxLineSpan) }) {
         Row(
@@ -268,14 +285,54 @@ private fun LazyGridScope.fileChipRow(
             horizontalArrangement = Arrangement.spacedBy(12.dp),
         ) {
             items.forEach { item ->
-                GridTile(
-                    label = item.name,
-                    icon = if (item.isDirectory) Icons.Outlined.Folder else Icons.Outlined.InsertDriveFile,
-                    caption = if (item.isDirectory) folderCaption else fileCaption,
-                    modifier =
-                        Modifier
-                            .width(120.dp)
-                            .clickable { onOpenItem(item) },
+                FileChip(
+                    item = item,
+                    folderCaption = folderCaption,
+                    fileCaption = fileCaption,
+                    onOpenItem = onOpenItem,
+                    onUnpin = onUnpin,
+                )
+            }
+        }
+    }
+}
+
+/**
+ * One file/folder chip. Tap opens it; if [onUnpin] is non-null, a long-press opens a
+ * [DropdownMenu] whose single action unpins the favorite (FR-9.1, T095).
+ */
+@OptIn(ExperimentalFoundationApi::class)
+@Composable
+private fun FileChip(
+    item: FileItem,
+    folderCaption: String,
+    fileCaption: String,
+    onOpenItem: (FileItem) -> Unit,
+    onUnpin: ((FileItem) -> Unit)?,
+) {
+    var menuExpanded by remember { mutableStateOf(false) }
+    Box {
+        GridTile(
+            label = item.name,
+            icon = if (item.isDirectory) Icons.Outlined.Folder else Icons.Outlined.InsertDriveFile,
+            caption = if (item.isDirectory) folderCaption else fileCaption,
+            modifier =
+                Modifier
+                    .width(120.dp)
+                    .combinedClickable(
+                        onClick = { onOpenItem(item) },
+                        onLongClick = { if (onUnpin != null) menuExpanded = true },
+                    ),
+        )
+        if (onUnpin != null) {
+            DropdownMenu(expanded = menuExpanded, onDismissRequest = { menuExpanded = false }) {
+                DropdownMenuItem(
+                    text = { Text(stringResource(R.string.home_action_unpin)) },
+                    leadingIcon = { Icon(Icons.Outlined.StarBorder, contentDescription = null) },
+                    onClick = {
+                        onUnpin(item)
+                        menuExpanded = false
+                    },
                 )
             }
         }

@@ -21,6 +21,8 @@
     <string name="home_chip_folder">مجلد</string>
     <string name="home_chip_file">ملف</string>
 
+    <string name="home_action_unpin">إزالة من المفضلة</string>
+
     <string name="home_browse_files">تصفح الملفات</string>
     <string name="home_browse_caption">جميع المجلدات</string>
 

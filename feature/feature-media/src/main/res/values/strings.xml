@@ -28,6 +28,10 @@
     <string name="media_share">Share</string>
     <string name="media_share_failed">Can\'t share this item</string>
 
+    <!-- Favorites context action (FR-9.1, T094) -->
+    <string name="media_action_pin">Add to favorites</string>
+    <string name="media_action_unpin">Remove from favorites</string>
+
     <!-- Hub count-load error messages -->
     <string name="media_error_permission">Grant storage access to see your media.</string>
     <string name="media_error_load">Couldn\'t load categories. Pull to refresh.</string>

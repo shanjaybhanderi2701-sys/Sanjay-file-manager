@@ -19,6 +19,10 @@
     <string name="browser_action_hide_hidden">Hide hidden files</string>
     <string name="browser_action_layout_grid">Switch to grid</string>
     <string name="browser_action_layout_list">Switch to list</string>
+
+    <!-- Favorites context action (FR-9.1, T094) -->
+    <string name="browser_action_pin">Add to favorites</string>
+    <string name="browser_action_unpin">Remove from favorites</string>
     <string name="browser_sort_name">Name</string>
     <string name="browser_sort_size">Size</string>
     <string name="browser_sort_date">Date modified</string>
