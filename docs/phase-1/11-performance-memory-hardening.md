@@ -56,3 +56,50 @@ acceptance evidence for closing APP-84; run them once T6.5 lands and attach resu
 Blocked on **T6.5 (feature-complete)**. Unblock owner: whoever lands T6.5. Action: once the app is
 feature-complete and launchable, run steps 1–5 above, attach LeakCanary results + benchmark numbers
 + the committed baseline profile, then close APP-84.
+
+---
+
+## T7.5 — R8 / minify + release config (APP-85)
+
+Owner: Founding Android Engineer · Parent: APP-46 (M7) · Dep: T7.4 (APP-84).
+**AC:** NFR-9.1 size budget; non-debuggable release.
+
+Landed in `:app` (config-only, no app code change):
+
+- **Non-debuggable release.** `buildTypes.release` pins `isDebuggable = false` explicitly so a
+  later edit cannot silently ship a debuggable build. Pairs with `isMinifyEnabled = true` +
+  `isShrinkResources = true` (R8 code + resource shrink) for the NFR-9.1 budget.
+- **R8 full mode** pinned in `gradle.properties` (`android.enableR8.fullMode=true`) — AGP 8 default,
+  made explicit so the budget can't regress on an AGP bump.
+- **R8 keep rules** (`app/proguard-rules.pro`) — deliberately minimal; library consumer rules cover
+  most reflection. App-specific keeps added: WorkManager workers (instantiated by the **default**
+  factory via reflection on the class name in `WorkData` — would crash without a keep), Hilt
+  `@EntryPoint` interfaces resolved at runtime, `@Serializable` nav-route/domain classes, domain
+  enum `values()/valueOf()`, and `SourceFile,LineNumberTable` for readable Play Console traces.
+- **CI-safe release signing.** `signingConfigs.release` reads keystore path/passwords/alias from
+  gradle properties or the `FILORA_RELEASE_*` env vars; when unset it falls back to the debug
+  keystore via `initWith(getByName("debug"))`, so `assembleStandardRelease` / `bundleStandardRelease`
+  always build (PR CI, local dev) without committing secrets. Production signing is supplied at
+  release time via those env vars (or Play App Signing on the uploaded AAB).
+- **Size-budget gate (NFR-9.1).** `./gradlew :app:verifyStandardReleaseSizeBudget` builds the
+  minified standard release APK and hard-fails if it exceeds **12 MB**. Wired into CI as the
+  dedicated `release-size` job, which also uploads the APK + R8 `mapping.txt` as artifacts.
+
+Production signing env vars (set as CI secrets at release time):
+
+```
+FILORA_RELEASE_STORE_FILE       # path to the upload keystore
+FILORA_RELEASE_STORE_PASSWORD
+FILORA_RELEASE_KEY_ALIAS
+FILORA_RELEASE_KEY_PASSWORD
+```
+
+Verify locally / in CI:
+
+```
+./gradlew :app:verifyStandardReleaseSizeBudget   # R8 build + 12 MB assertion
+./gradlew :app:bundleStandardRelease             # the AAB uploaded to Play
+```
+
+> On-device NFR-9.1 acceptance numbers (actual MB) are captured under M7 step 5 above once the app
+> is feature-complete (gated on T6.5); this issue lands the **enforced config + CI gate**.

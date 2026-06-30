@@ -59,3 +59,37 @@ jobs:
             **/build/reports/detekt/
           if-no-files-found: ignore
           retention-days: 7
+
+  release-size:
+    name: Release · R8 · Size budget (NFR-9.1)
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      # Builds the minified, non-debuggable standard release APK (R8 full mode) and
+      # hard-fails if it exceeds the 12 MB NFR-9.1 budget. Uses the debug-keystore
+      # fallback in :app signingConfigs, so no release secrets are needed in CI.
+      - name: Verify release size budget
+        run: ./gradlew --no-daemon --stacktrace verifyStandardReleaseSizeBudget
+
+      - name: Upload release mapping + APK
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-artifacts
+          path: |
+            app/build/outputs/apk/standard/release/*.apk
+            app/build/outputs/mapping/standardRelease/mapping.txt
+          if-no-files-found: ignore
+          retention-days: 7
