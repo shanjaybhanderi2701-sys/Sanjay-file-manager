@@ -43,6 +43,7 @@ fun FiloraNavHost(
                 onOpenCategory = { category -> navController.navigate(Route.Media(category.name)) },
                 onOpenStorage = { navController.navigate(Route.Storage) },
                 onBrowse = { navController.navigate(Route.Browser(location = "")) },
+                onOpenItem = { item -> navController.navigate(homeItemRoute(item)) },
             )
         }
         composable<Route.Browser> { BrowserScreen() }
