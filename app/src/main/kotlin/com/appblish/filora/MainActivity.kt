@@ -5,7 +5,12 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.semantics.testTagsAsResourceId
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.appblish.filora.core.data.storage.SafTreeAccess
 import com.appblish.filora.core.domain.model.ThemeMode
@@ -27,6 +32,7 @@ class MainActivity : ComponentActivity() {
     @Inject
     lateinit var settingsRepository: SettingsRepository
 
+    @OptIn(androidx.compose.ui.ExperimentalComposeUiApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -57,7 +63,16 @@ class MainActivity : ComponentActivity() {
                 darkTheme = darkTheme,
                 dynamicColor = preferences.useDynamicColor,
             ) {
-                FiloraNavHost(startDestination = startDestination)
+                // Expose Compose `testTag`s as resource-ids so UiAutomator (baseline
+                // profile generator + macrobenchmarks, T7.4 / NFR-1.1) can address nodes
+                // via `By.res(packageName, tag)`. No effect on production behavior.
+                FiloraNavHost(
+                    startDestination = startDestination,
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .testTag("filora_app_root")
+                        .semantics { testTagsAsResourceId = true },
+                )
             }
         }
     }
