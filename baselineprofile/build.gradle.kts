@@ -15,7 +15,10 @@ plugins {
 
 android {
     namespace = "com.appblish.filora.baselineprofile"
-    compileSdk = libs.versions.compileSdk.get().toInt()
+    compileSdk =
+        libs.versions.compileSdk
+            .get()
+            .toInt()
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
@@ -28,7 +31,10 @@ android {
     defaultConfig {
         // Macrobenchmark requires API 28+ on the test device even though the app minSdk is 24.
         minSdk = 28
-        targetSdk = libs.versions.targetSdk.get().toInt()
+        targetSdk =
+            libs.versions.targetSdk
+                .get()
+                .toInt()
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
