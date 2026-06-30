@@ -1,5 +1,6 @@
 package com.appblish.filora.core.data.media
 
+import com.appblish.filora.core.domain.repository.MediaAccess
 import com.appblish.filora.core.domain.repository.MediaRepository
 import dagger.Binds
 import dagger.Module
@@ -23,4 +24,8 @@ internal interface MediaDataModule {
     @Binds
     @Singleton
     fun bindMediaRepository(impl: MediaRepositoryImpl): MediaRepository
+
+    @Binds
+    @Singleton
+    fun bindMediaAccess(impl: AndroidMediaAccess): MediaAccess
 }

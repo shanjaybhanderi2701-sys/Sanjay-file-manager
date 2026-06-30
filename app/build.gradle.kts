@@ -15,6 +15,9 @@ android {
         versionCode = 1
         versionName = "0.1.0"
         vectorDrawables.useSupportLibrary = true
+        // Custom runner swaps in HiltTestApplication so the M4 smoke test can
+        // launch the real @AndroidEntryPoint MainActivity with the DI graph.
+        testInstrumentationRunner = "com.appblish.filora.HiltTestRunner"
     }
 
     buildFeatures {
@@ -98,4 +101,12 @@ dependencies {
     testImplementation(libs.junit4)
     androidTestImplementation(libs.androidx.test.ext.junit)
     androidTestImplementation(libs.androidx.espresso.core)
+
+    // Instrumented smoke test (M4 T4.6, spec §6): launches the Hilt-wired app and
+    // walks Home → category list to prove the milestone integrates end-to-end. The
+    // Compose test rule + ui-test-manifest come from the compose convention plugin.
+    androidTestImplementation(libs.androidx.test.runner)
+    androidTestImplementation(libs.androidx.test.rules)
+    androidTestImplementation(libs.hilt.android.testing)
+    kspAndroidTest(libs.hilt.compiler)
 }
