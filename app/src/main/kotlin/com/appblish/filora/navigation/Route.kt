@@ -8,6 +8,9 @@ import kotlinx.serialization.Serializable
  * [Browser.location] (a path or tree-uri string) and [Media.category].
  */
 sealed interface Route {
+    /** First-run storage permission rationale + request flow (FR-1.1). */
+    @Serializable data object Permission : Route
+
     @Serializable data object Home : Route
 
     @Serializable data class Browser(

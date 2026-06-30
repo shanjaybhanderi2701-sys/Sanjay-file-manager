@@ -1,4 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Filora</string>
+
+    <!-- FR-1.1 permission rationale + request flow -->
+    <string name="permission_title">Access your files</string>
+    <string name="permission_rationale_body">Filora needs access to your photos, videos, audio, and documents so it can show your media categories and let you browse, search, and organize your files. Filora never uploads your files — everything stays on your device.</string>
+    <string name="permission_denied_body">No problem. You can still browse storage you pick yourself using your device\'s file picker. Grant media access any time from Settings to unlock photo, video, and audio categories.</string>
+    <string name="permission_grant_button">Grant access</string>
+    <string name="permission_limited_button">Continue with limited access</string>
 </resources>

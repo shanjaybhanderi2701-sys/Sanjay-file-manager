@@ -11,17 +11,29 @@ import com.appblish.filora.feature.media.MediaCategoryScreen
 import com.appblish.filora.feature.search.SearchScreen
 import com.appblish.filora.feature.settings.SettingsScreen
 import com.appblish.filora.feature.storage.StorageScreen
+import com.appblish.filora.permission.PermissionRationaleScreen
 
 /**
- * Single-activity navigation graph. Start destination is [Route.Home]; feature
- * destinations use type-safe routes. Screens beyond Home are M1 placeholders.
+ * Single-activity navigation graph. [startDestination] is [Route.Permission] on a
+ * first run that lacks storage access and [Route.Home] otherwise (see
+ * [MainActivity][com.appblish.filora.MainActivity]). Feature destinations use
+ * type-safe routes; screens beyond Home are M1 placeholders.
  */
 @Composable
-fun FiloraNavHost(navController: NavHostController = rememberNavController(),) {
+fun FiloraNavHost(
+    startDestination: Route = Route.Home,
+    navController: NavHostController = rememberNavController(),
+) {
     NavHost(
         navController = navController,
-        startDestination = Route.Home,
+        startDestination = startDestination,
     ) {
+        composable<Route.Permission> {
+            PermissionRationaleScreen(
+                onGranted = { navController.navigateToHomeFromGate() },
+                onContinueWithLimitedAccess = { navController.navigateToHomeFromGate() },
+            )
+        }
         composable<Route.Home> {
             HomeScreen(
                 onOpenSettings = { navController.navigate(Route.Settings) },
@@ -32,5 +44,16 @@ fun FiloraNavHost(navController: NavHostController = rememberNavController(),) {
         composable<Route.Media> { MediaCategoryScreen() }
         composable<Route.Storage> { StorageScreen() }
         composable<Route.Settings> { SettingsScreen() }
+    }
+}
+
+/**
+ * Leave the permission gate for Home, clearing it from the back stack so system
+ * Back never returns to the rationale (nav-flow doc §3: `popUpTo(home)`).
+ */
+private fun NavHostController.navigateToHomeFromGate() {
+    navigate(Route.Home) {
+        popUpTo(Route.Permission) { inclusive = true }
+        launchSingleTop = true
     }
 }
