@@ -6,12 +6,14 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.toRoute
+import com.appblish.filora.BuildConfig
 import com.appblish.filora.core.domain.model.MediaCategory
 import com.appblish.filora.feature.browser.BrowserScreen
 import com.appblish.filora.feature.home.HomeScreen
 import com.appblish.filora.feature.media.MediaCategoryDetailScreen
 import com.appblish.filora.feature.media.MediaCategoryScreen
 import com.appblish.filora.feature.search.SearchScreen
+import com.appblish.filora.feature.settings.AboutScreen
 import com.appblish.filora.feature.settings.SettingsScreen
 import com.appblish.filora.feature.storage.StorageScreen
 import com.appblish.filora.permission.PermissionRationaleScreen
@@ -64,7 +66,10 @@ fun FiloraNavHost(
                 onOpenCategory = { _, category -> navController.navigate(Route.Media(category.name)) },
             )
         }
-        composable<Route.Settings> { SettingsScreen() }
+        composable<Route.Settings> {
+            SettingsScreen(onOpenAbout = { navController.navigate(Route.About) })
+        }
+        composable<Route.About> { AboutScreen(versionName = BuildConfig.VERSION_NAME) }
     }
 }
 

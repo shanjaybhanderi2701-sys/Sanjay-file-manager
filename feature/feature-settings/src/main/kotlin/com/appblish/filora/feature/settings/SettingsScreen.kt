@@ -1,6 +1,7 @@
 package com.appblish.filora.feature.settings
 
 import android.os.Build
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -18,6 +19,9 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.role
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -35,12 +39,14 @@ import com.appblish.filora.core.domain.model.ViewLayout
 @Composable
 fun SettingsScreen(
     modifier: Modifier = Modifier,
+    onOpenAbout: () -> Unit = {},
     viewModel: SettingsViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     SettingsContent(
         preferences = uiState.preferences,
         modifier = modifier,
+        onOpenAbout = onOpenAbout,
         actions =
             SettingsActions(
                 onThemeMode = viewModel::setThemeMode,
@@ -68,6 +74,7 @@ fun SettingsScreen(
 fun SettingsContent(
     preferences: UserPreferences,
     modifier: Modifier = Modifier,
+    onOpenAbout: () -> Unit = {},
     actions: SettingsActions = SettingsActions(),
 ) {
     Column(
@@ -145,6 +152,43 @@ fun SettingsContent(
             checked = preferences.defaultSortOrder.foldersFirst,
             onCheckedChange = actions.onFoldersFirst,
             testTag = "folders_first",
+        )
+
+        HorizontalDivider()
+
+        // T139 — About entry point.
+        SectionHeader("About")
+        NavRow(
+            label = "About Filora",
+            description = "Version, open-source licenses, and links.",
+            onClick = onOpenAbout,
+            testTag = "open_about",
+        )
+    }
+}
+
+@Composable
+private fun NavRow(
+    label: String,
+    description: String,
+    onClick: () -> Unit,
+    testTag: String,
+) {
+    Column(
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .clickable(onClick = onClick)
+                .semantics { role = Role.Button }
+                .testTag(testTag)
+                .padding(vertical = 8.dp),
+        verticalArrangement = Arrangement.spacedBy(2.dp),
+    ) {
+        Text(text = label, style = MaterialTheme.typography.bodyLarge)
+        Text(
+            text = description,
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
     }
 }
