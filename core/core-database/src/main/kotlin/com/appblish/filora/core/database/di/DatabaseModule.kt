@@ -18,11 +18,14 @@ import javax.inject.Singleton
 object DatabaseModule {
     @Provides
     @Singleton
+    // Spread is required by Room's vararg addMigrations API; the array is tiny.
+    @Suppress("SpreadOperator")
     fun provideDatabase(
         @ApplicationContext context: Context,
     ): FiloraDatabase =
         Room
             .databaseBuilder(context, FiloraDatabase::class.java, FiloraDatabase.NAME)
+            .addMigrations(*FiloraDatabase.MIGRATIONS)
             .build()
 
     @Provides
