@@ -3,6 +3,11 @@
 plugins {
     alias(libs.plugins.android.application) apply false
     alias(libs.plugins.android.library) apply false
+    // Declared versionless on the root classpath so the :baselineprofile module can
+    // apply com.android.test without re-requesting a version (which conflicts with the
+    // already-loaded AGP plugins). Same apply-false pattern as the other AGP plugins.
+    alias(libs.plugins.android.test) apply false
+    alias(libs.plugins.androidx.baselineprofile) apply false
     alias(libs.plugins.kotlin.android) apply false
     alias(libs.plugins.kotlin.jvm) apply false
     alias(libs.plugins.kotlin.serialization) apply false

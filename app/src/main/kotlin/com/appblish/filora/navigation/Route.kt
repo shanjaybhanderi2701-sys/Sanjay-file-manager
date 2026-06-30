@@ -21,6 +21,9 @@ sealed interface Route {
         val scope: String? = null
     ) : Route
 
+    /** The category-hub grid (FR-6.1); [Media] is a single category's detail list. */
+    @Serializable data object MediaHub : Route
+
     @Serializable data class Media(
         val category: String
     ) : Route

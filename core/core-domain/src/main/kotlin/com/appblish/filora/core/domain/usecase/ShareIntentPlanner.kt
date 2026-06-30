@@ -14,6 +14,17 @@ data class SharePlan(
 )
 
 /**
+ * How a single file should be handed to an external app via `ACTION_VIEW` (FR-6.1):
+ * the [mimeType] to advertise and whether the entry is openable at all. Directories
+ * have no viewer, so [isOpenable] is false for them and the Android layer skips the
+ * intent instead of dispatching a guaranteed-to-fail one.
+ */
+data class OpenPlan(
+    val mimeType: String,
+    val isOpenable: Boolean,
+)
+
+/**
  * Decides, from domain [FileItem]s alone, how an open/share intent should be typed
  * (FR-10.1, FR-10.2). Kept free of Android types so the type-negotiation rules stay
  * unit-testable; URI resolution and intent dispatch live in the feature layer.
@@ -21,6 +32,17 @@ data class SharePlan(
 object ShareIntentPlanner {
     /** Best MIME type for opening a single file with `ACTION_VIEW` (FR-10.1). */
     fun openType(item: FileItem): String = mimeOf(item)
+
+    /**
+     * Plan for opening [item] in another app from a media category (FR-6.1). A
+     * directory is not openable; every file resolves to its best [openType], falling
+     * back to a wildcard the chooser can still offer.
+     */
+    fun planOpen(item: FileItem): OpenPlan =
+        OpenPlan(
+            mimeType = openType(item),
+            isOpenable = !item.isDirectory,
+        )
 
     /**
      * Plan for sharing [items] via the system share sheet. Directories are not

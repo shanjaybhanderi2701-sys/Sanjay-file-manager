@@ -5,8 +5,11 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.toRoute
+import com.appblish.filora.core.domain.model.MediaCategory
 import com.appblish.filora.feature.browser.BrowserScreen
 import com.appblish.filora.feature.home.HomeScreen
+import com.appblish.filora.feature.media.MediaCategoryDetailScreen
 import com.appblish.filora.feature.media.MediaCategoryScreen
 import com.appblish.filora.feature.search.SearchScreen
 import com.appblish.filora.feature.settings.SettingsScreen
@@ -37,13 +40,20 @@ fun FiloraNavHost(
         composable<Route.Home> {
             HomeScreen(
                 onOpenSettings = { navController.navigate(Route.Settings) },
+                onOpenCategory = { category -> navController.navigate(Route.Media(category.name)) },
+                onBrowse = { navController.navigate(Route.Browser) },
             )
         }
         composable<Route.Browser> { BrowserScreen() }
         composable<Route.Search> { SearchScreen() }
-        composable<Route.Media> {
-            // Category file lists land in a later M4 task; the hub renders counts now.
-            MediaCategoryScreen(onOpenCategory = {})
+        composable<Route.MediaHub> {
+            MediaCategoryScreen(
+                onOpenCategory = { category -> navController.navigate(Route.Media(category.name)) },
+            )
+        }
+        composable<Route.Media> { backStackEntry ->
+            val category = MediaCategory.valueOf(backStackEntry.toRoute<Route.Media>().category)
+            MediaCategoryDetailScreen(category = category)
         }
         composable<Route.Storage> { StorageScreen() }
         composable<Route.Settings> { SettingsScreen() }

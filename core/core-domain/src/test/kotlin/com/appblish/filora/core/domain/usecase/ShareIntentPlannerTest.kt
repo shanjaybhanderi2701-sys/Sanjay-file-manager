@@ -65,4 +65,24 @@ class ShareIntentPlannerTest {
         assertFalse(plan.isMultiple)
         assertEquals(MimeTypes.WILDCARD, plan.mimeType)
     }
+
+    @Test
+    fun `planOpen types a file by its open mime and marks it openable`() {
+        val plan = ShareIntentPlanner.planOpen(file("clip.mp4", mimeType = "video/mp4"))
+        assertTrue(plan.isOpenable)
+        assertEquals("video/mp4", plan.mimeType)
+    }
+
+    @Test
+    fun `planOpen infers the open mime from the extension when mime is missing`() {
+        val plan = ShareIntentPlanner.planOpen(file("song.mp3"))
+        assertTrue(plan.isOpenable)
+        assertEquals("audio/mpeg", plan.mimeType)
+    }
+
+    @Test
+    fun `planOpen marks a directory as not openable`() {
+        val plan = ShareIntentPlanner.planOpen(file("Camera", isDirectory = true))
+        assertFalse(plan.isOpenable)
+    }
 }
