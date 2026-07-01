@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!-- Host activity for compose/navigation instrumented tests (T165/T166). Merged
+         only into the androidTest APK. -->
+    <application>
+        <activity
+            android:name="com.appblish.filora.HiltComponentActivity"
+            android:exported="false" />
+    </application>
+</manifest>
