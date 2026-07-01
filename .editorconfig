@@ -28,6 +28,11 @@ ktlint_standard_no-consecutive-comments = disabled
 # real readability wins here — same spirit as the multiline-expression-wrapping opt-out.
 ktlint_standard_function-signature = disabled
 ktlint_standard_function-expression-body = disabled
+# chain-method-continuation forces each call onto its own line whenever a chain
+# contains a lambda (e.g. `assertThat(list.map { it.x }).containsExactly(...)`), even
+# on sub-120-char lines — the same finicky-wrapping churn as the opt-outs above, and it
+# fires pervasively across Truth/Turbine test assertions. Disable for consistency.
+ktlint_standard_chain-method-continuation = disabled
 
 [*.{yml,yaml,toml,json}]
 indent_size = 2
