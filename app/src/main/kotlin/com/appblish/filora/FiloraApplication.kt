@@ -14,7 +14,6 @@ import dagger.hilt.android.HiltAndroidApp
  * debug-only [StrictMode] install, which is a no-op in release builds. */
 @HiltAndroidApp
 class FiloraApplication : Application() {
-
     override fun onCreate() {
         super.onCreate()
         if (isDebuggable()) {
@@ -22,8 +21,7 @@ class FiloraApplication : Application() {
         }
     }
 
-    private fun isDebuggable(): Boolean =
-        (applicationInfo.flags and ApplicationInfo.FLAG_DEBUGGABLE) != 0
+    private fun isDebuggable(): Boolean = (applicationInfo.flags and ApplicationInfo.FLAG_DEBUGGABLE) != 0
 
     /**
      * T149 — surface accidental main-thread disk/network I/O and leaked resources during
@@ -33,7 +31,8 @@ class FiloraApplication : Application() {
      */
     private fun enableStrictMode() {
         StrictMode.setThreadPolicy(
-            StrictMode.ThreadPolicy.Builder()
+            StrictMode.ThreadPolicy
+                .Builder()
                 .detectDiskReads()
                 .detectDiskWrites()
                 .detectNetwork()
@@ -41,7 +40,8 @@ class FiloraApplication : Application() {
                 .build(),
         )
         StrictMode.setVmPolicy(
-            StrictMode.VmPolicy.Builder()
+            StrictMode.VmPolicy
+                .Builder()
                 .detectLeakedClosableObjects()
                 .detectLeakedRegistrationObjects()
                 .detectActivityLeaks()

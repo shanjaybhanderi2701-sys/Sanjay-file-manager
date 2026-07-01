@@ -113,46 +113,7 @@ fun SettingsContent(
         HorizontalDivider()
 
         // FR-11.2 — Browsing defaults.
-        SectionHeader("Files")
-        SwitchRow(
-            label = "Show hidden files",
-            description = "Display files and folders that start with a dot.",
-            checked = preferences.showHiddenFiles,
-            onCheckedChange = actions.onShowHidden,
-            testTag = "show_hidden",
-        )
-        SettingRow(label = "Default view") {
-            ChipGroup(
-                options = ViewLayout.entries,
-                selected = preferences.defaultViewLayout,
-                label = { it.name },
-                onSelect = actions.onViewLayout,
-                testTagPrefix = "view",
-            )
-        }
-        SettingRow(label = "Sort by") {
-            ChipGroup(
-                options = SortOrder.By.entries,
-                selected = preferences.defaultSortOrder.by,
-                label = { it.label() },
-                onSelect = actions.onSortBy,
-                testTagPrefix = "sort",
-            )
-        }
-        SwitchRow(
-            label = "Ascending order",
-            description = "Smallest / A→Z / oldest first.",
-            checked = preferences.defaultSortOrder.ascending,
-            onCheckedChange = actions.onSortAscending,
-            testTag = "sort_ascending",
-        )
-        SwitchRow(
-            label = "Folders first",
-            description = "Group folders before files.",
-            checked = preferences.defaultSortOrder.foldersFirst,
-            onCheckedChange = actions.onFoldersFirst,
-            testTag = "folders_first",
-        )
+        FilesSettingsSection(preferences = preferences, actions = actions)
 
         HorizontalDivider()
 
@@ -165,6 +126,54 @@ fun SettingsContent(
             testTag = "open_about",
         )
     }
+}
+
+/** FR-11.2 browsing-default controls, hoisted out of [SettingsContent] to keep it small. */
+@Composable
+private fun FilesSettingsSection(
+    preferences: UserPreferences,
+    actions: SettingsActions,
+) {
+    SectionHeader("Files")
+    SwitchRow(
+        label = "Show hidden files",
+        description = "Display files and folders that start with a dot.",
+        checked = preferences.showHiddenFiles,
+        onCheckedChange = actions.onShowHidden,
+        testTag = "show_hidden",
+    )
+    SettingRow(label = "Default view") {
+        ChipGroup(
+            options = ViewLayout.entries,
+            selected = preferences.defaultViewLayout,
+            label = { it.name },
+            onSelect = actions.onViewLayout,
+            testTagPrefix = "view",
+        )
+    }
+    SettingRow(label = "Sort by") {
+        ChipGroup(
+            options = SortOrder.By.entries,
+            selected = preferences.defaultSortOrder.by,
+            label = { it.label() },
+            onSelect = actions.onSortBy,
+            testTagPrefix = "sort",
+        )
+    }
+    SwitchRow(
+        label = "Ascending order",
+        description = "Smallest / A→Z / oldest first.",
+        checked = preferences.defaultSortOrder.ascending,
+        onCheckedChange = actions.onSortAscending,
+        testTag = "sort_ascending",
+    )
+    SwitchRow(
+        label = "Folders first",
+        description = "Group folders before files.",
+        checked = preferences.defaultSortOrder.foldersFirst,
+        onCheckedChange = actions.onFoldersFirst,
+        testTag = "folders_first",
+    )
 }
 
 @Composable

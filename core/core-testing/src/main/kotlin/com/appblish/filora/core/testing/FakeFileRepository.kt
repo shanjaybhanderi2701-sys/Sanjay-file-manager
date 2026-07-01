@@ -130,7 +130,9 @@ class FakeFileRepository(
         val created = original.copy(name = destinationName, path = targetPath)
         mutate { snapshot ->
             // Replace any existing subtree at the target when overwriting.
-            snapshot.keys.filter { it == targetPath || it.startsWith("$targetPath/") }.toList()
+            snapshot.keys
+                .filter { it == targetPath || it.startsWith("$targetPath/") }
+                .toList()
                 .forEach { snapshot.remove(it) }
             snapshot[targetPath] = created
             // Deep-copy descendants, re-rooting their paths under the new target (the

@@ -92,7 +92,9 @@ fun fileTree(
 
 /** Builder receiver for a single directory level. */
 @FileTreeDsl
-class DirScope internal constructor(private val path: String) {
+class DirScope internal constructor(
+    private val path: String
+) {
     internal val nodes = mutableListOf<Node>()
 
     /** Adds a regular file with an explicit [sizeBytes]. */
@@ -182,11 +184,16 @@ class DirScope internal constructor(private val path: String) {
     internal sealed class Node {
         abstract fun size(): Long
 
-        data class File(val item: FileItem) : Node() {
+        data class File(
+            val item: FileItem
+        ) : Node() {
             override fun size(): Long = item.sizeBytes
         }
 
-        data class Symlink(val item: FileItem, val target: String) : Node() {
+        data class Symlink(
+            val item: FileItem,
+            val target: String
+        ) : Node() {
             override fun size(): Long = 0L
         }
 

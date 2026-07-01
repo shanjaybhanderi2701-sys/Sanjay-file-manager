@@ -51,15 +51,16 @@ object MediaFixtures {
         name: String,
         sizeBytes: Long,
         mimeType: String,
-    ): FileItem = FileItem(
-        name = name,
-        path = "/storage/emulated/0/Media/$name",
-        isDirectory = false,
-        sizeBytes = sizeBytes,
-        lastModifiedEpochMillis = 0L,
-        mimeType = mimeType,
-        extension = name.substringAfterLast('.', ""),
-    )
+    ): FileItem =
+        FileItem(
+            name = name,
+            path = "/storage/emulated/0/Media/$name",
+            isDirectory = false,
+            sizeBytes = sizeBytes,
+            lastModifiedEpochMillis = 0L,
+            mimeType = mimeType,
+            extension = name.substringAfterLast('.', ""),
+        )
 }
 
 /**
@@ -79,6 +80,7 @@ class FakeMediaRepository(
 
     override suspend fun categorySizes(): Result<Map<MediaCategory, Long>> =
         error?.asError()
-            ?: MediaCategory.entries.associateWith { c -> (byCategory[c] ?: emptyList()).sumOf { it.sizeBytes } }
+            ?: MediaCategory.entries
+                .associateWith { c -> (byCategory[c] ?: emptyList()).sumOf { it.sizeBytes } }
                 .asSuccess()
 }

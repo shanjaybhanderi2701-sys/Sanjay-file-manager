@@ -52,6 +52,5 @@ class FakeStorageRepository(
     override suspend fun largestFiles(
         rootPath: String,
         limit: Int,
-    ): Result<List<FileItem>> =
-        error?.asError() ?: largest.sortedByDescending { it.sizeBytes }.take(limit).asSuccess()
+    ): Result<List<FileItem>> = error?.asError() ?: largest.sortedByDescending { it.sizeBytes }.take(limit).asSuccess()
 }
