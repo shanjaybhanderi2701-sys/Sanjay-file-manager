@@ -109,18 +109,16 @@ Implemented: `core-ui/theme/Motion.kt` (`FiloraMotion`).
 - **Layer 1 — dynamic color (default, preferred).** On Android 12+ we use Material You dynamic color from the wallpaper. This is the Mobile_V5 "native & trustworthy" instinct: a file tool touching the user's real files should feel like it belongs on *their* phone. True dark mode is first-class.
 - **Layer 2 — the brand fallback / accent set** for pre-12 devices, dynamic-color-off, and brand surfaces (splash, store, first-run glyph).
 
-### ⚠️ Reconciliation decision (teal → Iris)
-The shipped Kotlin fallback (`core-ui/theme/Color.kt`) still seeds the **original teal** `#00696B`. The hi-fi/premium-craft direction (APP-134, `design/filora-screens/hifi`) moved the brand to **Filora Iris** `#5B5BD6` with a violet→orchid gradient and a duotone category wheel.
+### ✅ Ratified brand color — BLUE (board sign-off 2026-07-01)
+The shipped Kotlin fallback (`core-ui/theme/Color.kt`) still seeds the original teal `#00696B`; an interim **Iris/purple** `#5B5BD6` direction was explored (APP-134). **The board ratified a BLUE primary** (confirmation `blue-home-recent-cleaner-v2`, accepted by local-board). Regenerate the Kotlin fallback scheme from seed **`#2563EB`**. One accent only — never a second brand color. Category colors below are an *encoding* (like syntax highlighting), not additional brand colors.
 
-**Direction (this system, v1):** adopt **Filora Iris** as the single brand accent and regenerate the Kotlin fallback scheme from seed `#5B5BD6`. One accent only — never a second brand color. Category colors below are an *encoding* (like syntax highlighting), not additional brand colors.
-
-| Token | Iris (target) | Note |
+| Token | Blue (ratified) | Note |
 |---|---|---|
-| Primary | `#5B5BD6` | brand accent; pressed `#4B47CF` |
-| Brand gradient | `#5B5BD6 → #8B5CF6 → #C06BE6` | splash, FAB, hero glyph only |
-| Primary container | `#E6E5FB` / on `#1B1A54` | selection tint, chips |
-| Background | `#F5F4FB` (light) / `#15142B`-family (dark) | soft lilac tint, not flat white |
-| Surface | `#FFFFFF` / raised `#FBFAFF` | cards |
+| Primary | `#2563EB` | brand accent; pressed `#1D4FD7` |
+| Brand gradient | `#2563EB → #4C7DF5 → #38BDF8` | splash, FAB, hero ring/glyph only |
+| Primary container | `#DCE7FF` / on `#0A245F` | selection tint, chips |
+| Background | `#F5F7FC` (light) / `#0E1424`-family (dark) | soft cool tint, not flat white |
+| Surface | `#FFFFFF` / raised `#FBFCFF` | cards |
 | Ink / secondary / muted | `#15142B` / `#403E5C` / `#75738F` | text hierarchy |
 | Error | `#E5484D` / container `#FFE3E1` | destructive only, used sparingly |
 | Success | `#12A46B` | operation complete |
@@ -139,7 +137,22 @@ The shipped Kotlin fallback (`core-ui/theme/Color.kt`) still seeds the **origina
 | Folders | `#6E6C8A` / `#ECEBF3` |
 | Favorite | `#F5A524` / `#FFF0D2` |
 
-**Contrast:** ink-on-surface, ink-2, and on-container pairs all meet WCAG AA (≥4.5:1 body / ≥3:1 large). Category accents are used as *fills behind icons*, not as text color, so they never carry a contrast burden.
+**Contrast:** ink-on-surface, ink-2, and on-container pairs all meet WCAG AA (≥4.5:1 body / ≥3:1 large). Category accents are used as *fills behind icons*, not as text color, so they never carry a contrast burden. *Note:* the Documents category (`#2E7CF6`) sits near the primary blue, but it only ever appears as a category fill behind an icon — never as an interactive accent — so the two never collide semantically.
+
+---
+
+## 6.5 Home screen (landing) — carries browsing · serves §2.1, §2.5, §2.6
+
+Because **Browse is not a tab** (see §7.1), **Home is the entry into the file system** *and* the storage story. Composition (top→bottom), all on the token system — see the live blue mockup:
+
+1. **Greeting app bar** — "Good evening" overline + "Filora" (`titleLarge` 800) + search + gradient avatar.
+2. **Storage ring hero** — brand-gradient card, arc ring (used %), GB summary, category legend. The premium first-impression cue; count-up once on first paint (§5), static after.
+3. **Quick actions** — 4 tinted tiles: Clean up (→Cleaner) · Large files · Favourites · Trash. Each ≥48dp, thumb-reachable.
+4. **Storage locations (the Browse entry)** — Internal storage + SD card rows with used/free bars → tap opens the file browser (Hero Flow A), plus a "Browse all ›" affordance. This is what keeps browsing one tap deep despite Browse not being a tab.
+5. **Categories** — tinted tiles (Images/Videos/Audio/Docs/Downloads/Apps/Archives/More) with counts, using the category-wheel encoding.
+6. **Recent** — recently opened files (mirrors the Recent tab's head).
+
+States: loading = skeleton hero + rows; permission = trust-first card *before* the system prompt (§2.4); empty (new device) = neutral hero, no fabricated stat.
 
 ---
 
@@ -155,20 +168,20 @@ The screen a file manager lives or dies on. Content is the hero; chrome is quiet
 
 ### 7.1 Bottom navigation (tab bar) · serves §2.6 thumb-first + §2.7 restraint
 
-Five destinations — the Material 3 ceiling for a bottom bar (3–5). We **curate, not cram**: past five, targets shrink out of the thumb zone and the guide's restraint principle breaks, so the answer to "more options" is *the best five*, not more than five.
+**Ratified: three tabs — Home · Recent · Cleaner** (board sign-off 2026-07-01). A lean, InShot-style bar — fewer, bigger, thumb-first targets beat a crowded bar (§2.6/§2.7). Filled glyphs.
 
-| # | Tab | Icon | Why it earns a tab (maps to a shipped feature) |
+| # | Tab | Icon | Role (maps to shipped features) |
 |---|---|---|---|
-| 1 | **Home** | house | Dashboard: storage ring, categories, favorites/recents strips. |
-| 2 | **Browse** | folder | The file tree — the core utility (Hero Flow A). |
-| 3 | **Media** | image | Category hub (Photos/Video/Audio/Docs, M4) — the single highest-value file-manager destination after Browse; users think in *content*, not paths. |
-| 4 | **Storage** | gauge | Storage insights + "free up space" (M6/M11) — utility framed as value (§2.6). |
-| 5 | **Recent** | clock | Recently opened/modified (M9) — fast re-access is the #1 repeat task; benefit-led. |
+| 1 | **Home** | house (filled) | Landing + **the entry into browsing** (§6.5): storage ring, quick actions, Storage locations, categories, recents. |
+| 2 | **Recent** | clock (filled) | Recently opened/modified (M9) — fast re-access, the #1 repeat task. |
+| 3 | **Cleaner** | broom + sparkle | Free-up-space / Storage Analyzer (M11): junk, large files, duplicates — utility framed as value (§2.6). |
 
-- **Settings is not a tab.** Config is not a content destination — it lives in the **app-bar overflow / gear** (standard M3, Mobile_V5 native instinct). Removing it from the bar frees the slot for a content destination and keeps the bar all-tasks.
-- **Also considered, deliberately left off:** *Favorites* (already a Home strip + star action — a tab would duplicate), *Transfer/Send* (device-to-device is out of v1 scope — no tab for an unbuilt feature), *Search* (a persistent search bar on Home/Browse, not a destination).
-- **≥600dp:** the same five swap to a **navigation rail** (never both). Order and icons identical.
-- Each item ≥48dp, active = `iris-container` pill behind the icon + iris label (see mockup).
+- **Browse is not a tab.** The file tree opens from Home's **Storage locations** rows (Internal storage / SD) and the **Browse FAB**, so browsing stays one tap from Home. This is the deliberate, home-centric IA the board chose (InShot-like).
+- **Media / Favorites / Settings** are reachable from Home (category tiles; Favourites quick action; app-bar gear) — kept off the bar to hold the thumb-first three.
+- **≥600dp:** the same three swap to a **navigation rail** (never both).
+- Each item ≥48dp; active = `primaryContainer` pill behind a **filled** glyph + primary label.
+
+> **Journey note:** an earlier revision of this doc reflected a 5-tab bar (Home·Browse·Media·Storage·Recent). The board iterated to the 3-tab Home·Recent·Cleaner set above; this section is the current source of truth.
 
 ### Required states (never ship only the happy path)
 | State | Design |
@@ -205,9 +218,11 @@ Five destinations — the Material 3 ceiling for a bottom bar (3–5). We **cura
 
 ## 10. Reference artifacts & implementation
 
-- **Hero-flow hi-fi mockups (this issue):** `design/filora-screens/hero-flows/index.html` — Browse (5 states) + Multi-select action bar + delete confirm, in the Iris language.
+- **Canonical mockup (ratified):** `design/filora-screens/hero-flows-blue/index.html` — **blue** primary, **Home · Recent · Cleaner** bar, the **complete Home screen** (§6.5), Browse (5 states) + Multi-select action bar + delete confirm. Live: https://stormy-prism-ykpd.here.now/
+- **Superseded reference:** `design/filora-screens/hero-flows/index.html` (Iris/purple, 5-tab; kept for history — https://lunar-fennel-rb87.here.now/).
 - **Token source of truth (code):** `core/core-ui/src/main/kotlin/com/appblish/filora/core/ui/theme/` — `Spacing.kt`, `Shape.kt`, `Type.kt`, `Elevation.kt`, `Motion.kt`, `Color.kt`.
-- **Premium-craft direction:** `docs/phase-1/design/06-premium-craft.md` + `design/filora-screens/hifi/`.
-- **Prior hi-fi spec / tokens:** `docs/phase-1/design/05-hifi-spec.md`.
+- **Premium-craft direction:** `docs/phase-1/design/06-premium-craft.md`. **Prior hi-fi spec:** `docs/phase-1/design/05-hifi-spec.md`.
 
-**Open engineering follow-up:** regenerate `Color.kt` from the Iris seed `#5B5BD6` to close the teal→Iris gap (§6). Owner: Senior Kotlin Engineer, on design sign-off.
+**Terminology note:** earlier revisions (and some `iris-*` token names in §8) describe the accent as "Iris"/purple. The **ratified accent is blue `#2563EB`** — read any `iris-*` name as the primary / primary-container role.
+
+**Open engineering follow-up (delegated):** (1) regenerate `Color.kt` from the **blue seed `#2563EB`** (not teal, not Iris); (2) nav = **Home · Recent · Cleaner** with Browse opening from Home; (3) build the Home screen per §6.5. Owner: Founding Android / Senior Kotlin Engineer, via the A-blend alignment issues (APP-112 / APP-117 / APP-118) + the child issue linked on APP-137.
