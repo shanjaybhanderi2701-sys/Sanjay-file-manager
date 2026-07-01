@@ -1,7 +1,6 @@
 package com.appblish.filora.feature.settings
 
 import android.os.Build
-import androidx.annotation.StringRes
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -20,7 +19,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.role
 import androidx.compose.ui.semantics.semantics
@@ -88,24 +86,23 @@ fun SettingsContent(
         verticalArrangement = Arrangement.spacedBy(20.dp),
     ) {
         // FR-11.1 — Appearance.
-        SectionHeader(stringResource(R.string.settings_section_appearance))
-        SettingRow(label = stringResource(R.string.settings_theme)) {
+        SectionHeader("Appearance")
+        SettingRow(label = "Theme") {
             ChipGroup(
                 options = ThemeMode.entries,
                 selected = preferences.themeMode,
-                label = { stringResource(it.labelRes()) },
-                key = { it.name },
+                label = { it.label() },
                 onSelect = actions.onThemeMode,
                 testTagPrefix = "theme",
             )
         }
         SwitchRow(
-            label = stringResource(R.string.settings_dynamic_color),
+            label = "Dynamic color",
             description =
                 if (supportsDynamicColor) {
-                    stringResource(R.string.settings_dynamic_color_desc_supported)
+                    "Use colors from your wallpaper (Material You)."
                 } else {
-                    stringResource(R.string.settings_dynamic_color_desc_unsupported)
+                    "Requires Android 12 or newer."
                 },
             checked = preferences.useDynamicColor && supportsDynamicColor,
             onCheckedChange = actions.onDynamicColor,
@@ -116,60 +113,67 @@ fun SettingsContent(
         HorizontalDivider()
 
         // FR-11.2 — Browsing defaults.
-        SectionHeader(stringResource(R.string.settings_section_files))
-        SwitchRow(
-            label = stringResource(R.string.settings_show_hidden),
-            description = stringResource(R.string.settings_show_hidden_desc),
-            checked = preferences.showHiddenFiles,
-            onCheckedChange = actions.onShowHidden,
-            testTag = "show_hidden",
-        )
-        SettingRow(label = stringResource(R.string.settings_default_view)) {
-            ChipGroup(
-                options = ViewLayout.entries,
-                selected = preferences.defaultViewLayout,
-                label = { it.name },
-                key = { it.name },
-                onSelect = actions.onViewLayout,
-                testTagPrefix = "view",
-            )
-        }
-        SettingRow(label = stringResource(R.string.settings_sort_by)) {
-            ChipGroup(
-                options = SortOrder.By.entries,
-                selected = preferences.defaultSortOrder.by,
-                label = { stringResource(it.labelRes()) },
-                key = { it.tagKey() },
-                onSelect = actions.onSortBy,
-                testTagPrefix = "sort",
-            )
-        }
-        SwitchRow(
-            label = stringResource(R.string.settings_ascending_order),
-            description = stringResource(R.string.settings_ascending_order_desc),
-            checked = preferences.defaultSortOrder.ascending,
-            onCheckedChange = actions.onSortAscending,
-            testTag = "sort_ascending",
-        )
-        SwitchRow(
-            label = stringResource(R.string.settings_folders_first),
-            description = stringResource(R.string.settings_folders_first_desc),
-            checked = preferences.defaultSortOrder.foldersFirst,
-            onCheckedChange = actions.onFoldersFirst,
-            testTag = "folders_first",
-        )
+        FilesSettingsSection(preferences = preferences, actions = actions)
 
         HorizontalDivider()
 
         // T139 — About entry point.
-        SectionHeader(stringResource(R.string.settings_section_about))
+        SectionHeader("About")
         NavRow(
-            label = stringResource(R.string.settings_about),
-            description = stringResource(R.string.settings_about_desc),
+            label = "About Filora",
+            description = "Version, open-source licenses, and links.",
             onClick = onOpenAbout,
             testTag = "open_about",
         )
     }
+}
+
+/** FR-11.2 browsing-default controls, hoisted out of [SettingsContent] to keep it small. */
+@Composable
+private fun FilesSettingsSection(
+    preferences: UserPreferences,
+    actions: SettingsActions,
+) {
+    SectionHeader("Files")
+    SwitchRow(
+        label = "Show hidden files",
+        description = "Display files and folders that start with a dot.",
+        checked = preferences.showHiddenFiles,
+        onCheckedChange = actions.onShowHidden,
+        testTag = "show_hidden",
+    )
+    SettingRow(label = "Default view") {
+        ChipGroup(
+            options = ViewLayout.entries,
+            selected = preferences.defaultViewLayout,
+            label = { it.name },
+            onSelect = actions.onViewLayout,
+            testTagPrefix = "view",
+        )
+    }
+    SettingRow(label = "Sort by") {
+        ChipGroup(
+            options = SortOrder.By.entries,
+            selected = preferences.defaultSortOrder.by,
+            label = { it.label() },
+            onSelect = actions.onSortBy,
+            testTagPrefix = "sort",
+        )
+    }
+    SwitchRow(
+        label = "Ascending order",
+        description = "Smallest / A→Z / oldest first.",
+        checked = preferences.defaultSortOrder.ascending,
+        onCheckedChange = actions.onSortAscending,
+        testTag = "sort_ascending",
+    )
+    SwitchRow(
+        label = "Folders first",
+        description = "Group folders before files.",
+        checked = preferences.defaultSortOrder.foldersFirst,
+        onCheckedChange = actions.onFoldersFirst,
+        testTag = "folders_first",
+    )
 }
 
 @Composable
@@ -255,8 +259,7 @@ private fun SwitchRow(
 private fun <T> ChipGroup(
     options: List<T>,
     selected: T,
-    label: @Composable (T) -> String,
-    key: (T) -> String,
+    label: (T) -> String,
     onSelect: (T) -> Unit,
     testTagPrefix: String,
 ) {
@@ -266,7 +269,7 @@ private fun <T> ChipGroup(
                 selected = option == selected,
                 onClick = { onSelect(option) },
                 label = { Text(label(option)) },
-                modifier = Modifier.testTag("${testTagPrefix}_${key(option)}"),
+                modifier = Modifier.testTag("${testTagPrefix}_${label(option)}"),
             )
         }
     }
@@ -275,30 +278,14 @@ private fun <T> ChipGroup(
 private val supportsDynamicColor: Boolean
     get() = Build.VERSION.SDK_INT >= Build.VERSION_CODES.S
 
-@StringRes
-private fun ThemeMode.labelRes(): Int =
+private fun ThemeMode.label(): String =
     when (this) {
-        ThemeMode.System -> R.string.settings_theme_system
-        ThemeMode.Light -> R.string.settings_theme_light
-        ThemeMode.Dark -> R.string.settings_theme_dark
+        ThemeMode.System -> "System"
+        ThemeMode.Light -> "Light"
+        ThemeMode.Dark -> "Dark"
     }
 
-@StringRes
-private fun SortOrder.By.labelRes(): Int =
-    when (this) {
-        SortOrder.By.Name -> R.string.settings_sortby_name
-        SortOrder.By.Size -> R.string.settings_sortby_size
-        SortOrder.By.DateModified -> R.string.settings_sortby_date
-        SortOrder.By.Type -> R.string.settings_sortby_type
-    }
-
-/**
- * Stable, non-localized testTag suffix preserving the historical tags
- * (`sort_Name`/`sort_Size`/`sort_Date`/`sort_Type`). Kept separate from the
- * enum's `.name` because [SortOrder.By.DateModified] historically tagged as
- * `Date`, so existing UI tests stay byte-identical.
- */
-private fun SortOrder.By.tagKey(): String =
+private fun SortOrder.By.label(): String =
     when (this) {
         SortOrder.By.Name -> "Name"
         SortOrder.By.Size -> "Size"

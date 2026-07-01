@@ -41,4 +41,5 @@
     <string name="media_preview_image">معاينة الصورة</string>
     <string name="media_preview_close">إغلاق المعاينة</string>
     <string name="media_preview_open_external">فتح في تطبيق آخر</string>
+    <string name="media_a11y_open">فتح %1$s</string>
 </resources>

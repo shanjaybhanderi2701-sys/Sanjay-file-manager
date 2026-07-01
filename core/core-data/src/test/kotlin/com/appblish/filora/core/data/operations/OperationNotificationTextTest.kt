@@ -12,7 +12,6 @@ import org.junit.Before
 import org.junit.Test
 
 class OperationNotificationTextTest {
-
     private val context: Context = mockk()
 
     @Before

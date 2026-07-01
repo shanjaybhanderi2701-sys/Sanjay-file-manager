@@ -9,12 +9,18 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.semantics.LiveRegionMode
+import androidx.compose.ui.semantics.liveRegion
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 
 /**
  * Labeled progress row for file operations. Pass a [progress] in 0f..1f for
  * determinate, or `null` for indeterminate.
+ *
+ * The row is a polite live region (NFR-5): TalkBack announces label/percent/detail
+ * updates as the operation advances without the user having to re-focus it.
  */
 @Composable
 fun ProgressBarRow(
@@ -23,7 +29,13 @@ fun ProgressBarRow(
     progress: Float? = null,
     detail: String? = null,
 ) {
-    Column(modifier = modifier.fillMaxWidth().padding(16.dp)) {
+    Column(
+        modifier =
+            modifier
+                .fillMaxWidth()
+                .padding(16.dp)
+                .semantics { liveRegion = LiveRegionMode.Polite },
+    ) {
         Row(modifier = Modifier.fillMaxWidth()) {
             Text(
                 text = label,

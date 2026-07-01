@@ -17,7 +17,7 @@ object ThumbnailSampling {
         reqWidth: Int,
         reqHeight: Int,
     ): Int {
-        if (srcWidth <= 0 || srcHeight <= 0 || reqWidth <= 0 || reqHeight <= 0) return 1
+        if (intArrayOf(srcWidth, srcHeight, reqWidth, reqHeight).any { it <= 0 }) return 1
 
         var inSampleSize = 1
         val halfWidth = srcWidth / 2
