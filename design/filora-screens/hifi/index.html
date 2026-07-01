@@ -3,823 +3,593 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Filora — Premium Hi-Fi (A-blend, craft pass)</title>
+<title>Filora — InShot-feel Hi-Fi (APP-134, ratified blue)</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
   /* ============================================================
-     FILORA — PREMIUM TOKENS (craft pass, APP-134)
-     Signature "Iris" brand story — NOT stock M3 teal.
-     Every value here maps to a core-ui/theme token (see 06-premium-craft.md).
+     FILORA — InShot-feel craft pass (APP-134 v3)
+     Grounded in the Chief's XFolder/InShot benchmark study
+     (APP-112 doc `premium-design-reference`, 8 real screenshots) and the
+     ratified blue design system (docs/phase-1/design/07-design-system.md).
+     Brand = ratified BLUE #2563EB (Iris/purple is obsolete). Category wheel
+     = a fixed encoding, not a 2nd brand color. Light-first (matches the
+     reference home); dark % -ring cleaner shot marketed as premium.
      ============================================================ */
   :root{
-    /* --- Brand: Filora Iris --- */
-    --iris:#5B5BD6;          /* primary  (was #00696B teal) */
-    --iris-600:#4B47CF;      /* primary pressed */
-    --violet:#8B5CF6;        /* gradient mid */
-    --orchid:#C06BE6;        /* gradient end */
-    --iris-container:#E6E5FB;
-    --on-iris-container:#1B1A54;
+    /* Ratified brand — BLUE */
+    --blue:#2563EB; --blue-600:#1D4FD7; --blue-400:#4C7DF5; --cyan:#38BDF8;
+    --blue-grad:linear-gradient(135deg,#2563EB,#4C7DF5 52%,#38BDF8);
+    --blue-c:#DCE7FF; --on-blue-c:#0A245F; --blue-soft:#EDF2FF;
 
-    /* --- Ink & neutrals (indigo-tinted, not pure grey) --- */
-    --ink:#15142B;           /* on-surface, headings */
-    --ink-2:#403E5C;         /* secondary text */
-    --muted:#75738F;         /* metadata, captions */
-    --bg:#F5F4FB;            /* app background — soft lilac tint, not flat white */
-    --surface:#FFFFFF;
-    --surf-tint:#FBFAFF;     /* raised card fill */
-    --line:#ECEAF7;          /* hairline dividers/borders */
-    --line-2:#E2DFF2;
+    /* Light canvas — bright, friendly (cue 6) */
+    --bg:#F4F6FC; --surface:#FFFFFF; --surf-2:#FAFBFF;
+    --ink:#131A2C; --ink-2:#414962; --muted:#7C879B; --faint:#9AA3B5;
+    --line:#EAEDF6; --line-2:#E0E4F0;
 
-    /* --- Per-category accent wheel (harmonised S/L for cohesion) --- */
-    --c-image:#F43F6E;    --c-image-c:#FFE1E9;
-    --c-video:#7C5CF7;    --c-video-c:#EAE2FF;
-    --c-audio:#F5921B;    --c-audio-c:#FFEBCF;
-    --c-doc:#2E7CF6;      --c-doc-c:#DBE9FF;
-    --c-download:#12A46B; --c-download-c:#CFF3E1;
-    --c-app:#5B5BD6;      --c-app-c:#E4E4FB;
+    /* Category / file-type accent wheel (colorful custom icons — cue 1/3) */
+    --c-image:#F43F6E;    --c-image-c:#FFE4EB;
+    --c-video:#F0693B;    --c-video-c:#FFE5DC;   /* red-orange video (ref) */
+    --c-audio:#F5921B;    --c-audio-c:#FFEDD6;
+    --c-doc:#2E7CF6;      --c-doc-c:#DCEAFF;
+    --c-download:#12A46B; --c-download-c:#D2F3E4;
+    --c-app:#22B36A;      --c-app-c:#D3F3E2;      /* green apps (ref) */
     --c-archive:#B44BC9;  --c-archive-c:#F6DEFB;
-    --c-folder:#6E6C8A;   --c-folder-c:#ECEBF3;
+    --c-folder:#3B82F6;   --c-folder-c:#DCEAFF;   /* blue folders w/ badges (ref) */
     --c-fav:#F5A524;      --c-fav-c:#FFF0D2;
-    --success:#12A46B; --error:#E5484D; --error-c:#FFE3E1; --on-error-c:#5C0A0C;
+    --c-analyze:#12A46B;  --c-clean:#7C5CF7;  --c-safe:#2E7CF6; --c-trash:#F0574E;
+    --success:#12A46B; --error:#E5484D; --error-c:#FFE3E1;
 
-    /* --- Elevation: real layered soft shadows (light, indigo-tinted) --- */
-    --sh-1:0 1px 2px rgba(21,20,43,.05), 0 1px 3px rgba(21,20,43,.05);
-    --sh-2:0 6px 16px rgba(21,20,43,.07), 0 2px 5px rgba(21,20,43,.05);
-    --sh-3:0 16px 34px rgba(21,20,43,.12), 0 5px 12px rgba(21,20,43,.06);
-    --sh-brand:0 12px 26px rgba(91,91,214,.30), 0 3px 8px rgba(91,91,214,.20);
+    /* Depth — soft, layered (cue 6) */
+    --sh-1:0 1px 2px rgba(19,26,44,.05), 0 1px 3px rgba(19,26,44,.05);
+    --sh-2:0 8px 20px rgba(19,26,44,.07), 0 2px 6px rgba(19,26,44,.05);
+    --sh-3:0 18px 40px rgba(19,26,44,.12), 0 5px 14px rgba(19,26,44,.07);
+    --sh-blue:0 12px 26px rgba(37,99,235,.30), 0 3px 8px rgba(37,99,235,.20);
 
-    /* --- Shape: compact/native radii (density pass, APP-134) --- */
-    --r-sm:10px; --r-md:12px; --r-lg:14px; --r-xl:18px; --r-2xl:22px; --r-pill:999px;
-
-    /* --- Spacing (4dp base — unchanged from A-blend) --- */
+    --r-sm:12px; --r-md:16px; --r-lg:20px; --r-xl:26px; --r-2xl:30px; --r-pill:999px;
     --xs:4px; --sm:8px; --md:12px; --lg:16px; --xl:24px; --xxl:32px;
-
     --font:'Manrope',-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
   }
-
   *{box-sizing:border-box;margin:0;padding:0}
-  body{font-family:var(--font);background:radial-gradient(1200px 600px at 15% -5%,#1c1b3a,#0c0b1c 60%);
-    color:#cdcbe6;padding:40px 20px 90px;-webkit-font-smoothing:antialiased}
+  body{font-family:var(--font);
+    background:radial-gradient(1100px 620px at 12% -6%,#1a2340,#0b1020 60%);
+    color:#c5cde0;padding:42px 20px 96px;-webkit-font-smoothing:antialiased}
 
-  /* ---------- Page chrome ---------- */
-  header.page{max-width:1240px;margin:0 auto 30px}
-  .brandline{display:flex;align-items:center;gap:12px}
-  .logo{width:40px;height:40px;border-radius:12px;
-    background:linear-gradient(135deg,var(--iris),var(--violet) 55%,var(--orchid));
-    box-shadow:var(--sh-brand);display:flex;align-items:center;justify-content:center}
-  header.page h1{font-size:28px;color:#f4f3ff;font-weight:800;letter-spacing:-.6px}
-  header.page .sub{color:#9d9bc4;margin-top:10px;font-size:14.5px;line-height:1.6;max-width:860px}
-  .pill{display:inline-block;background:rgba(91,91,214,.16);color:#c7c5ff;border:1px solid rgba(124,92,247,.35);
-    padding:4px 12px;border-radius:var(--r-pill);font-size:12px;font-weight:600;margin-top:16px;margin-right:6px}
-  .sectlabel{max-width:1240px;margin:44px auto 6px;color:#8886b3;font-size:12px;font-weight:700;
-    letter-spacing:1.4px;text-transform:uppercase}
-  .sectlabel + .sectnote{max-width:1240px;margin:0 auto 18px;color:#75739c;font-size:13px}
+  header.page{max-width:1300px;margin:0 auto 26px}
+  .brandline{display:flex;align-items:center;gap:13px}
+  .logo{width:44px;height:44px;border-radius:14px;background:var(--blue-grad);
+    box-shadow:var(--sh-blue);display:flex;align-items:center;justify-content:center}
+  header.page h1{font-size:28px;color:#f3f6ff;font-weight:800;letter-spacing:-.6px}
+  header.page .sub{color:#9aa3c2;margin-top:11px;font-size:14.5px;line-height:1.62;max-width:900px}
+  header.page .sub b{color:#d3d9ef}
+  .pillrow{margin-top:15px}
+  .pill{display:inline-flex;align-items:center;gap:6px;background:rgba(37,99,235,.16);color:#bcd3ff;
+    border:1px solid rgba(76,125,245,.34);padding:5px 13px;border-radius:var(--r-pill);
+    font-size:12px;font-weight:600;margin-right:7px;margin-bottom:7px}
+  .pill.warm{background:rgba(245,165,36,.14);border-color:rgba(245,165,36,.3);color:#f6cf93}
+  .sectlabel{max-width:1300px;margin:48px auto 6px;color:#8b93b6;font-size:12px;font-weight:800;
+    letter-spacing:1.5px;text-transform:uppercase;display:flex;align-items:center;gap:12px}
+  .sectlabel::before{content:"";width:24px;height:3px;border-radius:2px;background:var(--blue-grad)}
+  .sectnote{max-width:1300px;margin:0 auto 20px;color:#767d9c;font-size:13px;line-height:1.55}
 
-  .gallery{max-width:1240px;margin:0 auto;display:flex;flex-wrap:wrap;gap:40px;align-items:flex-start}
+  .gallery{max-width:1300px;margin:0 auto;display:flex;flex-wrap:wrap;gap:40px;align-items:flex-start}
   .frame{display:flex;flex-direction:column;gap:12px}
-  .frame > .cap{color:#b7b5da;font-size:13.5px;font-weight:700;text-align:center}
-  .frame > .cap span{display:block;color:#7d7ba6;font-weight:500;font-size:11.5px;margin-top:3px;max-width:308px}
+  .frame > .cap{color:#bcc2dc;font-size:13.5px;font-weight:700;text-align:center}
+  .frame > .cap span{display:block;color:#7a819f;font-weight:500;font-size:11.5px;margin-top:3px;max-width:312px;line-height:1.5}
 
-  /* ---------- Device shells ---------- */
-  .phone{width:308px;height:648px;background:var(--bg);border-radius:40px;
-    border:10px solid #050510;overflow:hidden;position:relative;color:var(--ink);
-    box-shadow:0 30px 70px rgba(0,0,0,.6), inset 0 0 0 2px #1c1b32}
-  .tablet{width:600px;height:452px;background:var(--bg);border-radius:26px;
-    border:10px solid #050510;overflow:hidden;position:relative;color:var(--ink);
-    box-shadow:0 30px 70px rgba(0,0,0,.6);display:flex}
-  .scroll{position:absolute;inset:0 0 68px 0;overflow:hidden}
-  .tablet .scroll{position:relative;inset:auto;flex:1}
-  .content{padding-bottom:20px}
+  /* device shell */
+  .phone{width:312px;height:660px;background:var(--bg);border-radius:42px;
+    border:10px solid #05060f;overflow:hidden;position:relative;color:var(--ink);
+    box-shadow:0 34px 74px rgba(0,0,0,.6), inset 0 0 0 2px #1a1f33}
+  .phone.dark{background:#0E1424;color:#EAEEF9}
+  .scroll{position:absolute;inset:0 0 66px 0;overflow:hidden}
+  .scroll.nonav{inset:0}
+  .content{padding-bottom:18px}
+  .status{height:32px;display:flex;align-items:center;justify-content:space-between;padding:10px 20px 0;
+    font-size:11px;font-weight:700;color:var(--ink)}
+  .phone.dark .status{color:#EAEEF9}
 
-  /* ---------- Icons (custom duotone line set) ---------- */
-  .icon{width:24px;height:24px;display:inline-block;vertical-align:middle;flex-shrink:0}
+  /* icons */
+  .icon{width:24px;height:24px;display:inline-flex;vertical-align:middle;flex-shrink:0}
   .icon svg{width:100%;height:100%;display:block}
-  .duo .tone{opacity:.28}
 
-  /* ---------- App bar ---------- */
-  .appbar{padding:12px var(--lg) 6px;display:flex;align-items:center;justify-content:space-between;gap:10px}
-  .appbar .title{font-size:19px;font-weight:800;letter-spacing:-.4px}
-  .appbar .grp{display:flex;gap:6px;align-items:center}
-  .iconbtn{width:40px;height:40px;border-radius:var(--r-pill);display:flex;align-items:center;justify-content:center;
-    color:var(--ink-2);background:transparent}
-  .iconbtn:hover{background:var(--iris-container)}
-  .avatar{width:34px;height:34px;border-radius:var(--r-pill);
-    background:linear-gradient(135deg,var(--iris),var(--orchid));color:#fff;font-weight:700;
-    display:flex;align-items:center;justify-content:center;font-size:13px;box-shadow:var(--sh-1)}
+  /* app bar */
+  .appbar{padding:10px var(--lg) 6px;display:flex;align-items:center;gap:10px}
+  .appbar .h1{font-size:22px;font-weight:800;letter-spacing:-.4px}
+  .appbar .grp{display:flex;gap:2px;align-items:center;margin-left:auto}
+  .iconbtn{width:40px;height:40px;border-radius:var(--r-pill);display:flex;align-items:center;justify-content:center;color:var(--ink-2)}
+  .phone.dark .iconbtn{color:#AEB6CC}
+  .avatar{width:34px;height:34px;border-radius:var(--r-pill);background:var(--blue-grad);color:#fff;font-weight:800;
+    display:flex;align-items:center;justify-content:center;font-size:12.5px;box-shadow:var(--sh-1)}
 
-  /* ---------- Generic building blocks ---------- */
-  .pad{padding:0 var(--lg)}
-  .sec{display:flex;align-items:center;justify-content:space-between;margin:16px var(--lg) 8px}
-  .sec h3{font-size:15.5px;font-weight:800;letter-spacing:-.2px}
-  .sec a{font-size:12.5px;font-weight:700;color:var(--iris)}
-  .muted{color:var(--muted)}
+  /* section header */
+  .sec{display:flex;align-items:center;justify-content:space-between;margin:18px var(--lg) 10px}
+  .sec h3{font-size:16px;font-weight:800;letter-spacing:-.2px}
+  .sec a{font-size:12px;font-weight:700;color:var(--blue)}
 
-  /* card */
-  .card{background:var(--surface);border-radius:var(--r-lg);box-shadow:var(--sh-2);border:1px solid var(--line)}
+  /* colorful leading tile (custom-icon look) */
+  .tile{width:44px;height:44px;border-radius:13px;display:flex;align-items:center;justify-content:center;flex-shrink:0;position:relative}
+  .tile .icon{width:24px;height:24px}
+  .tile .mini{position:absolute;right:-3px;bottom:-3px;width:19px;height:19px;border-radius:7px;background:#fff;
+    display:flex;align-items:center;justify-content:center;box-shadow:var(--sh-1)}
+  .tile .mini .icon{width:12px;height:12px}
+  .phone.dark .tile .mini{background:#1A2233}
 
-  /* file row — compact native density (~56dp) */
-  .row{display:flex;align-items:center;gap:var(--md);padding:8px var(--lg);min-height:56px}
-  .row .nm{font-size:14.5px;font-weight:600;line-height:19px}
-  .row .mt{font-size:12px;line-height:15px;color:var(--muted);margin-top:1px;font-weight:500}
+  /* file rows */
+  .row{display:flex;align-items:center;gap:var(--md);padding:9px var(--lg);min-height:60px}
+  .row .nm{font-size:15px;font-weight:700;line-height:19px}
+  .row .mt{font-size:11.5px;line-height:15px;color:var(--muted);margin-top:3px;font-weight:600}
   .row .gr{flex:1;min-width:0}
   .row .nm,.row .mt{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-  .row .tail{color:var(--muted);display:flex;align-items:center;gap:10px}
-  .divider{height:1px;background:var(--line);margin:0 var(--lg)}
+  .row .tail{color:var(--faint);display:flex;align-items:center;gap:8px}
+  .divider{height:1px;background:var(--line);margin:0 var(--lg) 0 72px}
 
-  /* leading icon tile — duotone, per-type accent (40dp visual, ≥48dp row touch target) */
-  .tile{width:40px;height:40px;border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
-  .tile .icon{width:20px;height:20px}
-
-  /* chips */
-  .chips{display:flex;gap:8px;flex-wrap:wrap;padding:2px var(--lg) 4px}
-  .chip{display:inline-flex;align-items:center;gap:7px;border:1px solid var(--line-2);
-    border-radius:var(--r-pill);padding:8px 14px;font-size:12.5px;font-weight:600;color:var(--ink-2);background:var(--surface)}
-  .chip.on{background:var(--iris);border-color:var(--iris);color:#fff;box-shadow:var(--sh-brand)}
-  .chip .icon{width:16px;height:16px}
-
-  /* ---------- HOME: hero storage ring ---------- */
-  .hero{margin:8px var(--lg) 4px;padding:15px 16px;border-radius:var(--r-2xl);color:#fff;position:relative;overflow:hidden;
-    background:linear-gradient(135deg,#5B5BD6 0%,#7C5CF7 48%,#B067E6 100%);box-shadow:var(--sh-brand)}
-  .hero::after{content:"";position:absolute;right:-40px;top:-50px;width:180px;height:180px;border-radius:50%;
+  /* HERO storage ring card */
+  .hero{margin:6px var(--lg);padding:18px;border-radius:var(--r-2xl);color:#fff;position:relative;overflow:hidden;
+    background:var(--blue-grad);box-shadow:var(--sh-blue)}
+  .hero::after{content:"";position:absolute;right:-46px;top:-54px;width:180px;height:180px;border-radius:50%;
     background:radial-gradient(circle,rgba(255,255,255,.22),transparent 70%)}
-  .hero .htop{display:flex;align-items:center;justify-content:space-between;position:relative;z-index:1}
-  .hero .greet{font-size:12px;font-weight:600;opacity:.85}
-  .hero .htitle{font-size:15.5px;font-weight:800;margin-top:1px;letter-spacing:-.3px}
-  .hero .hbody{display:flex;align-items:center;gap:14px;margin-top:12px;position:relative;z-index:1}
-  .ring{width:80px;height:80px;flex-shrink:0;position:relative}
+  .hero .htop{display:flex;justify-content:space-between;align-items:center;position:relative;z-index:1}
+  .hero .greet{font-size:12px;font-weight:600;opacity:.9}
+  .hero .htitle{font-size:17px;font-weight:800;margin-top:1px}
+  .hbody{display:flex;align-items:center;gap:16px;margin-top:14px;position:relative;z-index:1}
+  .ring{width:98px;height:98px;flex-shrink:0;position:relative}
   .ring svg{transform:rotate(-90deg)}
   .ring .rc{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
-  .ring .rc b{font-size:19px;font-weight:800;letter-spacing:-.5px}
-  .ring .rc s{font-size:9.5px;opacity:.85;text-decoration:none;font-weight:600;margin-top:0}
-  .legend{flex:1;display:flex;flex-direction:column;gap:8px}
-  .leg{display:flex;align-items:center;gap:8px;font-size:12px;font-weight:600}
+  .ring .rc b{font-size:22px;font-weight:800;letter-spacing:-.5px}
+  .ring .rc s{font-size:9.5px;opacity:.85;text-decoration:none;font-weight:700}
+  .legend{flex:1;display:flex;flex-direction:column;gap:7px}
+  .leg{display:flex;align-items:center;gap:8px;font-size:11.5px;font-weight:600}
   .leg .dot{width:9px;height:9px;border-radius:3px;flex-shrink:0}
-  .leg .lv{margin-left:auto;opacity:.9;font-weight:700}
+  .leg .lv{margin-left:auto;opacity:.92;font-weight:700}
 
-  /* quick tools */
-  .qtools{display:flex;gap:9px;padding:14px var(--lg) 2px}
-  .qt{flex:1;background:var(--surface);border:1px solid var(--line);border-radius:var(--r-md);padding:12px 6px;
-    display:flex;flex-direction:column;align-items:center;gap:7px;box-shadow:var(--sh-1)}
-  .qt .qi{width:38px;height:38px;border-radius:12px;display:flex;align-items:center;justify-content:center}
-  .qt .qi .icon{width:20px;height:20px}
-  .qt span{font-size:11px;font-weight:700;color:var(--ink-2)}
+  /* volume storage cards (Main / SD — cue 2) */
+  .vols{display:flex;gap:11px;padding:12px var(--lg) 2px}
+  .vol{flex:1;background:var(--surface);border:1px solid var(--line);border-radius:var(--r-lg);padding:14px;box-shadow:var(--sh-1)}
+  .phone.dark .vol{background:#141A28;border-color:rgba(255,255,255,.07)}
+  .vol .vh{display:flex;align-items:center;gap:8px}
+  .vol .vi{width:32px;height:32px;border-radius:10px;display:flex;align-items:center;justify-content:center}
+  .vol .vi .icon{width:18px;height:18px}
+  .vol .vn{font-size:13px;font-weight:800}
+  .vol .vsub{font-size:11px;color:var(--muted);font-weight:600;margin-top:10px}
+  .vbar{height:7px;border-radius:var(--r-pill);background:var(--line-2);overflow:hidden;margin-top:7px}
+  .phone.dark .vbar{background:rgba(255,255,255,.1)}
+  .vbar i{display:block;height:100%;border-radius:var(--r-pill);background:var(--blue-grad)}
 
-  /* category grid */
-  .catgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:4px var(--lg)}
-  .cat{border-radius:var(--r-lg);padding:12px;display:flex;flex-direction:column;gap:8px;position:relative;
-    overflow:hidden;box-shadow:var(--sh-1);border:1px solid var(--line);background:var(--surface)}
-  .cat .ci{width:36px;height:36px;border-radius:11px;display:flex;align-items:center;justify-content:center}
-  .cat .ci .icon{width:20px;height:20px}
-  .cat .cn{font-size:14px;font-weight:800;letter-spacing:-.2px}
-  .cat .cm{font-size:11.5px;font-weight:600;color:var(--muted);margin-top:-5px}
-  .cat .arc{position:absolute;right:-24px;bottom:-24px;width:70px;height:70px;border-radius:50%;opacity:.14}
+  /* quick tools (utility value — cue 5) */
+  .qtools{display:flex;gap:8px;padding:14px var(--lg) 2px}
+  .qt{flex:1;display:flex;flex-direction:column;align-items:center;gap:7px}
+  .qt .qi{width:52px;height:52px;border-radius:17px;display:flex;align-items:center;justify-content:center;box-shadow:var(--sh-1)}
+  .qt .qi .icon{width:25px;height:25px}
+  .qt span{font-size:10.5px;font-weight:700;color:var(--ink-2)}
+  .phone.dark .qt span{color:#C0C8D9}
 
-  /* recents strip */
-  .strip{display:flex;gap:12px;padding:4px var(--lg) 8px;overflow:hidden}
-  .rcard{width:118px;flex-shrink:0;border-radius:var(--r-md);overflow:hidden;background:var(--surface);
-    box-shadow:var(--sh-2);border:1px solid var(--line)}
-  .rcard .thumb{height:82px;display:flex;align-items:center;justify-content:center;position:relative}
-  .rcard .thumb .icon{width:30px;height:30px}
-  .rcard .rmeta{padding:8px 10px 10px}
-  .rcard .rn{font-size:12px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-  .rcard .rt{font-size:10.5px;color:var(--muted);font-weight:600;margin-top:2px}
-  .badge{position:absolute;top:6px;right:6px;background:rgba(21,20,43,.6);color:#fff;font-size:9px;font-weight:700;
-    padding:2px 6px;border-radius:var(--r-pill)}
+  /* category grid — colorful icon tiles */
+  .catgrid{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:10px;padding:6px var(--lg)}
+  .cat{display:flex;flex-direction:column;align-items:center;gap:7px}
+  .cat .ci{width:54px;height:54px;border-radius:18px;display:flex;align-items:center;justify-content:center;box-shadow:var(--sh-1)}
+  .cat .ci .icon{width:27px;height:27px}
+  .cat .cn{font-size:11px;font-weight:700}
+  .cat .cm{font-size:9.5px;font-weight:600;color:var(--muted);margin-top:-5px}
 
-  /* fav pills */
-  .favs{display:flex;gap:8px;padding:4px var(--lg) 10px;flex-wrap:wrap}
-  .favp{display:inline-flex;align-items:center;gap:8px;background:var(--surface);border:1px solid var(--line);
-    border-radius:var(--r-pill);padding:8px 13px 8px 9px;font-size:12.5px;font-weight:700;box-shadow:var(--sh-1)}
-  .favp .fi{width:26px;height:26px;border-radius:9px;display:flex;align-items:center;justify-content:center}
-  .favp .fi .icon{width:15px;height:15px}
+  /* source-grouped media (cue 4) */
+  .srcgrid{display:grid;grid-template-columns:1fr 1fr;gap:11px;padding:6px var(--lg)}
+  .src{border-radius:var(--r-lg);overflow:hidden;position:relative;height:112px;box-shadow:var(--sh-2);display:flex;flex-direction:column;justify-content:flex-end}
+  .src .ov{position:absolute;inset:0;background:linear-gradient(to top,rgba(10,15,30,.72),rgba(10,15,30,.05) 60%)}
+  .src .sl{position:relative;padding:10px 12px;color:#fff}
+  .src .sn{font-size:13px;font-weight:800}
+  .src .sc{font-size:10.5px;font-weight:600;opacity:.9;margin-top:1px}
+  .src .sb{position:absolute;top:8px;left:8px;width:26px;height:26px;border-radius:9px;background:rgba(255,255,255,.92);
+    display:flex;align-items:center;justify-content:center}
+  .src .sb .icon{width:15px;height:15px}
 
-  /* ---------- Bottom nav ---------- */
-  .bnav{position:absolute;left:0;right:0;bottom:0;height:68px;background:rgba(255,255,255,.92);
-    backdrop-filter:blur(14px);display:flex;justify-content:space-around;align-items:center;
-    border-top:1px solid var(--line);padding-bottom:6px}
-  .bnav .n{display:flex;flex-direction:column;align-items:center;gap:3px;font-size:10.5px;color:var(--muted);font-weight:600}
-  .bnav .n .b{width:56px;height:30px;border-radius:var(--r-pill);display:flex;align-items:center;justify-content:center}
-  .bnav .n .b .icon{width:22px;height:22px}
-  .bnav .n.act{color:var(--iris)}
-  .bnav .n.act .b{background:var(--iris-container)}
-
-  /* FAB */
-  .fab{position:absolute;right:18px;bottom:84px;width:58px;height:58px;border-radius:20px;
-    background:linear-gradient(135deg,var(--iris),var(--violet));box-shadow:var(--sh-brand);
-    display:flex;align-items:center;justify-content:center;color:#fff;z-index:5}
-  .fab .icon{width:26px;height:26px}
+  /* chips */
+  .chips{display:flex;gap:8px;flex-wrap:wrap;padding:2px var(--lg) 6px}
+  .chip{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line-2);border-radius:var(--r-pill);
+    padding:8px 14px;font-size:12px;font-weight:700;color:var(--ink-2);background:var(--surface)}
+  .chip.on{background:var(--blue);border-color:var(--blue);color:#fff;box-shadow:var(--sh-blue)}
+  .chip .icon{width:15px;height:15px}
+  .phone.dark .chip{background:#141A28;color:#C0C8D9;border-color:rgba(255,255,255,.1)}
 
   /* breadcrumb */
-  .crumbs{display:flex;align-items:center;gap:5px;padding:2px var(--lg) 8px;font-size:12.5px;color:var(--muted);
-    font-weight:600;overflow:hidden;white-space:nowrap}
-  .crumbs b{color:var(--ink)}
-  .crumbs .sep{opacity:.5}
+  .crumbs{display:flex;align-items:center;gap:5px;padding:2px var(--lg) 8px;font-size:12px;color:var(--muted);font-weight:700;white-space:nowrap;overflow:hidden}
+  .crumbs b{color:var(--ink)}.crumbs .sep{opacity:.45}
 
-  /* selection app bar */
-  .appbar.sel{background:var(--iris-container);border-radius:0 0 var(--r-lg) var(--r-lg);margin:0 8px;padding-top:14px}
-  .appbar.sel .title{color:var(--on-iris-container);font-size:17px}
-  .check{width:24px;height:24px;border-radius:8px;background:var(--iris);display:flex;align-items:center;
-    justify-content:center;color:#fff;flex-shrink:0}
-  .row.selrow{background:var(--iris-container)}
-
-  /* media grid */
-  .mgrid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;padding:4px var(--lg)}
-  .mcell{aspect-ratio:1;border-radius:14px;overflow:hidden;position:relative;display:flex;align-items:center;justify-content:center}
-  .mcell .icon{width:26px;height:26px}
-  .mcell .pd{position:absolute;bottom:5px;right:6px;color:#fff;font-size:9.5px;font-weight:700;
-    background:rgba(21,20,43,.55);padding:1px 6px;border-radius:var(--r-pill)}
+  /* selection bar (chunky, single-purpose — InShot) */
+  .selbar{margin:0 8px;background:var(--blue);border-radius:0 0 var(--r-lg) var(--r-lg);color:#fff;
+    padding:12px 14px;display:flex;align-items:center;gap:10px;box-shadow:var(--sh-blue)}
+  .selbar .h1{font-size:16px;font-weight:800}
+  .selbar .grp{margin-left:auto;display:flex;gap:6px}
+  .selbar .sbtn{width:38px;height:38px;border-radius:12px;background:rgba(255,255,255,.18);display:flex;align-items:center;justify-content:center}
+  .check{width:24px;height:24px;border-radius:8px;background:var(--blue);display:flex;align-items:center;justify-content:center;color:#fff;flex-shrink:0}
+  .row.selrow{background:var(--blue-soft)}
+  .phone.dark .row.selrow{background:rgba(37,99,235,.16)}
 
   /* search */
-  .searchbar{margin:6px var(--lg) 4px;display:flex;align-items:center;gap:10px;background:var(--surface);
-    border:1px solid var(--line);border-radius:var(--r-pill);padding:12px 16px;box-shadow:var(--sh-2)}
+  .searchbar{margin:6px var(--lg);display:flex;align-items:center;gap:10px;background:var(--surface);
+    border:1px solid var(--line);border-radius:var(--r-pill);padding:13px 16px;box-shadow:var(--sh-2)}
   .searchbar .icon{width:20px;height:20px;color:var(--muted)}
-  .searchbar input{border:0;outline:0;flex:1;font:inherit;font-size:14.5px;font-weight:600;background:transparent;color:var(--ink)}
-  .searchbar input::placeholder{color:var(--muted);font-weight:500}
+  .searchbar input{border:0;outline:0;flex:1;font:inherit;font-size:14.5px;font-weight:700;background:transparent;color:var(--ink)}
 
-  /* storage story */
-  .story{margin:8px var(--lg);padding:22px 20px;border-radius:var(--r-2xl);color:#fff;position:relative;overflow:hidden;
-    background:linear-gradient(160deg,#242349 0%,#3a2f6e 55%,#5B5BD6 120%);box-shadow:var(--sh-3)}
-  .story .stag{font-size:11.5px;font-weight:700;letter-spacing:1px;text-transform:uppercase;opacity:.7}
-  .story .snum{font-size:40px;font-weight:800;letter-spacing:-1.4px;margin-top:6px;line-height:1}
-  .story .ssub{font-size:13px;opacity:.85;font-weight:600;margin-top:4px}
-  .segbar{display:flex;height:14px;border-radius:var(--r-pill);overflow:hidden;margin-top:18px;gap:2px;background:rgba(255,255,255,.12)}
-  .segbar i{display:block;height:100%}
-  .breakdown{margin:6px var(--lg) 0}
-  .brow{display:flex;align-items:center;gap:12px;padding:12px 4px}
-  .brow .bdot{width:10px;height:10px;border-radius:4px}
-  .brow .bn{font-size:14px;font-weight:700;flex:1}
-  .brow .bv{font-size:13px;font-weight:700;color:var(--muted)}
-  .mini{height:6px;border-radius:var(--r-pill);background:var(--line);overflow:hidden;margin-top:6px}
-  .mini i{display:block;height:100%;border-radius:var(--r-pill)}
+  /* cleaner cards (cue 5) */
+  .cleanhero{margin:6px var(--lg);padding:20px;border-radius:var(--r-2xl);color:#fff;position:relative;overflow:hidden;
+    background:linear-gradient(150deg,#1D2540,#3A2F6E 60%,#2563EB 130%);box-shadow:var(--sh-3)}
+  .cleanhero .ch-ring{position:absolute;right:14px;top:50%;transform:translateY(-50%)}
+  .cleanhero .tag{font-size:11px;font-weight:800;letter-spacing:.8px;text-transform:uppercase;opacity:.72}
+  .cleanhero .num{font-size:34px;font-weight:800;letter-spacing:-1.2px;margin-top:5px}
+  .cleanhero .sub{font-size:12.5px;opacity:.85;font-weight:600;margin-top:3px;max-width:150px}
+  .cleanhero .cbtn{margin-top:14px;display:inline-flex;background:#fff;color:#2563EB;font-weight:800;font-size:12.5px;padding:10px 18px;border-radius:var(--r-pill)}
+  .clist{padding:8px var(--lg) 0}
+  .cardrow{display:flex;align-items:center;gap:13px;background:var(--surface);border:1px solid var(--line);
+    border-radius:var(--r-lg);padding:13px 14px;margin-bottom:10px;box-shadow:var(--sh-1)}
+  .phone.dark .cardrow{background:#141A28;border-color:rgba(255,255,255,.07)}
+  .cardrow .ci{width:44px;height:44px;border-radius:13px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+  .cardrow .ci .icon{width:23px;height:23px}
+  .cardrow .cg{flex:1}.cardrow .ct{font-size:14px;font-weight:800}.cardrow .cs{font-size:11.5px;color:var(--muted);font-weight:600;margin-top:2px}
+  .cardrow .cv{font-size:13px;font-weight:800;color:var(--blue)}
 
   /* settings */
-  .setgrp{margin:14px var(--lg) 0;background:var(--surface);border:1px solid var(--line);border-radius:var(--r-lg);
-    overflow:hidden;box-shadow:var(--sh-1)}
-  .setrow{display:flex;align-items:center;gap:14px;padding:15px var(--lg)}
-  .setrow .si{width:38px;height:38px;border-radius:11px;display:flex;align-items:center;justify-content:center;background:var(--iris-container)}
-  .setrow .si .icon{width:20px;height:20px;color:var(--iris)}
-  .setrow .sg{flex:1}
-  .setrow .st{font-size:14.5px;font-weight:700}
-  .setrow .sd{font-size:12px;color:var(--muted);font-weight:500;margin-top:1px}
-  .toggle{width:44px;height:26px;border-radius:var(--r-pill);background:var(--iris);position:relative;flex-shrink:0}
-  .toggle::after{content:"";position:absolute;top:3px;right:3px;width:20px;height:20px;border-radius:50%;background:#fff;box-shadow:var(--sh-1)}
-  .toggle.off{background:var(--line-2)}
-  .toggle.off::after{left:3px;right:auto}
-  .swatch{display:flex;gap:8px}
-  .swatch i{width:26px;height:26px;border-radius:8px;border:2px solid transparent}
-  .swatch i.sel{border-color:var(--ink)}
+  .setgrp{margin:12px var(--lg) 0;background:var(--surface);border:1px solid var(--line);border-radius:var(--r-lg);overflow:hidden;box-shadow:var(--sh-1)}
+  .setrow{display:flex;align-items:center;gap:13px;padding:14px var(--lg)}
+  .setrow .si{width:36px;height:36px;border-radius:11px;display:flex;align-items:center;justify-content:center}
+  .setrow .si .icon{width:19px;height:19px;color:#fff}
+  .setrow .sg{flex:1}.setrow .st{font-size:14px;font-weight:700}.setrow .sd{font-size:11.5px;color:var(--muted);font-weight:600;margin-top:1px}
+  .setdiv{height:1px;background:var(--line);margin:0 var(--lg) 0 64px}
+  .toggle{width:44px;height:26px;border-radius:var(--r-pill);background:var(--blue);position:relative;flex-shrink:0}
+  .toggle::after{content:"";position:absolute;top:3px;right:3px;width:20px;height:20px;border-radius:50%;background:#fff}
+  .toggle.off{background:var(--line-2)}.toggle.off::after{left:3px;right:auto}
+  .grouplbl{margin:18px var(--lg) 6px;font-size:11.5px;font-weight:800;letter-spacing:.5px;color:var(--muted);text-transform:uppercase}
 
-  /* state screens with character */
-  .state{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;
-    padding:40px 30px;height:100%;gap:6px}
-  .state .bloom{width:120px;height:120px;border-radius:34px;display:flex;align-items:center;justify-content:center;
-    margin-bottom:14px;position:relative}
+  /* bottom nav — Home · Recent · Cleaner (ratified 3-tab) */
+  .bnav{position:absolute;left:0;right:0;bottom:0;height:66px;background:rgba(255,255,255,.94);backdrop-filter:blur(14px);
+    display:flex;justify-content:space-around;align-items:center;border-top:1px solid var(--line);padding-bottom:6px}
+  .phone.dark .bnav{background:rgba(14,20,36,.94);border-color:rgba(255,255,255,.07)}
+  .bnav .n{display:flex;flex-direction:column;align-items:center;gap:3px;font-size:11px;color:var(--muted);font-weight:700}
+  .bnav .n .b{width:58px;height:30px;border-radius:var(--r-pill);display:flex;align-items:center;justify-content:center}
+  .bnav .n .b .icon{width:23px;height:23px}
+  .bnav .n.act{color:var(--blue)}.bnav .n.act .b{background:var(--blue-c)}
+  .phone.dark .bnav .n.act .b{background:rgba(37,99,235,.24)}
+  .fab{position:absolute;right:18px;bottom:80px;width:56px;height:56px;border-radius:19px;background:var(--blue-grad);
+    box-shadow:var(--sh-blue);display:flex;align-items:center;justify-content:center;color:#fff;z-index:5}
+  .fab .icon{width:26px;height:26px}
+
+  /* states */
+  .state{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:36px 30px;height:100%;gap:5px}
+  .state .bloom{width:118px;height:118px;border-radius:32px;display:flex;align-items:center;justify-content:center;margin-bottom:12px}
   .state .bloom .icon{width:56px;height:56px}
-  .state h4{font-size:18px;font-weight:800;letter-spacing:-.3px}
-  .state p{font-size:13px;color:var(--muted);font-weight:500;line-height:1.5;max-width:230px}
-  .state .cta{margin-top:14px;background:var(--iris);color:#fff;font-weight:700;font-size:13.5px;
-    padding:12px 22px;border-radius:var(--r-pill);box-shadow:var(--sh-brand)}
-  /* skeleton */
-  .sk{background:linear-gradient(100deg,var(--line) 30%,#F6F5FC 50%,var(--line) 70%);
-    background-size:200% 100%;animation:sh 1.3s infinite;border-radius:8px}
+  .state h4{font-size:18px;font-weight:800}.state p{font-size:12.5px;color:var(--muted);font-weight:600;line-height:1.5;max-width:220px}
+  .state .cta{margin-top:14px;background:var(--blue);color:#fff;font-weight:800;font-size:13px;padding:12px 24px;border-radius:var(--r-pill);box-shadow:var(--sh-blue)}
+  .sk{background:linear-gradient(100deg,var(--line) 30%,#fff 50%,var(--line) 70%);background-size:200% 100%;animation:sh 1.3s infinite;border-radius:10px}
   @keyframes sh{to{background-position:-200% 0}}
 
-  /* tablet dual pane */
-  .pane-l{width:230px;border-right:1px solid var(--line);background:var(--surf-tint);overflow:hidden}
-  .pane-r{flex:1;overflow:hidden}
-  .pane-r.selpane{box-shadow:inset 4px 0 0 var(--iris)}
-
-  .navrail{width:74px;background:var(--surf-tint);border-right:1px solid var(--line);
-    display:flex;flex-direction:column;align-items:center;padding-top:16px;gap:6px}
-  .navrail .r{width:52px;padding:8px 0;border-radius:var(--r-md);display:flex;flex-direction:column;align-items:center;
-    gap:4px;font-size:10px;font-weight:600;color:var(--muted)}
-  .navrail .r .b{width:44px;height:28px;border-radius:var(--r-pill);display:flex;align-items:center;justify-content:center}
+  /* tablet dual-pane */
+  .tablet{width:600px;height:452px;background:var(--bg);border-radius:26px;border:10px solid #05060f;overflow:hidden;position:relative;color:var(--ink);box-shadow:0 34px 74px rgba(0,0,0,.6);display:flex}
+  .navrail{width:76px;background:var(--surf-2);border-right:1px solid var(--line);display:flex;flex-direction:column;align-items:center;padding-top:14px;gap:6px}
+  .navrail .r{width:56px;padding:8px 0;border-radius:var(--r-md);display:flex;flex-direction:column;align-items:center;gap:4px;font-size:10px;font-weight:700;color:var(--muted)}
+  .navrail .r .b{width:46px;height:28px;border-radius:var(--r-pill);display:flex;align-items:center;justify-content:center}
   .navrail .r .b .icon{width:22px;height:22px}
-  .navrail .r.act{color:var(--iris)}
-  .navrail .r.act .b{background:var(--iris-container)}
+  .navrail .r.act{color:var(--blue)}.navrail .r.act .b{background:var(--blue-c)}
+  .pane-l{width:232px;border-right:1px solid var(--line);background:var(--surf-2);overflow:hidden}
+  .pane-r{flex:1;overflow:hidden;box-shadow:inset 4px 0 0 var(--blue)}
 
-  /* ---------- STORE SCREENSHOTS — conversion surfaces (taste principle #7) ---------- */
-  .shot{width:288px;border-radius:30px;padding:26px 20px 0;overflow:hidden;position:relative;
-    display:flex;flex-direction:column;align-items:center;box-shadow:var(--sh-3)}
-  .shot::after{content:"";position:absolute;right:-70px;top:-70px;width:220px;height:220px;border-radius:50%;
-    background:radial-gradient(circle,rgba(255,255,255,.20),transparent 70%)}
-  .shot .sh-hd{color:#fff;text-align:center;font-weight:800;font-size:21px;line-height:1.22;letter-spacing:-.5px;
-    position:relative;z-index:1}
-  .shot .sh-sub{color:rgba(255,255,255,.9);text-align:center;font-weight:600;font-size:12.5px;margin-top:8px;
-    max-width:236px;position:relative;z-index:1}
-  .shot .sh-dev{width:200px;height:300px;background:var(--bg);border-radius:26px 26px 0 0;margin-top:20px;
-    border:7px solid #0a0a1c;border-bottom:none;overflow:hidden;position:relative;z-index:1;
-    box-shadow:0 20px 40px rgba(0,0,0,.35)}
-  .shot .sh-dev .content{transform:scale(.62);transform-origin:top left;width:161%}
-  /* Iris store frame variants */
-  .shot.s-iris{background:linear-gradient(150deg,#5B5BD6 0%,#7C5CF7 52%,#B067E6 100%)}
-  .shot.s-teal{background:linear-gradient(150deg,#12A46B 0%,#2E7CF6 100%)}
-  .shot.s-rose{background:linear-gradient(150deg,#F43F6E 0%,#8B5CF6 100%)}
-
-  footer{max-width:1240px;margin:60px auto 0;color:#6c6a95;font-size:12.5px;line-height:1.7;border-top:1px solid #23223f;padding-top:20px}
-  footer code{background:#1a1934;color:#c7c5ff;padding:2px 6px;border-radius:6px;font-size:11.5px}
+  footer{max-width:1300px;margin:56px auto 0;color:#6b7194;font-size:12.5px;line-height:1.7;border-top:1px solid #222840;padding-top:20px}
+  footer code{background:#181d33;color:#bcd3ff;padding:2px 6px;border-radius:6px;font-size:11.5px}
 </style>
 </head>
 <body>
 <header class="page">
   <div class="brandline">
-    <div class="logo">
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-        <path d="M4 8.5C4 6.6 5.6 5 7.5 5H10l2 2.4h4.5C18.4 7.4 20 9 20 10.9V16c0 1.9-1.6 3.5-3.5 3.5h-9C5.6 19.5 4 17.9 4 16V8.5Z" fill="#fff" opacity=".92"/>
-        <circle cx="12" cy="13" r="3.1" fill="#7C5CF7"/>
-      </svg>
-    </div>
-    <h1>Filora — Premium Hi-Fi</h1>
+    <div class="logo"><svg width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M4 8.5C4 6.6 5.6 5 7.5 5H10l2 2.4h4.5C18.4 7.4 20 9 20 10.9V16c0 1.9-1.6 3.5-3.5 3.5h-9C5.6 19.5 4 17.9 4 16V8.5Z" fill="#fff"/><circle cx="12" cy="13" r="3" fill="#2563EB"/></svg></div>
+    <h1>Filora — InShot-feel Hi-Fi</h1>
   </div>
-  <p class="sub">Craft pass on the approved <b>A-blend</b> direction (APP-134). Same IA, density and accessibility — elevated
-  from stock Material-3 to a <b>branded product</b>: a signature <b>Iris</b> color story, a per-category accent wheel, a custom
-  duotone icon set, layered soft elevation, larger radii, a display type scale, and states with character. Nothing copied
-  from the reference app; A-blend's rejected extremes (dense / heavy visual) are still avoided. Applies the standing
-  <b>InShot-portfolio taste principles</b> — signature color + custom icons + compact native density + first-impression
-  conversion surfaces — while keeping Filora calm and ad-free.</p>
-  <span class="pill">Direction A-blend · craft pass</span>
-  <span class="pill">Brand: Filora Iris</span>
-  <span class="pill">Compact native density</span>
-  <span class="pill">+ Store conversion surfaces</span>
-  <span class="pill">AA · 48dp · TalkBack · RTL preserved</span>
-  <span class="pill">Compose + M3 (custom theme/shapes/icons)</span>
+  <p class="sub">APP-134 craft pass, <b>realigned to the total feel of InShot / XFolder</b> and the ratified
+  <b>blue</b> design system (the earlier Iris/purple pass is retired). Grounded in the Chief's benchmark study of the
+  reference app's 8 screenshots — the premium cues it isolated: <b>colorful custom per-type icons</b>, <b>storage as the
+  hero</b> (volume cards + % rings), <b>content-type color-coded rows with mini content badges</b>, <b>source-grouped
+  media</b>, and <b>Cleaner/utility value surfaces</b> — while keeping Filora calmer, ad-free, and accessible.</p>
+  <div class="pillrow">
+    <span class="pill">Ratified blue #2563EB</span>
+    <span class="pill">Home · Recent · Cleaner</span>
+    <span class="pill">Colorful custom icons</span>
+    <span class="pill warm">Ad-free — our edge vs the reference</span>
+    <span class="pill">48dp · AA · TalkBack · RTL</span>
+  </div>
 </header>
 
-<!-- =================== ICON SPRITE (custom duotone line set) =================== -->
-<svg width="0" height="0" style="position:absolute" aria-hidden="true">
-  <defs>
-    <!-- category -->
-    <symbol id="i-image" viewBox="0 0 24 24"><rect class="tone" x="3" y="4" width="18" height="16" rx="4" fill="currentColor"/><path d="M3 15.5 8 11l4 3.5 3-2.5 6 5" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/><circle cx="8.5" cy="9" r="1.6" fill="currentColor"/></symbol>
-    <symbol id="i-video" viewBox="0 0 24 24"><rect class="tone" x="3" y="5" width="18" height="14" rx="4" fill="currentColor"/><path d="M10 9.2v5.6l4.8-2.8L10 9.2Z" fill="currentColor"/></symbol>
-    <symbol id="i-audio" viewBox="0 0 24 24"><circle class="tone" cx="12" cy="12" r="9" fill="currentColor"/><path d="M10 15V9.2l6-1.4v5.4" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/><circle cx="8.4" cy="15.2" r="1.8" fill="currentColor"/><circle cx="14.4" cy="13.4" r="1.8" fill="currentColor"/></symbol>
-    <symbol id="i-doc" viewBox="0 0 24 24"><path class="tone" d="M6 3.5h7l5 5V19a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V5.5a2 2 0 0 1 2-2Z" fill="currentColor"/><path d="M13 3.5v5h5M8 13h8M8 16.5h5" stroke="currentColor" stroke-width="1.7" fill="none" stroke-linecap="round" stroke-linejoin="round"/></symbol>
-    <symbol id="i-download" viewBox="0 0 24 24"><rect class="tone" x="3.5" y="3.5" width="17" height="17" rx="5" fill="currentColor"/><path d="M12 7v7m0 0 3-3m-3 3-3-3M8 17h8" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/></symbol>
-    <symbol id="i-app" viewBox="0 0 24 24"><rect class="tone" x="3.5" y="3.5" width="17" height="17" rx="6" fill="currentColor"/><rect x="7.2" y="7.2" width="4.2" height="4.2" rx="1.4" fill="currentColor"/><rect x="12.6" y="7.2" width="4.2" height="4.2" rx="1.4" fill="currentColor"/><rect x="7.2" y="12.6" width="4.2" height="4.2" rx="1.4" fill="currentColor"/><rect x="12.6" y="12.6" width="4.2" height="4.2" rx="2.1" fill="currentColor"/></symbol>
-    <symbol id="i-archive" viewBox="0 0 24 24"><path class="tone" d="M4 6.5 6 3.8h12l2 2.7V18a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6.5Z" fill="currentColor"/><path d="M4 6.5h16M11 3.8v3m0 0h2m-2 3h2m-2 3h2m-1 0v3.2" stroke="currentColor" stroke-width="1.6" fill="none" stroke-linecap="round"/></symbol>
-    <symbol id="i-folder" viewBox="0 0 24 24"><path class="tone" d="M3 7.5A2.5 2.5 0 0 1 5.5 5H9l2 2.2h7.5A2.5 2.5 0 0 1 21 9.7V16.5A2.5 2.5 0 0 1 18.5 19h-13A2.5 2.5 0 0 1 3 16.5v-9Z" fill="currentColor"/></symbol>
-    <symbol id="i-folder-line" viewBox="0 0 24 24"><path d="M3 7.5A2.5 2.5 0 0 1 5.5 5H9l2 2.2h7.5A2.5 2.5 0 0 1 21 9.7V16.5A2.5 2.5 0 0 1 18.5 19h-13A2.5 2.5 0 0 1 3 16.5v-9Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></symbol>
-    <!-- nav / toolbar -->
-    <symbol id="i-home" viewBox="0 0 24 24"><path class="tone" d="M4 10.5 12 4l8 6.5V19a1.5 1.5 0 0 1-1.5 1.5H5.5A1.5 1.5 0 0 1 4 19v-8.5Z" fill="currentColor"/><path d="M9.5 20.5v-6h5v6" stroke="#fff" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/></symbol>
-    <symbol id="i-home-line" viewBox="0 0 24 24"><path d="M4 10.5 12 4l8 6.5V19a1.5 1.5 0 0 1-1.5 1.5H5.5A1.5 1.5 0 0 1 4 19v-8.5ZM9.5 20.5v-6h5v6" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/></symbol>
-    <symbol id="i-grid" viewBox="0 0 24 24"><rect x="4" y="4" width="7" height="7" rx="2.2" stroke="currentColor" stroke-width="1.8" fill="none"/><rect x="13" y="4" width="7" height="7" rx="2.2" stroke="currentColor" stroke-width="1.8" fill="none"/><rect x="4" y="13" width="7" height="7" rx="2.2" stroke="currentColor" stroke-width="1.8" fill="none"/><rect x="13" y="13" width="7" height="7" rx="2.2" stroke="currentColor" stroke-width="1.8" fill="none"/></symbol>
-    <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5" stroke="currentColor" stroke-width="1.9" fill="none"/><path d="m16 16 4 4" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/></symbol>
-    <symbol id="i-storage" viewBox="0 0 24 24"><path d="M12 3.5a8.5 8.5 0 1 1-6 2.5" stroke="currentColor" stroke-width="1.9" fill="none" stroke-linecap="round"/><path d="M12 3.5V12l5.5 3.2" stroke="currentColor" stroke-width="1.9" fill="none" stroke-linecap="round"/></symbol>
-    <symbol id="i-settings" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3" stroke="currentColor" stroke-width="1.8" fill="none"/><path d="M12 3v2.5M12 18.5V21M4.2 7l2.2 1.3M17.6 15.7l2.2 1.3M4.2 17l2.2-1.3M17.6 8.3l2.2-1.3" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round"/></symbol>
-    <symbol id="i-back" viewBox="0 0 24 24"><path d="M15 5 8 12l7 7" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></symbol>
-    <symbol id="i-more" viewBox="0 0 24 24"><circle cx="12" cy="5.5" r="1.8" fill="currentColor"/><circle cx="12" cy="12" r="1.8" fill="currentColor"/><circle cx="12" cy="18.5" r="1.8" fill="currentColor"/></symbol>
-    <symbol id="i-sort" viewBox="0 0 24 24"><path d="M7 5v14m0 0-3-3m3 3 3-3M17 19V5m0 0-3 3m3-3 3 3" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/></symbol>
-    <symbol id="i-star" viewBox="0 0 24 24"><path d="m12 3.6 2.5 5.1 5.6.8-4.1 4 1 5.6-5-2.7-5 2.7 1-5.6-4.1-4 5.6-.8L12 3.6Z" fill="currentColor"/></symbol>
-    <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.4" stroke="currentColor" stroke-width="1.8" fill="none"/><path d="M12 7.5V12l3 2" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round"/></symbol>
-    <symbol id="i-share" viewBox="0 0 24 24"><circle cx="6" cy="12" r="2.4" stroke="currentColor" stroke-width="1.8" fill="none"/><circle cx="17" cy="6" r="2.4" stroke="currentColor" stroke-width="1.8" fill="none"/><circle cx="17" cy="18" r="2.4" stroke="currentColor" stroke-width="1.8" fill="none"/><path d="m8.2 10.8 6.6-3.6M8.2 13.2l6.6 3.6" stroke="currentColor" stroke-width="1.8"/></symbol>
-    <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2.2" fill="none" stroke-linecap="round"/></symbol>
-    <symbol id="i-check" viewBox="0 0 24 24"><path d="m5 12.5 4.5 4.5L19 7.5" stroke="currentColor" stroke-width="2.2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></symbol>
-    <symbol id="i-broom" viewBox="0 0 24 24"><path d="M14 3 9.5 7.5m0 0 7 7m-7-7L7 10l7 7 2.5-2.5m0 0L20 11M6 21c1.5-3 3-4.5 5.5-5" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/></symbol>
-    <symbol id="i-shield" viewBox="0 0 24 24"><path class="tone" d="M12 3 5 6v5.5c0 4 3 7.3 7 9 4-1.7 7-5 7-9V6l-7-3Z" fill="currentColor"/><path d="m9 12 2 2 4-4" stroke="#fff" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/></symbol>
-    <symbol id="i-transfer" viewBox="0 0 24 24"><path d="M4 8h13m0 0-3.5-3.5M17 8l-3.5 3.5M20 16H7m0 0 3.5-3.5M7 16l3.5 3.5" stroke="currentColor" stroke-width="1.8" fill="none" stroke-linecap="round" stroke-linejoin="round"/></symbol>
-    <symbol id="i-cloudoff" viewBox="0 0 24 24"><path class="tone" d="M7 18a4 4 0 0 1-.5-7.97A5 5 0 0 1 16 9.2 3.5 3.5 0 0 1 17 18H7Z" fill="currentColor"/><path d="m4 4 16 16" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/></symbol>
-    <symbol id="i-sparkle" viewBox="0 0 24 24"><path d="M12 3.5 13.6 9 19 10.5 13.6 12 12 17.5 10.4 12 5 10.5 10.4 9 12 3.5Z" fill="currentColor"/><path d="M18.5 15.5 19.2 18l2.3.7-2.3.8-.7 2.5-.8-2.5-2.2-.8 2.2-.7.8-2.5Z" fill="currentColor" opacity=".55"/></symbol>
-    <symbol id="i-inbox" viewBox="0 0 24 24"><path class="tone" d="M4 5.5h16v13a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 4 18.5v-13Z" fill="currentColor"/><path d="M4 13h4l1.5 2.5h5L16 13h4" stroke="#fff" stroke-width="1.7" fill="none" stroke-linecap="round" stroke-linejoin="round"/></symbol>
-  </defs>
-</svg>
+<!-- ICON SPRITE — colorful filled/custom set -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs>
+  <symbol id="i-image" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="4.5" fill="currentColor"/><circle cx="8.4" cy="9.2" r="1.8" fill="#fff"/><path d="M4 17.5 9 12.5l3.4 3 3-2.6L20 17.5" stroke="#fff" stroke-width="1.9" fill="none" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-video" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="4.5" fill="currentColor"/><path d="M10 8.8v6.4l5.2-3.2L10 8.8Z" fill="#fff"/></symbol>
+  <symbol id="i-audio" viewBox="0 0 24 24"><path d="M9 17V7.4l9-2v9" stroke="currentColor" stroke-width="2.1" fill="none" stroke-linecap="round" stroke-linejoin="round"/><circle cx="6.6" cy="17.2" r="2.6" fill="currentColor"/><circle cx="15.6" cy="14.4" r="2.6" fill="currentColor"/></symbol>
+  <symbol id="i-doc" viewBox="0 0 24 24"><path d="M6 3.2h7l5 5V19.2a1.8 1.8 0 0 1-1.8 1.8H6a1.8 1.8 0 0 1-1.8-1.8V5a1.8 1.8 0 0 1 1.8-1.8Z" fill="currentColor"/><path d="M13 3.2V8h5" fill="#fff" opacity=".55"/><path d="M8 13h8M8 16.5h5.5" stroke="#fff" stroke-width="1.7" stroke-linecap="round"/></symbol>
+  <symbol id="i-download" viewBox="0 0 24 24"><rect x="3.4" y="3.4" width="17.2" height="17.2" rx="5.5" fill="currentColor"/><path d="M12 7v7m0 0 3.2-3.2M12 14l-3.2-3.2M8 17h8" stroke="#fff" stroke-width="1.9" fill="none" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-app" viewBox="0 0 24 24"><path d="M7.5 8.5 9 5.4m7.5 3.1L15 5.4" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/><rect x="4" y="8" width="16" height="9.5" rx="4" fill="currentColor"/><circle cx="9" cy="12.4" r="1.2" fill="#fff"/><circle cx="15" cy="12.4" r="1.2" fill="#fff"/></symbol>
+  <symbol id="i-archive" viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="16" rx="4.5" fill="currentColor"/><path d="M12 4v3m0 0h1.6m-1.6 0V4m0 6h1.6M12 10v2.4m0 0h1.6M12 12.4v3.4" stroke="#fff" stroke-width="1.5" stroke-linecap="round"/></symbol>
+  <symbol id="i-folder" viewBox="0 0 24 24"><path d="M3 7.5A2.5 2.5 0 0 1 5.5 5H9l2 2.2h7.5A2.5 2.5 0 0 1 21 9.7v6.8A2.5 2.5 0 0 1 18.5 19h-13A2.5 2.5 0 0 1 3 16.5v-9Z" fill="currentColor"/></symbol>
+  <symbol id="i-folder-line" viewBox="0 0 24 24"><path d="M3 7.5A2.5 2.5 0 0 1 5.5 5H9l2 2.2h7.5A2.5 2.5 0 0 1 21 9.7v6.8A2.5 2.5 0 0 1 18.5 19h-13A2.5 2.5 0 0 1 3 16.5v-9Z" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round"/></symbol>
+  <symbol id="i-home" viewBox="0 0 24 24"><path d="M4 10.5 12 4l8 6.5V19a1.5 1.5 0 0 1-1.5 1.5H5.5A1.5 1.5 0 0 1 4 19v-8.5Z" fill="currentColor"/></symbol>
+  <symbol id="i-home-line" viewBox="0 0 24 24"><path d="M4 10.5 12 4l8 6.5V19a1.5 1.5 0 0 1-1.5 1.5H5.5A1.5 1.5 0 0 1 4 19v-8.5Z" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linejoin="round"/></symbol>
+  <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.4" fill="currentColor"/><path d="M12 7.6V12l3 1.8" stroke="#fff" stroke-width="1.9" fill="none" stroke-linecap="round"/></symbol>
+  <symbol id="i-clock-line" viewBox="0 0 24 24"><circle cx="12" cy="12" r="8.4" stroke="currentColor" stroke-width="1.9" fill="none"/><path d="M12 7.6V12l3 1.8" stroke="currentColor" stroke-width="1.9" fill="none" stroke-linecap="round"/></symbol>
+  <symbol id="i-broom" viewBox="0 0 24 24"><path d="M14 3 9.5 7.5m0 0 7 7m-7-7L7 10l7 7 2.5-2.5m0 0L20 11M6 21c1.5-3 3-4.5 5.5-5" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M17.5 3.5 18 5l1.5.5L18 6l-.5 1.5L17 6l-1.5-.5L17 5l.5-1.5Z" fill="currentColor"/></symbol>
+  <symbol id="i-broom-line" viewBox="0 0 24 24"><path d="M14 3 9.5 7.5m0 0 7 7m-7-7L7 10l7 7 2.5-2.5m0 0L20 11M6 21c1.5-3 3-4.5 5.5-5" stroke="currentColor" stroke-width="1.9" fill="none" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-analyze" viewBox="0 0 24 24"><path d="M12 3.5a8.5 8.5 0 1 0 8.5 8.5H12V3.5Z" fill="currentColor"/><path d="M13.6 3.7A8.5 8.5 0 0 1 20.3 10h-6.7V3.7Z" fill="currentColor" opacity=".5"/></symbol>
+  <symbol id="i-safe" viewBox="0 0 24 24"><path d="M12 3 5 5.8v5.4c0 4 3 7.4 7 9 4-1.6 7-5 7-9V5.8L12 3Z" fill="currentColor"/><path d="m9 12 2 2 4-4" stroke="#fff" stroke-width="1.9" fill="none" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-trash" viewBox="0 0 24 24"><path d="M5 7h14M9 7V5.4A1.4 1.4 0 0 1 10.4 4h3.2A1.4 1.4 0 0 1 15 5.4V7m3 0-.8 12.2a1.6 1.6 0 0 1-1.6 1.5H8.4a1.6 1.6 0 0 1-1.6-1.5L6 7" stroke="currentColor" stroke-width="1.9" fill="none" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5" stroke="currentColor" stroke-width="2" fill="none"/><path d="m16 16 4 4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+  <symbol id="i-grid" viewBox="0 0 24 24"><rect x="4" y="4" width="7" height="7" rx="2.3" fill="currentColor"/><rect x="13" y="4" width="7" height="7" rx="2.3" fill="currentColor"/><rect x="4" y="13" width="7" height="7" rx="2.3" fill="currentColor"/><rect x="13" y="13" width="7" height="7" rx="2.3" fill="currentColor"/></symbol>
+  <symbol id="i-sort" viewBox="0 0 24 24"><path d="M7 5v14m0 0-3-3m3 3 3-3M17 19V5m0 0-3 3m3-3 3 3" stroke="currentColor" stroke-width="1.9" fill="none" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-back" viewBox="0 0 24 24"><path d="M15 5 8 12l7 7" stroke="currentColor" stroke-width="2.1" fill="none" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-more" viewBox="0 0 24 24"><circle cx="12" cy="5.5" r="1.9" fill="currentColor"/><circle cx="12" cy="12" r="1.9" fill="currentColor"/><circle cx="12" cy="18.5" r="1.9" fill="currentColor"/></symbol>
+  <symbol id="i-share" viewBox="0 0 24 24"><circle cx="6" cy="12" r="2.4" stroke="currentColor" stroke-width="1.9" fill="none"/><circle cx="17" cy="6" r="2.4" stroke="currentColor" stroke-width="1.9" fill="none"/><circle cx="17" cy="18" r="2.4" stroke="currentColor" stroke-width="1.9" fill="none"/><path d="m8.2 10.8 6.6-3.6M8.2 13.2l6.6 3.6" stroke="currentColor" stroke-width="1.9"/></symbol>
+  <symbol id="i-star" viewBox="0 0 24 24"><path d="m12 3.6 2.5 5.1 5.6.8-4.1 4 1 5.6-5-2.7-5 2.7 1-5.6-4.1-4 5.6-.8L12 3.6Z" fill="currentColor"/></symbol>
+  <symbol id="i-camera" viewBox="0 0 24 24"><path d="M4 8.5h3l1.4-2h7.2L17 8.5h3v10H4v-10Z" fill="currentColor"/><circle cx="12" cy="13" r="3.2" fill="#fff"/></symbol>
+  <symbol id="i-chat" viewBox="0 0 24 24"><path d="M4 6.5A2.5 2.5 0 0 1 6.5 4h11A2.5 2.5 0 0 1 20 6.5v7A2.5 2.5 0 0 1 17.5 16H9l-4 3.5v-3.5A2.5 2.5 0 0 1 4 13.5v-7Z" fill="currentColor"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><path d="m5 12.5 4.5 4.5L19 7.5" stroke="currentColor" stroke-width="2.3" fill="none" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-inbox" viewBox="0 0 24 24"><path d="M4 5.5h16v13a1.5 1.5 0 0 1-1.5 1.5h-13A1.5 1.5 0 0 1 4 18.5v-13Z" fill="currentColor"/><path d="M4 13h4l1.5 2.5h5L16 13h4" stroke="#fff" stroke-width="1.7" fill="none" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-cloudoff" viewBox="0 0 24 24"><path d="M7 18a4 4 0 0 1-.5-7.97A5 5 0 0 1 16 9.2 3.5 3.5 0 0 1 17 18H7Z" fill="currentColor"/><path d="m4 4 16 16" stroke="#fff" stroke-width="2" stroke-linecap="round"/></symbol>
+  <symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4.4" fill="currentColor"/><path d="M12 3v2.4M12 18.6V21M3 12h2.4M18.6 12H21M5.6 5.6l1.7 1.7M16.7 16.7l1.7 1.7M5.6 18.4l1.7-1.7M16.7 7.3l1.7-1.7" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"/></symbol>
+  <symbol id="i-sd" viewBox="0 0 24 24"><path d="M7 3h7l4 4v12.5A1.5 1.5 0 0 1 16.5 21h-9A1.5 1.5 0 0 1 6 19.5v-15A1.5 1.5 0 0 1 7 3Z" fill="currentColor"/><path d="M10 5.5v3M12.5 5.5v3M15 6v2.5" stroke="#fff" stroke-width="1.5" stroke-linecap="round"/></symbol>
+  <symbol id="i-phone" viewBox="0 0 24 24"><rect x="6" y="3" width="12" height="18" rx="3" fill="currentColor"/><rect x="9.5" y="17" width="5" height="1.8" rx="0.9" fill="#fff"/></symbol>
+</defs></svg>
 
-<!-- =================================================================
-     PRIMARY SURFACES
-     ================================================================= -->
-<div class="sectlabel">Primary surfaces — phone</div>
-<div class="sectnote">The screens that carry the "premium feel." Home is the #1 selling surface.</div>
+<!-- ==================== PRIMARY SURFACES ==================== -->
+<div class="sectlabel">Primary surfaces — light (matches the reference home)</div>
+<div class="sectnote">The InShot cues applied to A-blend's IA. Home leads with the storage story; every type has a colorful custom icon.</div>
 <div class="gallery">
 
-  <!-- ============ HOME ============ -->
-  <div class="frame">
-    <div class="phone">
-      <div class="scroll"><div class="content">
-        <div class="appbar">
-          <div>
-            <div style="font-size:12px;font-weight:700;color:var(--muted)">Good evening</div>
-            <div class="title">Filora</div>
-          </div>
-          <div class="grp">
-            <div class="iconbtn"><span class="icon duo" style="color:var(--ink-2)"><svg><use href="#i-search"/></svg></span></div>
-            <div class="avatar">SB</div>
-          </div>
-        </div>
-
-        <!-- hero storage ring -->
-        <div class="hero">
-          <div class="htop">
-            <div>
-              <div class="greet">Device storage</div>
-              <div class="htitle">128 GB total</div>
-            </div>
-            <span class="icon" style="color:#fff;opacity:.85"><svg><use href="#i-sparkle"/></svg></span>
-          </div>
-          <div class="hbody">
-            <div class="ring">
-              <svg width="80" height="80" viewBox="0 0 80 80">
-                <circle cx="40" cy="40" r="34" stroke="rgba(255,255,255,.22)" stroke-width="9" fill="none"/>
-                <circle cx="40" cy="40" r="34" stroke="#fff" stroke-width="9" fill="none" stroke-linecap="round"
-                  stroke-dasharray="213.6" stroke-dashoffset="73"/>
-              </svg>
-              <div class="rc"><b>66%</b><s>used</s></div>
-            </div>
-            <div class="legend">
-              <div class="leg"><span class="dot" style="background:#FF9EB4"></span>Photos<span class="lv">28 GB</span></div>
-              <div class="leg"><span class="dot" style="background:#C7B4FF"></span>Video<span class="lv">31 GB</span></div>
-              <div class="leg"><span class="dot" style="background:#FFD79E"></span>Audio<span class="lv">9 GB</span></div>
-              <div class="leg"><span class="dot" style="background:rgba(255,255,255,.5)"></span>Other<span class="lv">17 GB</span></div>
-            </div>
-          </div>
-        </div>
-
-        <!-- quick tools -->
-        <div class="qtools">
-          <div class="qt"><div class="qi" style="background:var(--c-download-c)"><span class="icon" style="color:var(--c-download)"><svg><use href="#i-broom"/></svg></span></div><span>Clean up</span></div>
-          <div class="qt"><div class="qi" style="background:var(--c-doc-c)"><span class="icon" style="color:var(--c-doc)"><svg><use href="#i-transfer"/></svg></span></div><span>Transfer</span></div>
-          <div class="qt"><div class="qi" style="background:var(--c-app-c)"><span class="icon" style="color:var(--c-app)"><svg><use href="#i-shield"/></svg></span></div><span>Safe box</span></div>
-          <div class="qt"><div class="qi" style="background:var(--c-fav-c)"><span class="icon" style="color:var(--c-fav)"><svg><use href="#i-clock"/></svg></span></div><span>Recent</span></div>
-        </div>
-
-        <!-- categories -->
-        <div class="sec"><h3>Categories</h3><a>See all</a></div>
-        <div class="catgrid">
-          <div class="cat"><div class="arc" style="background:var(--c-image)"></div><div class="ci" style="background:var(--c-image-c)"><span class="icon duo" style="color:var(--c-image)"><svg><use href="#i-image"/></svg></span></div><div class="cn">Images</div><div class="cm">4,120 · 28 GB</div></div>
-          <div class="cat"><div class="arc" style="background:var(--c-video)"></div><div class="ci" style="background:var(--c-video-c)"><span class="icon duo" style="color:var(--c-video)"><svg><use href="#i-video"/></svg></span></div><div class="cn">Videos</div><div class="cm">312 · 31 GB</div></div>
-          <div class="cat"><div class="arc" style="background:var(--c-audio)"></div><div class="ci" style="background:var(--c-audio-c)"><span class="icon duo" style="color:var(--c-audio)"><svg><use href="#i-audio"/></svg></span></div><div class="cn">Audio</div><div class="cm">880 · 9 GB</div></div>
-          <div class="cat"><div class="arc" style="background:var(--c-doc)"></div><div class="ci" style="background:var(--c-doc-c)"><span class="icon duo" style="color:var(--c-doc)"><svg><use href="#i-doc"/></svg></span></div><div class="cn">Documents</div><div class="cm">642 · 3 GB</div></div>
-        </div>
-
-        <!-- recents -->
-        <div class="sec"><h3>Recent</h3><a>More</a></div>
-        <div class="strip">
-          <div class="rcard"><div class="thumb" style="background:var(--c-image-c)"><span class="icon duo" style="color:var(--c-image)"><svg><use href="#i-image"/></svg></span><span class="badge">JPG</span></div><div class="rmeta"><div class="rn">IMG_2381.jpg</div><div class="rt">2m ago · 4.2 MB</div></div></div>
-          <div class="rcard"><div class="thumb" style="background:var(--c-doc-c)"><span class="icon duo" style="color:var(--c-doc)"><svg><use href="#i-doc"/></svg></span><span class="badge">PDF</span></div><div class="rmeta"><div class="rn">Invoice_Q3.pdf</div><div class="rt">1h ago · 210 KB</div></div></div>
-          <div class="rcard"><div class="thumb" style="background:var(--c-video-c)"><span class="icon duo" style="color:var(--c-video)"><svg><use href="#i-video"/></svg></span><span class="badge">4K</span></div><div class="rmeta"><div class="rn">clip_final.mp4</div><div class="rt">3h ago</div></div></div>
-        </div>
-
-        <!-- favorites -->
-        <div class="sec"><h3>Favorites</h3></div>
-        <div class="favs">
-          <div class="favp"><span class="fi" style="background:var(--c-folder-c)"><span class="icon duo" style="color:var(--c-folder)"><svg><use href="#i-folder"/></svg></span></span>Projects</div>
-          <div class="favp"><span class="fi" style="background:var(--c-download-c)"><span class="icon duo" style="color:var(--c-download)"><svg><use href="#i-download"/></svg></span></span>Downloads</div>
-          <div class="favp"><span class="fi" style="background:var(--c-image-c)"><span class="icon duo" style="color:var(--c-image)"><svg><use href="#i-image"/></svg></span></span>Camera</div>
-        </div>
-      </div></div>
-      <div class="bnav">
-        <div class="n act"><div class="b"><span class="icon" style="color:var(--iris)"><svg><use href="#i-home"/></svg></span></div>Home</div>
-        <div class="n"><div class="b"><span class="icon"><svg><use href="#i-folder-line"/></svg></span></div>Browse</div>
-        <div class="n"><div class="b"><span class="icon"><svg><use href="#i-grid"/></svg></span></div>Media</div>
-        <div class="n"><div class="b"><span class="icon"><svg><use href="#i-storage"/></svg></span></div>Storage</div>
-      </div>
-    </div>
-    <div class="cap">Home — sells the product<span>Iris hero ring + quick tools + accent category tiles + depth strip</span></div>
-  </div>
-
-  <!-- ============ BROWSER (selection) ============ -->
-  <div class="frame">
-    <div class="phone">
-      <div class="scroll"><div class="content">
-        <div class="appbar sel">
-          <div class="grp"><span class="icon" style="color:var(--on-iris-container)"><svg><use href="#i-back"/></svg></span><div class="title">3 selected</div></div>
-          <div class="grp">
-            <div class="iconbtn"><span class="icon" style="color:var(--on-iris-container)"><svg><use href="#i-share"/></svg></span></div>
-            <div class="iconbtn"><span class="icon" style="color:var(--on-iris-container)"><svg><use href="#i-more"/></svg></span></div>
-          </div>
-        </div>
-        <div class="crumbs" style="margin-top:12px"><span>Internal</span><span class="sep">›</span><span>Projects</span><span class="sep">›</span><b>Filora</b></div>
-        <div class="chips"><div class="chip on"><span class="icon"><svg><use href="#i-sort"/></svg></span>Name</div><div class="chip">Modified</div><div class="chip"><span class="icon"><svg><use href="#i-grid"/></svg></span>Grid</div></div>
-
-        <div class="row selrow"><div class="check"><span class="icon"><svg><use href="#i-check"/></svg></span></div><div class="tile" style="background:var(--c-folder-c)"><span class="icon duo" style="color:var(--c-folder)"><svg><use href="#i-folder"/></svg></span></div><div class="gr"><div class="nm">design</div><div class="mt">14 items · yesterday</div></div></div>
-        <div class="divider"></div>
-        <div class="row selrow"><div class="check"><span class="icon"><svg><use href="#i-check"/></svg></span></div><div class="tile" style="background:var(--c-folder-c)"><span class="icon duo" style="color:var(--c-folder)"><svg><use href="#i-folder"/></svg></span></div><div class="gr"><div class="nm">src</div><div class="mt">208 items · 2d ago</div></div></div>
-        <div class="divider"></div>
-        <div class="row"><div class="tile" style="background:var(--c-doc-c)"><span class="icon duo" style="color:var(--c-doc)"><svg><use href="#i-doc"/></svg></span></div><div class="gr"><div class="nm">README.md</div><div class="mt">4.1 KB · 2d ago</div></div><div class="tail"><span class="icon" style="color:var(--c-fav)"><svg><use href="#i-star"/></svg></span></div></div>
-        <div class="divider"></div>
-        <div class="row selrow"><div class="check"><span class="icon"><svg><use href="#i-check"/></svg></span></div><div class="tile" style="background:var(--c-image-c)"><span class="icon duo" style="color:var(--c-image)"><svg><use href="#i-image"/></svg></span></div><div class="gr"><div class="nm">hero_shot.png</div><div class="mt">2.2 MB · 3d ago</div></div></div>
-        <div class="divider"></div>
-        <div class="row"><div class="tile" style="background:var(--c-archive-c)"><span class="icon duo" style="color:var(--c-archive)"><svg><use href="#i-archive"/></svg></span></div><div class="gr"><div class="nm">assets.zip</div><div class="mt">48 MB · 5d ago</div></div><div class="tail"><span class="icon"><svg><use href="#i-more"/></svg></span></div></div>
-        <div class="divider"></div>
-        <div class="row"><div class="tile" style="background:var(--c-app-c)"><span class="icon duo" style="color:var(--c-app)"><svg><use href="#i-app"/></svg></span></div><div class="gr"><div class="nm">filora-debug.apk</div><div class="mt">18 MB · 5d ago</div></div></div>
-      </div></div>
-    </div>
-    <div class="cap">Browser — file list + selection<span>Iris selection bar, per-type duotone tiles, breadcrumb, tactile check</span></div>
-  </div>
-
-  <!-- ============ MEDIA HUB ============ -->
-  <div class="frame">
-    <div class="phone">
-      <div class="scroll"><div class="content">
-        <div class="appbar"><div class="title">Media</div><div class="grp"><div class="iconbtn"><span class="icon"><svg><use href="#i-search"/></svg></span></div></div></div>
-        <div class="catgrid" style="grid-template-columns:1fr 1fr;padding-top:8px">
-          <div class="cat" style="background:linear-gradient(150deg,var(--c-image-c),#fff)"><div class="arc" style="background:var(--c-image)"></div><div class="ci" style="background:var(--c-image)"><span class="icon" style="color:#fff"><svg><use href="#i-image"/></svg></span></div><div class="cn">Images</div><div class="cm">4,120 files</div></div>
-          <div class="cat" style="background:linear-gradient(150deg,var(--c-video-c),#fff)"><div class="arc" style="background:var(--c-video)"></div><div class="ci" style="background:var(--c-video)"><span class="icon" style="color:#fff"><svg><use href="#i-video"/></svg></span></div><div class="cn">Videos</div><div class="cm">312 files</div></div>
-          <div class="cat" style="background:linear-gradient(150deg,var(--c-audio-c),#fff)"><div class="arc" style="background:var(--c-audio)"></div><div class="ci" style="background:var(--c-audio)"><span class="icon" style="color:#fff"><svg><use href="#i-audio"/></svg></span></div><div class="cn">Audio</div><div class="cm">880 files</div></div>
-          <div class="cat" style="background:linear-gradient(150deg,var(--c-doc-c),#fff)"><div class="arc" style="background:var(--c-doc)"></div><div class="ci" style="background:var(--c-doc)"><span class="icon" style="color:#fff"><svg><use href="#i-doc"/></svg></span></div><div class="cn">Documents</div><div class="cm">642 files</div></div>
-          <div class="cat" style="background:linear-gradient(150deg,var(--c-download-c),#fff)"><div class="arc" style="background:var(--c-download)"></div><div class="ci" style="background:var(--c-download)"><span class="icon" style="color:#fff"><svg><use href="#i-download"/></svg></span></div><div class="cn">Downloads</div><div class="cm">156 files</div></div>
-          <div class="cat" style="background:linear-gradient(150deg,var(--c-archive-c),#fff)"><div class="arc" style="background:var(--c-archive)"></div><div class="ci" style="background:var(--c-archive)"><span class="icon" style="color:#fff"><svg><use href="#i-archive"/></svg></span></div><div class="cn">Archives</div><div class="cm">37 files</div></div>
-        </div>
-        <div class="sec"><h3>Photos</h3><a>Open</a></div>
-        <div class="mgrid">
-          <div class="mcell" style="background:linear-gradient(135deg,#FFC1CE,#FF9EB4)"><span class="icon duo" style="color:#fff;opacity:.65"><svg><use href="#i-image"/></svg></span></div>
-          <div class="mcell" style="background:linear-gradient(135deg,#C7B4FF,#A688FF)"><span class="icon duo" style="color:#fff;opacity:.65"><svg><use href="#i-image"/></svg></span></div>
-          <div class="mcell" style="background:linear-gradient(135deg,#9EE6C6,#5ED6A4)"><span class="icon" style="color:#fff;opacity:.7"><svg><use href="#i-video"/></svg></span><span class="pd">0:42</span></div>
-          <div class="mcell" style="background:linear-gradient(135deg,#FFD79E,#FFBE5E)"><span class="icon duo" style="color:#fff;opacity:.65"><svg><use href="#i-image"/></svg></span></div>
-          <div class="mcell" style="background:linear-gradient(135deg,#B4D2FF,#88AEFF)"><span class="icon duo" style="color:#fff;opacity:.65"><svg><use href="#i-image"/></svg></span></div>
-          <div class="mcell" style="background:linear-gradient(135deg,#F0C1FF,#D68BFF)"><span class="icon duo" style="color:#fff;opacity:.65"><svg><use href="#i-image"/></svg></span></div>
-        </div>
-      </div></div>
-      <div class="bnav">
-        <div class="n"><div class="b"><span class="icon"><svg><use href="#i-home-line"/></svg></span></div>Home</div>
-        <div class="n"><div class="b"><span class="icon"><svg><use href="#i-folder-line"/></svg></span></div>Browse</div>
-        <div class="n act"><div class="b"><span class="icon" style="color:var(--iris)"><svg><use href="#i-grid"/></svg></span></div>Media</div>
-        <div class="n"><div class="b"><span class="icon"><svg><use href="#i-storage"/></svg></span></div>Storage</div>
-      </div>
-    </div>
-    <div class="cap">Media hub — category grid<span>Gradient accent tiles per category + real thumbnail grid with depth</span></div>
-  </div>
-
-  <!-- ============ SEARCH ============ -->
-  <div class="frame">
-    <div class="phone">
-      <div class="scroll"><div class="content">
-        <div class="appbar" style="padding-bottom:4px"><div class="grp"><span class="icon" style="color:var(--ink-2)"><svg><use href="#i-back"/></svg></span><div class="title" style="font-size:19px">Search</div></div></div>
-        <div class="searchbar"><span class="icon"><svg><use href="#i-search"/></svg></span><input value="report" /><span class="icon" style="color:var(--iris)"><svg><use href="#i-sparkle"/></svg></span></div>
-        <div class="chips" style="padding-top:12px"><div class="chip on">Documents <span style="opacity:.7">✕</span></div><div class="chip on">This month <span style="opacity:.7">✕</span></div><div class="chip">&gt; 1 MB</div><div class="chip">Type</div></div>
-        <div class="sec"><h3>8 results</h3><a>Sort</a></div>
-        <div class="row"><div class="tile" style="background:var(--c-doc-c)"><span class="icon duo" style="color:var(--c-doc)"><svg><use href="#i-doc"/></svg></span></div><div class="gr"><div class="nm">Q3_<mark style="background:var(--c-fav-c);border-radius:4px">report</mark>.pdf</div><div class="mt">Projects/Finance · 2.1 MB</div></div></div>
-        <div class="divider"></div>
-        <div class="row"><div class="tile" style="background:var(--c-doc-c)"><span class="icon duo" style="color:var(--c-doc)"><svg><use href="#i-doc"/></svg></span></div><div class="gr"><div class="nm">annual_<mark style="background:var(--c-fav-c);border-radius:4px">report</mark>.docx</div><div class="mt">Downloads · 5.4 MB</div></div></div>
-        <div class="divider"></div>
-        <div class="row"><div class="tile" style="background:var(--c-image-c)"><span class="icon duo" style="color:var(--c-image)"><svg><use href="#i-image"/></svg></span></div><div class="gr"><div class="nm"><mark style="background:var(--c-fav-c);border-radius:4px">report</mark>_chart.png</div><div class="mt">Pictures · 820 KB</div></div></div>
-        <div class="divider"></div>
-        <div class="row"><div class="tile" style="background:var(--c-archive-c)"><span class="icon duo" style="color:var(--c-archive)"><svg><use href="#i-archive"/></svg></span></div><div class="gr"><div class="nm"><mark style="background:var(--c-fav-c);border-radius:4px">report</mark>s_2025.zip</div><div class="mt">Documents · 12 MB</div></div></div>
-      </div></div>
-    </div>
-    <div class="cap">Search — filters + results<span>Pill search field, Iris filter chips, accent match highlight</span></div>
-  </div>
-
-  <!-- ============ STORAGE (storage-story) ============ -->
-  <div class="frame">
-    <div class="phone">
-      <div class="scroll"><div class="content">
-        <div class="appbar"><div class="title">Storage</div><div class="grp"><div class="iconbtn"><span class="icon"><svg><use href="#i-more"/></svg></span></div></div></div>
-        <div class="story">
-          <div class="stag">You can free up</div>
-          <div class="snum">12.4 GB</div>
-          <div class="ssub">Junk, duplicates &amp; large old files</div>
-          <div class="segbar">
-            <i style="flex:28;background:#FF9EB4"></i><i style="flex:31;background:#C7B4FF"></i>
-            <i style="flex:9;background:#FFD79E"></i><i style="flex:3;background:#88AEFF"></i><i style="flex:29;background:rgba(255,255,255,.35)"></i>
-          </div>
-        </div>
-        <div class="breakdown">
-          <div class="brow"><span class="bdot" style="background:var(--c-image)"></span><div style="flex:1"><div class="bn">Images</div><div class="mini"><i style="width:64%;background:var(--c-image)"></i></div></div><span class="bv">28 GB</span></div>
-          <div class="brow"><span class="bdot" style="background:var(--c-video)"></span><div style="flex:1"><div class="bn">Videos</div><div class="mini"><i style="width:72%;background:var(--c-video)"></i></div></div><span class="bv">31 GB</span></div>
-          <div class="brow"><span class="bdot" style="background:var(--c-audio)"></span><div style="flex:1"><div class="bn">Audio</div><div class="mini"><i style="width:22%;background:var(--c-audio)"></i></div></div><span class="bv">9 GB</span></div>
-          <div class="brow"><span class="bdot" style="background:var(--c-app)"></span><div style="flex:1"><div class="bn">Apps</div><div class="mini"><i style="width:40%;background:var(--c-app)"></i></div></div><span class="bv">17 GB</span></div>
-        </div>
-        <div class="sec"><h3>Largest files</h3><a>All</a></div>
-        <div class="row"><div class="tile" style="background:var(--c-video-c)"><span class="icon duo" style="color:var(--c-video)"><svg><use href="#i-video"/></svg></span></div><div class="gr"><div class="nm">trip_4k.mov</div><div class="mt">Movies · Nov 2025</div></div><div class="tail bv" style="font-weight:700">2.4 GB</div></div>
-      </div></div>
-      <div class="bnav">
-        <div class="n"><div class="b"><span class="icon"><svg><use href="#i-home-line"/></svg></span></div>Home</div>
-        <div class="n"><div class="b"><span class="icon"><svg><use href="#i-folder-line"/></svg></span></div>Browse</div>
-        <div class="n"><div class="b"><span class="icon"><svg><use href="#i-grid"/></svg></span></div>Media</div>
-        <div class="n act"><div class="b"><span class="icon" style="color:var(--iris)"><svg><use href="#i-storage"/></svg></span></div>Storage</div>
-      </div>
-    </div>
-    <div class="cap">Storage — storage-story (Storage only)<span>Dark "free up" hero, segmented bar, per-category mini-meters</span></div>
-  </div>
-
-  <!-- ============ SETTINGS ============ -->
-  <div class="frame">
-    <div class="phone">
-      <div class="scroll"><div class="content">
-        <div class="appbar"><div class="grp"><span class="icon" style="color:var(--ink-2)"><svg><use href="#i-back"/></svg></span><div class="title" style="font-size:19px">Settings</div></div></div>
-
-        <div class="setgrp">
-          <div class="setrow"><div class="si"><span class="icon"><svg><use href="#i-sparkle"/></svg></span></div><div class="sg"><div class="st">Theme</div><div class="sd">System · Dynamic color on</div></div>
-            <div class="swatch"><i style="background:var(--iris)" class="sel"></i><i style="background:var(--c-image)"></i><i style="background:var(--c-download)"></i></div>
-          </div>
-          <div class="divider"></div>
-          <div class="setrow"><div class="si"><span class="icon"><svg><use href="#i-grid"/></svg></span></div><div class="sg"><div class="st">Default view</div><div class="sd">List</div></div><div class="toggle off"></div></div>
-        </div>
-
-        <div style="margin:20px var(--lg) 6px;font-size:12px;font-weight:800;letter-spacing:.6px;color:var(--muted);text-transform:uppercase">Browsing</div>
-        <div class="setgrp" style="margin-top:0">
-          <div class="setrow"><div class="si"><span class="icon"><svg><use href="#i-folder-line"/></svg></span></div><div class="sg"><div class="st">Show hidden files</div><div class="sd">Files starting with a dot</div></div><div class="toggle"></div></div>
-          <div class="divider"></div>
-          <div class="setrow"><div class="si"><span class="icon"><svg><use href="#i-sort"/></svg></span></div><div class="sg"><div class="st">Default sort</div><div class="sd">Name, ascending</div></div></div>
-        </div>
-
-        <div style="margin:20px var(--lg) 6px;font-size:12px;font-weight:800;letter-spacing:.6px;color:var(--muted);text-transform:uppercase">About</div>
-        <div class="setgrp" style="margin-top:0">
-          <div class="setrow"><div class="si"><span class="icon"><svg><use href="#i-shield"/></svg></span></div><div class="sg"><div class="st">Privacy</div><div class="sd">No data collected</div></div></div>
-          <div class="divider"></div>
-          <div class="setrow"><div class="si"><span class="icon"><svg><use href="#i-star"/></svg></span></div><div class="sg"><div class="st">Filora</div><div class="sd">Version 1.0 · Rate the app</div></div></div>
-        </div>
-      </div></div>
-    </div>
-    <div class="cap">Settings — grouped, iconographic<span>Rounded grouped cards, Iris theme swatches, custom toggles</span></div>
-  </div>
-
-</div>
-
-<!-- =================================================================
-     STATES WITH CHARACTER
-     ================================================================= -->
-<div class="sectlabel">States with character</div>
-<div class="sectnote">Empty / loading / error are branded iconographic moments — never bare text.</div>
-<div class="gallery">
-
-  <!-- EMPTY -->
-  <div class="frame">
-    <div class="phone"><div class="scroll">
-      <div class="appbar"><div class="grp"><span class="icon" style="color:var(--ink-2)"><svg><use href="#i-back"/></svg></span><div class="title" style="font-size:19px">Downloads</div></div></div>
-      <div class="state">
-        <div class="bloom" style="background:radial-gradient(circle at 50% 40%,var(--c-download-c),#fff)">
-          <span class="icon duo" style="color:var(--c-download)"><svg><use href="#i-inbox"/></svg></span>
-        </div>
-        <h4>Nothing here yet</h4>
-        <p>Files you download will land in this folder. Pull to refresh anytime.</p>
-        <div class="cta">Browse files</div>
-      </div>
-    </div></div>
-    <div class="cap">Empty — friendly &amp; branded<span>Duotone bloom illustration + accent CTA</span></div>
-  </div>
-
-  <!-- LOADING -->
+  <!-- HOME -->
   <div class="frame">
     <div class="phone"><div class="scroll"><div class="content">
-      <div class="appbar"><div class="title">Filora</div></div>
-      <div style="margin:8px var(--lg)"><div class="sk" style="height:150px;border-radius:var(--r-2xl)"></div></div>
+      <div class="status"><span>9:41</span><span>Filora</span></div>
+      <div class="appbar"><div><div style="font-size:11.5px;font-weight:700;color:var(--muted)">Welcome back</div><div class="h1">Home</div></div>
+        <div class="grp"><div class="iconbtn"><span class="icon"><svg><use href="#i-search"/></svg></span></div><div class="avatar">SB</div></div></div>
+
+      <div class="hero">
+        <div class="htop"><div><div class="greet">Device storage</div><div class="htitle">84 GB of 128 GB used</div></div>
+          <span class="icon" style="color:#fff;opacity:.9;width:22px;height:22px"><svg><use href="#i-analyze"/></svg></span></div>
+        <div class="hbody">
+          <div class="ring"><svg width="98" height="98" viewBox="0 0 98 98"><circle cx="49" cy="49" r="41" stroke="rgba(255,255,255,.24)" stroke-width="11" fill="none"/><circle cx="49" cy="49" r="41" stroke="#fff" stroke-width="11" fill="none" stroke-linecap="round" stroke-dasharray="257.6" stroke-dashoffset="88"/></svg><div class="rc"><b>66%</b><s>USED</s></div></div>
+          <div class="legend">
+            <div class="leg"><span class="dot" style="background:#FF9EB4"></span>Photos<span class="lv">28 GB</span></div>
+            <div class="leg"><span class="dot" style="background:#FFB38C"></span>Video<span class="lv">31 GB</span></div>
+            <div class="leg"><span class="dot" style="background:#FFD79E"></span>Audio<span class="lv">9 GB</span></div>
+            <div class="leg"><span class="dot" style="background:rgba(255,255,255,.5)"></span>Other<span class="lv">16 GB</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="vols">
+        <div class="vol"><div class="vh"><div class="vi" style="background:var(--c-doc-c)"><span class="icon" style="color:var(--c-doc)"><svg><use href="#i-phone"/></svg></span></div><div class="vn">Internal</div></div><div class="vbar"><i style="width:66%"></i></div><div class="vsub">84 GB used · 44 free</div></div>
+        <div class="vol"><div class="vh"><div class="vi" style="background:var(--c-download-c)"><span class="icon" style="color:var(--c-download)"><svg><use href="#i-sd"/></svg></span></div><div class="vn">SD card</div></div><div class="vbar"><i style="width:22%;background:var(--c-download)"></i></div><div class="vsub">7 GB used · 25 free</div></div>
+      </div>
+
       <div class="qtools">
-        <div class="sk" style="height:74px;flex:1;border-radius:var(--r-md)"></div>
-        <div class="sk" style="height:74px;flex:1;border-radius:var(--r-md)"></div>
-        <div class="sk" style="height:74px;flex:1;border-radius:var(--r-md)"></div>
-        <div class="sk" style="height:74px;flex:1;border-radius:var(--r-md)"></div>
+        <div class="qt"><div class="qi" style="background:var(--c-clean);color:#fff"><span class="icon"><svg><use href="#i-broom"/></svg></span></div><span>Clean up</span></div>
+        <div class="qt"><div class="qi" style="background:var(--c-analyze);color:#fff"><span class="icon"><svg><use href="#i-analyze"/></svg></span></div><span>Analyze</span></div>
+        <div class="qt"><div class="qi" style="background:var(--c-safe);color:#fff"><span class="icon"><svg><use href="#i-safe"/></svg></span></div><span>Safe folder</span></div>
+        <div class="qt"><div class="qi" style="background:var(--c-trash);color:#fff"><span class="icon"><svg><use href="#i-trash"/></svg></span></div><span>Recycle</span></div>
       </div>
+
+      <div class="sec"><h3>Categories</h3><a>All</a></div>
       <div class="catgrid">
-        <div class="sk" style="height:96px;border-radius:var(--r-lg)"></div>
-        <div class="sk" style="height:96px;border-radius:var(--r-lg)"></div>
-        <div class="sk" style="height:96px;border-radius:var(--r-lg)"></div>
-        <div class="sk" style="height:96px;border-radius:var(--r-lg)"></div>
+        <div class="cat"><div class="ci" style="background:var(--c-image-c)"><span class="icon" style="color:var(--c-image)"><svg><use href="#i-image"/></svg></span></div><div class="cn">Images</div><div class="cm">28 GB</div></div>
+        <div class="cat"><div class="ci" style="background:var(--c-video-c)"><span class="icon" style="color:var(--c-video)"><svg><use href="#i-video"/></svg></span></div><div class="cn">Videos</div><div class="cm">31 GB</div></div>
+        <div class="cat"><div class="ci" style="background:var(--c-audio-c)"><span class="icon" style="color:var(--c-audio)"><svg><use href="#i-audio"/></svg></span></div><div class="cn">Audio</div><div class="cm">9 GB</div></div>
+        <div class="cat"><div class="ci" style="background:var(--c-doc-c)"><span class="icon" style="color:var(--c-doc)"><svg><use href="#i-doc"/></svg></span></div><div class="cn">Docs</div><div class="cm">3 GB</div></div>
+        <div class="cat"><div class="ci" style="background:var(--c-download-c)"><span class="icon" style="color:var(--c-download)"><svg><use href="#i-download"/></svg></span></div><div class="cn">Downloads</div><div class="cm">6 GB</div></div>
+        <div class="cat"><div class="ci" style="background:var(--c-app-c)"><span class="icon" style="color:var(--c-app)"><svg><use href="#i-app"/></svg></span></div><div class="cn">Apps</div><div class="cm">2 GB</div></div>
+        <div class="cat"><div class="ci" style="background:var(--c-archive-c)"><span class="icon" style="color:var(--c-archive)"><svg><use href="#i-archive"/></svg></span></div><div class="cn">Archives</div><div class="cm">1 GB</div></div>
+        <div class="cat"><div class="ci" style="background:var(--c-fav-c)"><span class="icon" style="color:var(--c-fav)"><svg><use href="#i-star"/></svg></span></div><div class="cn">Favorites</div><div class="cm">14</div></div>
       </div>
-    </div></div></div>
-    <div class="cap">Loading — shaped skeletons<span>Skeleton mirrors the real layout, shimmer honors reduce-motion</span></div>
+
+      <div class="sec"><h3>Recent files</h3><a>More</a></div>
+      <div class="row"><div class="tile" style="background:var(--c-image-c)"><span class="icon" style="color:var(--c-image)"><svg><use href="#i-image"/></svg></span></div><div class="gr"><div class="nm">IMG_2381.jpg</div><div class="mt">Camera · 2m ago · 4.2 MB</div></div><span class="icon tail"><svg><use href="#i-more"/></svg></span></div>
+      <div class="divider"></div>
+      <div class="row"><div class="tile" style="background:var(--c-doc-c)"><span class="icon" style="color:var(--c-doc)"><svg><use href="#i-doc"/></svg></span></div><div class="gr"><div class="nm">Invoice_Q3.pdf</div><div class="mt">Downloads · 1h ago · 210 KB</div></div><span class="icon tail"><svg><use href="#i-more"/></svg></span></div>
+    </div></div>
+    <div class="bnav">
+      <div class="n act"><div class="b"><span class="icon" style="color:var(--blue)"><svg><use href="#i-home"/></svg></span></div>Home</div>
+      <div class="n"><div class="b"><span class="icon"><svg><use href="#i-clock-line"/></svg></span></div>Recent</div>
+      <div class="n"><div class="b"><span class="icon"><svg><use href="#i-broom-line"/></svg></span></div>Cleaner</div>
+    </div>
+    <div class="fab"><span class="icon"><svg><use href="#i-folder-line"/></svg></span></div>
+    </div>
+    <div class="cap">Home — sells the product<span>Storage ring + volume cards + utility tools + colorful category icons + recent (Browse = FAB)</span></div>
   </div>
 
-  <!-- ERROR -->
+  <!-- BROWSER + selection -->
   <div class="frame">
-    <div class="phone"><div class="scroll">
-      <div class="appbar"><div class="grp"><span class="icon" style="color:var(--ink-2)"><svg><use href="#i-back"/></svg></span><div class="title" style="font-size:19px">Open file</div></div></div>
-      <div class="state">
-        <div class="bloom" style="background:radial-gradient(circle at 50% 40%,var(--error-c),#fff)">
-          <span class="icon duo" style="color:var(--error)"><svg><use href="#i-cloudoff"/></svg></span>
-        </div>
-        <h4>Can't open this file</h4>
-        <p>No app on your device can handle this type. Try sharing it to another app instead.</p>
-        <div class="cta" style="background:var(--error)">Share instead</div>
+    <div class="phone"><div class="scroll"><div class="content">
+      <div class="status"><span>9:41</span><span></span></div>
+      <div class="selbar"><span class="icon"><svg><use href="#i-back"/></svg></span><div class="h1">3 selected</div>
+        <div class="grp"><div class="sbtn"><span class="icon"><svg><use href="#i-share"/></svg></span></div><div class="sbtn"><span class="icon"><svg><use href="#i-more"/></svg></span></div></div></div>
+      <div class="crumbs" style="margin-top:12px"><span>Internal</span><span class="sep">›</span><span>Projects</span><span class="sep">›</span><b>Filora</b></div>
+      <div class="chips"><div class="chip on"><span class="icon"><svg><use href="#i-sort"/></svg></span>Name</div><div class="chip">Date</div><div class="chip">Size</div><div class="chip"><span class="icon"><svg><use href="#i-grid"/></svg></span></div></div>
+
+      <div class="row selrow"><div class="check"><span class="icon"><svg><use href="#i-check"/></svg></span></div>
+        <div class="tile" style="background:var(--c-folder)"><span class="icon" style="color:#fff"><svg><use href="#i-folder"/></svg></span><span class="mini"><span class="icon" style="color:var(--c-image)"><svg><use href="#i-camera"/></svg></span></span></div>
+        <div class="gr"><div class="nm">DCIM</div><div class="mt">1,204 items · Camera</div></div></div>
+      <div class="divider"></div>
+      <div class="row selrow"><div class="check"><span class="icon"><svg><use href="#i-check"/></svg></span></div>
+        <div class="tile" style="background:var(--c-folder)"><span class="icon" style="color:#fff"><svg><use href="#i-folder"/></svg></span><span class="mini"><span class="icon" style="color:var(--c-audio)"><svg><use href="#i-audio"/></svg></span></span></div>
+        <div class="gr"><div class="nm">Music</div><div class="mt">312 items · yesterday</div></div></div>
+      <div class="divider"></div>
+      <div class="row"><div class="tile" style="background:var(--c-doc-c)"><span class="icon" style="color:var(--c-doc)"><svg><use href="#i-doc"/></svg></span></div><div class="gr"><div class="nm">README.md</div><div class="mt">4.1 KB · 2d ago</div></div><span class="icon tail" style="color:var(--c-fav)"><svg><use href="#i-star"/></svg></span></div>
+      <div class="divider"></div>
+      <div class="row selrow"><div class="check"><span class="icon"><svg><use href="#i-check"/></svg></span></div><div class="tile" style="background:var(--c-image-c)"><span class="icon" style="color:var(--c-image)"><svg><use href="#i-image"/></svg></span></div><div class="gr"><div class="nm">hero_shot.png</div><div class="mt">2.2 MB · 3d ago</div></div></div>
+      <div class="divider"></div>
+      <div class="row"><div class="tile" style="background:var(--c-video-c)"><span class="icon" style="color:var(--c-video)"><svg><use href="#i-video"/></svg></span></div><div class="gr"><div class="nm">demo_final.mp4</div><div class="mt">148 MB · 4d ago</div></div><span class="icon tail"><svg><use href="#i-more"/></svg></span></div>
+      <div class="divider"></div>
+      <div class="row"><div class="tile" style="background:var(--c-archive-c)"><span class="icon" style="color:var(--c-archive)"><svg><use href="#i-archive"/></svg></span></div><div class="gr"><div class="nm">assets.zip</div><div class="mt">48 MB · 5d ago</div></div><span class="icon tail"><svg><use href="#i-more"/></svg></span></div>
+    </div></div></div>
+    <div class="cap">Browser — color-coded rows + selection<span>Blue folders with mini content badges (camera/music), per-type colored icons, chunky action bar</span></div>
+  </div>
+
+  <!-- MEDIA — source grouped -->
+  <div class="frame">
+    <div class="phone"><div class="scroll"><div class="content">
+      <div class="status"><span>9:41</span><span></span></div>
+      <div class="appbar"><span class="icon" style="color:var(--ink-2)"><svg><use href="#i-back"/></svg></span><div class="h1" style="font-size:19px">Images</div><div class="grp"><div class="iconbtn"><span class="icon"><svg><use href="#i-grid"/></svg></span></div><div class="iconbtn"><span class="icon"><svg><use href="#i-search"/></svg></span></div></div></div>
+      <div class="chips"><div class="chip on">Source</div><div class="chip">Albums</div><div class="chip">Timeline</div></div>
+      <div class="srcgrid">
+        <div class="src" style="background:linear-gradient(135deg,#FF8FA8,#F43F6E)"><div class="ov"></div><span class="sb"><span class="icon" style="color:var(--c-image)"><svg><use href="#i-camera"/></svg></span></span><div class="sl"><div class="sn">Camera</div><div class="sc">1,204 photos</div></div></div>
+        <div class="src" style="background:linear-gradient(135deg,#57C98A,#12A46B)"><div class="ov"></div><span class="sb"><span class="icon" style="color:#12A46B"><svg><use href="#i-chat"/></svg></span></span><div class="sl"><div class="sn">WhatsApp</div><div class="sc">886 photos</div></div></div>
+        <div class="src" style="background:linear-gradient(135deg,#8FB4FF,#2E7CF6)"><div class="ov"></div><span class="sb"><span class="icon" style="color:var(--c-doc)"><svg><use href="#i-image"/></svg></span></span><div class="sl"><div class="sn">Screenshots</div><div class="sc">342 photos</div></div></div>
+        <div class="src" style="background:linear-gradient(135deg,#C79BFF,#7C5CF7)"><div class="ov"></div><span class="sb"><span class="icon" style="color:#7C5CF7"><svg><use href="#i-download"/></svg></span></span><div class="sl"><div class="sn">Downloads</div><div class="sc">210 photos</div></div></div>
+        <div class="src" style="background:linear-gradient(135deg,#FFC078,#F5921B)"><div class="ov"></div><span class="sb"><span class="icon" style="color:var(--c-audio)"><svg><use href="#i-chat"/></svg></span></span><div class="sl"><div class="sn">Telegram</div><div class="sc">158 photos</div></div></div>
+        <div class="src" style="background:linear-gradient(135deg,#8FD0FF,#38BDF8)"><div class="ov"></div><span class="sb"><span class="icon" style="color:#2E7CF6"><svg><use href="#i-chat"/></svg></span></span><div class="sl"><div class="sn">Instagram</div><div class="sc">94 photos</div></div></div>
       </div>
     </div></div>
-    <div class="cap">Error — human, actionable<span>Duotone cloud-off, plain-language cause + recovery action</span></div>
+    <div class="bnav">
+      <div class="n"><div class="b"><span class="icon"><svg><use href="#i-home-line"/></svg></span></div>Home</div>
+      <div class="n"><div class="b"><span class="icon"><svg><use href="#i-clock-line"/></svg></span></div>Recent</div>
+      <div class="n"><div class="b"><span class="icon"><svg><use href="#i-broom-line"/></svg></span></div>Cleaner</div>
+    </div></div>
+    <div class="cap">Media hub — source-grouped<span>Photos grouped by origin (Camera/WhatsApp/Screenshots…) with counts — smart & personal (cue 4)</span></div>
+  </div>
+
+  <!-- SEARCH -->
+  <div class="frame">
+    <div class="phone"><div class="scroll"><div class="content">
+      <div class="status"><span>9:41</span><span></span></div>
+      <div class="appbar" style="padding-bottom:2px"><span class="icon" style="color:var(--ink-2)"><svg><use href="#i-back"/></svg></span><div class="h1" style="font-size:19px">Search</div></div>
+      <div class="searchbar"><span class="icon"><svg><use href="#i-search"/></svg></span><input value="report" /><span class="icon" style="color:var(--blue)"><svg><use href="#i-more"/></svg></span></div>
+      <div class="chips" style="padding-top:8px"><div class="chip on">Documents ✕</div><div class="chip on">This month ✕</div><div class="chip">&gt; 1 MB</div><div class="chip">Type</div></div>
+      <div class="sec"><h3>8 results</h3><a>Sort</a></div>
+      <div class="row"><div class="tile" style="background:var(--c-doc-c)"><span class="icon" style="color:var(--c-doc)"><svg><use href="#i-doc"/></svg></span></div><div class="gr"><div class="nm">Q3_<mark style="background:var(--blue-c);color:var(--on-blue-c);border-radius:4px">report</mark>.pdf</div><div class="mt">Projects/Finance · 2.1 MB</div></div></div>
+      <div class="divider"></div>
+      <div class="row"><div class="tile" style="background:var(--c-doc-c)"><span class="icon" style="color:var(--c-doc)"><svg><use href="#i-doc"/></svg></span></div><div class="gr"><div class="nm">annual_<mark style="background:var(--blue-c);color:var(--on-blue-c);border-radius:4px">report</mark>.docx</div><div class="mt">Downloads · 5.4 MB</div></div></div>
+      <div class="divider"></div>
+      <div class="row"><div class="tile" style="background:var(--c-image-c)"><span class="icon" style="color:var(--c-image)"><svg><use href="#i-image"/></svg></span></div><div class="gr"><div class="nm"><mark style="background:var(--blue-c);color:var(--on-blue-c);border-radius:4px">report</mark>_chart.png</div><div class="mt">Pictures · 820 KB</div></div></div>
+      <div class="divider"></div>
+      <div class="row"><div class="tile" style="background:var(--c-archive-c)"><span class="icon" style="color:var(--c-archive)"><svg><use href="#i-archive"/></svg></span></div><div class="gr"><div class="nm"><mark style="background:var(--blue-c);color:var(--on-blue-c);border-radius:4px">report</mark>s.zip</div><div class="mt">Documents · 12 MB</div></div></div>
+    </div></div></div>
+    <div class="cap">Search — filters + results<span>Pill field, blue filter chips, accent match highlight, colored type icons</span></div>
+  </div>
+
+  <!-- CLEANER (dark) -->
+  <div class="frame">
+    <div class="phone dark"><div class="scroll"><div class="content">
+      <div class="status"><span>9:41</span><span></span></div>
+      <div class="appbar"><div class="h1">Cleaner</div><div class="grp"><div class="iconbtn"><span class="icon"><svg><use href="#i-more"/></svg></span></div></div></div>
+      <div class="cleanhero">
+        <div class="ch-ring"><svg width="86" height="86" viewBox="0 0 86 86"><circle cx="43" cy="43" r="35" stroke="rgba(255,255,255,.18)" stroke-width="9" fill="none"/><circle cx="43" cy="43" r="35" stroke="#fff" stroke-width="9" fill="none" stroke-linecap="round" transform="rotate(-90 43 43)" stroke-dasharray="219.9" stroke-dashoffset="150"/><text x="43" y="40" text-anchor="middle" fill="#fff" font-size="17" font-weight="800" font-family="Manrope">31%</text><text x="43" y="54" text-anchor="middle" fill="#fff" font-size="8" opacity=".8" font-weight="700" font-family="Manrope">JUNK</text></svg></div>
+        <div class="tag">You can free up</div><div class="num">12.4 GB</div>
+        <div class="sub">Junk, duplicates &amp; large old files</div>
+        <div class="cbtn">Clean up now</div>
+      </div>
+      <div class="clist">
+        <div class="cardrow"><div class="ci" style="background:var(--c-clean);color:#fff"><span class="icon"><svg><use href="#i-broom"/></svg></span></div><div class="cg"><div class="ct">Junk files</div><div class="cs">Cache, temp, logs</div></div><div class="cv">4.2 GB</div></div>
+        <div class="cardrow"><div class="ci" style="background:var(--c-image);color:#fff"><span class="icon"><svg><use href="#i-image"/></svg></span></div><div class="cg"><div class="ct">Duplicate photos</div><div class="cs">318 duplicates</div></div><div class="cv">2.8 GB</div></div>
+        <div class="cardrow"><div class="ci" style="background:var(--c-video);color:#fff"><span class="icon"><svg><use href="#i-video"/></svg></span></div><div class="cg"><div class="ct">Large files</div><div class="cs">&gt; 100 MB · 14 files</div></div><div class="cv">5.4 GB</div></div>
+        <div class="cardrow"><div class="ci" style="background:var(--c-trash);color:#fff"><span class="icon"><svg><use href="#i-trash"/></svg></span></div><div class="cg"><div class="ct">Recycle bin</div><div class="cs">22 items</div></div><div class="cv">1.1 GB</div></div>
+      </div>
+    </div></div>
+    <div class="bnav">
+      <div class="n"><div class="b"><span class="icon"><svg><use href="#i-home-line"/></svg></span></div>Home</div>
+      <div class="n"><div class="b"><span class="icon"><svg><use href="#i-clock-line"/></svg></span></div>Recent</div>
+      <div class="n act"><div class="b"><span class="icon" style="color:var(--blue)"><svg><use href="#i-broom"/></svg></span></div>Cleaner</div>
+    </div></div>
+    <div class="cap">Cleaner — utility as value (dark)<span>The marketed dark % ring + friendly junk/duplicate/large-file cards with clear values (cues 2 & 5)</span></div>
+  </div>
+
+  <!-- SETTINGS -->
+  <div class="frame">
+    <div class="phone"><div class="scroll"><div class="content">
+      <div class="status"><span>9:41</span><span></span></div>
+      <div class="appbar"><span class="icon" style="color:var(--ink-2)"><svg><use href="#i-back"/></svg></span><div class="h1" style="font-size:19px">Settings</div></div>
+      <div class="setgrp">
+        <div class="setrow"><div class="si" style="background:var(--blue)"><span class="icon"><svg><use href="#i-sun"/></svg></span></div><div class="sg"><div class="st">Theme</div><div class="sd">System · Dark mode ready</div></div><div class="toggle"></div></div>
+        <div class="setdiv"></div>
+        <div class="setrow"><div class="si" style="background:var(--c-doc)"><span class="icon"><svg><use href="#i-grid"/></svg></span></div><div class="sg"><div class="st">Default view</div><div class="sd">List</div></div></div>
+      </div>
+      <div class="grouplbl">Browsing</div>
+      <div class="setgrp" style="margin-top:0">
+        <div class="setrow"><div class="si" style="background:var(--c-folder)"><span class="icon"><svg><use href="#i-folder-line"/></svg></span></div><div class="sg"><div class="st">Show hidden files</div><div class="sd">Files starting with a dot</div></div><div class="toggle off"></div></div>
+        <div class="setdiv"></div>
+        <div class="setrow"><div class="si" style="background:var(--c-audio)"><span class="icon"><svg><use href="#i-sort"/></svg></span></div><div class="sg"><div class="st">Default sort</div><div class="sd">Name, ascending</div></div></div>
+      </div>
+      <div class="grouplbl">Privacy & about</div>
+      <div class="setgrp" style="margin-top:0">
+        <div class="setrow"><div class="si" style="background:var(--c-safe)"><span class="icon"><svg><use href="#i-safe"/></svg></span></div><div class="sg"><div class="st">Safe folder</div><div class="sd">PIN-locked · no data collected</div></div></div>
+        <div class="setdiv"></div>
+        <div class="setrow"><div class="si" style="background:var(--c-fav)"><span class="icon"><svg><use href="#i-star"/></svg></span></div><div class="sg"><div class="st">Filora</div><div class="sd">Version 1.0 · Rate the app</div></div></div>
+      </div>
+    </div></div></div>
+    <div class="cap">Settings — grouped, colorful icon wells<span>Rounded grouped cards, per-row colored icon tile, custom toggles, dark-mode marketed</span></div>
   </div>
 
 </div>
 
-<!-- =================================================================
-     LARGE SCREEN — DUAL PANE (≥600dp)
-     ================================================================= -->
+<!-- ==================== STATES ==================== -->
+<div class="sectlabel">States with character</div>
+<div class="sectnote">Branded iconographic empty / loading / error — never bare text.</div>
+<div class="gallery">
+  <div class="frame"><div class="phone"><div class="scroll nonav">
+    <div class="status"><span>9:41</span><span></span></div>
+    <div class="appbar"><span class="icon" style="color:var(--ink-2)"><svg><use href="#i-back"/></svg></span><div class="h1" style="font-size:19px">Downloads</div></div>
+    <div class="state"><div class="bloom" style="background:radial-gradient(circle at 50% 40%,var(--c-download-c),#fff)"><span class="icon" style="color:var(--c-download)"><svg><use href="#i-inbox"/></svg></span></div>
+      <h4>Nothing here yet</h4><p>Files you download will land here. Pull down to refresh anytime.</p><div class="cta">Browse files</div></div>
+  </div></div><div class="cap">Empty — friendly<span>Colorful bloom + accent CTA</span></div></div>
+
+  <div class="frame"><div class="phone"><div class="scroll nonav"><div class="content">
+    <div class="status"><span>9:41</span><span></span></div>
+    <div class="appbar"><div class="h1">Home</div></div>
+    <div style="margin:6px var(--lg)"><div class="sk" style="height:140px;border-radius:var(--r-2xl)"></div></div>
+    <div class="vols"><div class="sk" style="height:78px;flex:1;border-radius:var(--r-lg)"></div><div class="sk" style="height:78px;flex:1;border-radius:var(--r-lg)"></div></div>
+    <div class="catgrid">
+      <div class="sk" style="height:80px"></div><div class="sk" style="height:80px"></div><div class="sk" style="height:80px"></div><div class="sk" style="height:80px"></div></div>
+  </div></div></div><div class="cap">Loading — shaped skeleton<span>Mirrors the real layout; shimmer honors reduce-motion</span></div></div>
+
+  <div class="frame"><div class="phone"><div class="scroll nonav">
+    <div class="status"><span>9:41</span><span></span></div>
+    <div class="appbar"><span class="icon" style="color:var(--ink-2)"><svg><use href="#i-back"/></svg></span><div class="h1" style="font-size:19px">Open file</div></div>
+    <div class="state"><div class="bloom" style="background:radial-gradient(circle at 50% 40%,var(--error-c),#fff)"><span class="icon" style="color:var(--error)"><svg><use href="#i-cloudoff"/></svg></span></div>
+      <h4>Can't open this file</h4><p>No app on your device can handle this type. Try sharing it to another app.</p><div class="cta" style="background:var(--error)">Share instead</div></div>
+  </div></div><div class="cap">Error — human, actionable<span>Duotone cloud-off, plain-language cause + recovery</span></div></div>
+</div>
+
+<!-- ==================== DUAL PANE ==================== -->
 <div class="sectlabel">Large screen — dual-pane (≥600dp)</div>
-<div class="sectnote">A-blend structure kept: nav-rail + list/detail. Selected pane carries an Iris edge + elevation.</div>
+<div class="sectnote">A-blend structure kept: nav-rail + list/detail; selected pane carries a blue edge + elevation.</div>
 <div class="gallery">
-  <div class="frame">
-    <div class="tablet">
-      <div class="navrail">
-        <div class="logo" style="width:38px;height:38px;margin-bottom:10px"><svg width="22" height="22" viewBox="0 0 24 24"><path d="M4 8.5C4 6.6 5.6 5 7.5 5H10l2 2.4h4.5C18.4 7.4 20 9 20 10.9V16c0 1.9-1.6 3.5-3.5 3.5h-9C5.6 19.5 4 17.9 4 16V8.5Z" fill="#fff" opacity=".92"/><circle cx="12" cy="13" r="3.1" fill="#7C5CF7"/></svg></div>
-        <div class="r act"><div class="b"><span class="icon" style="color:var(--iris)"><svg><use href="#i-home"/></svg></span></div>Home</div>
-        <div class="r"><div class="b"><span class="icon"><svg><use href="#i-folder-line"/></svg></span></div>Browse</div>
-        <div class="r"><div class="b"><span class="icon"><svg><use href="#i-grid"/></svg></span></div>Media</div>
-        <div class="r"><div class="b"><span class="icon"><svg><use href="#i-storage"/></svg></span></div>Storage</div>
-      </div>
-      <div class="pane-l">
-        <div class="appbar" style="padding-top:14px"><div class="title" style="font-size:18px">Projects</div><span class="icon"><svg><use href="#i-sort"/></svg></span></div>
-        <div class="row" style="min-height:52px"><div class="tile" style="width:38px;height:38px;background:var(--c-folder-c)"><span class="icon duo" style="color:var(--c-folder)"><svg><use href="#i-folder"/></svg></span></div><div class="gr"><div class="nm" style="font-size:14px">design</div></div></div>
-        <div class="row selrow" style="min-height:52px"><div class="tile" style="width:38px;height:38px;background:var(--c-image-c)"><span class="icon duo" style="color:var(--c-image)"><svg><use href="#i-image"/></svg></span></div><div class="gr"><div class="nm" style="font-size:14px">hero_shot.png</div><div class="mt">2.2 MB</div></div></div>
-        <div class="row" style="min-height:52px"><div class="tile" style="width:38px;height:38px;background:var(--c-doc-c)"><span class="icon duo" style="color:var(--c-doc)"><svg><use href="#i-doc"/></svg></span></div><div class="gr"><div class="nm" style="font-size:14px">README.md</div></div></div>
-        <div class="row" style="min-height:52px"><div class="tile" style="width:38px;height:38px;background:var(--c-archive-c)"><span class="icon duo" style="color:var(--c-archive)"><svg><use href="#i-archive"/></svg></span></div><div class="gr"><div class="nm" style="font-size:14px">assets.zip</div></div></div>
-      </div>
-      <div class="pane-r selpane">
-        <div class="appbar" style="padding-top:14px"><div class="title" style="font-size:16px">hero_shot.png</div><div class="grp"><span class="icon" style="color:var(--ink-2)"><svg><use href="#i-share"/></svg></span><span class="icon" style="color:var(--c-fav)"><svg><use href="#i-star"/></svg></span></div></div>
-        <div style="margin:6px var(--lg);height:160px;border-radius:var(--r-lg);background:linear-gradient(135deg,#FFC1CE,#C7B4FF);box-shadow:var(--sh-2)"></div>
-        <div style="margin:0 var(--lg)">
-          <div class="brow" style="padding:8px 0"><span class="bn" style="font-weight:600;color:var(--muted)">Size</span><span class="bv" style="color:var(--ink)">2.2 MB</span></div>
-          <div class="divider" style="margin:0"></div>
-          <div class="brow" style="padding:8px 0"><span class="bn" style="font-weight:600;color:var(--muted)">Type</span><span class="bv" style="color:var(--ink)">PNG image</span></div>
-          <div class="divider" style="margin:0"></div>
-          <div class="brow" style="padding:8px 0"><span class="bn" style="font-weight:600;color:var(--muted)">Modified</span><span class="bv" style="color:var(--ink)">3 days ago</span></div>
-        </div>
+  <div class="frame"><div class="tablet">
+    <div class="navrail">
+      <div class="logo" style="width:38px;height:38px;margin-bottom:8px"><svg width="22" height="22" viewBox="0 0 24 24"><path d="M4 8.5C4 6.6 5.6 5 7.5 5H10l2 2.4h4.5C18.4 7.4 20 9 20 10.9V16c0 1.9-1.6 3.5-3.5 3.5h-9C5.6 19.5 4 17.9 4 16V8.5Z" fill="#fff"/><circle cx="12" cy="13" r="3" fill="#2563EB"/></svg></div>
+      <div class="r act"><div class="b"><span class="icon" style="color:var(--blue)"><svg><use href="#i-home"/></svg></span></div>Home</div>
+      <div class="r"><div class="b"><span class="icon"><svg><use href="#i-clock-line"/></svg></span></div>Recent</div>
+      <div class="r"><div class="b"><span class="icon"><svg><use href="#i-broom-line"/></svg></span></div>Cleaner</div>
+    </div>
+    <div class="pane-l">
+      <div class="appbar" style="padding-top:12px"><div class="h1" style="font-size:17px">Projects</div><span class="icon" style="margin-left:auto;color:var(--ink-2)"><svg><use href="#i-sort"/></svg></span></div>
+      <div class="row" style="min-height:52px"><div class="tile" style="width:38px;height:38px;background:var(--c-folder)"><span class="icon" style="color:#fff"><svg><use href="#i-folder"/></svg></span></div><div class="gr"><div class="nm" style="font-size:14px">design</div></div></div>
+      <div class="row selrow" style="min-height:52px"><div class="tile" style="width:38px;height:38px;background:var(--c-image-c)"><span class="icon" style="color:var(--c-image)"><svg><use href="#i-image"/></svg></span></div><div class="gr"><div class="nm" style="font-size:14px">hero_shot.png</div><div class="mt">2.2 MB</div></div></div>
+      <div class="row" style="min-height:52px"><div class="tile" style="width:38px;height:38px;background:var(--c-doc-c)"><span class="icon" style="color:var(--c-doc)"><svg><use href="#i-doc"/></svg></span></div><div class="gr"><div class="nm" style="font-size:14px">README.md</div></div></div>
+      <div class="row" style="min-height:52px"><div class="tile" style="width:38px;height:38px;background:var(--c-archive-c)"><span class="icon" style="color:var(--c-archive)"><svg><use href="#i-archive"/></svg></span></div><div class="gr"><div class="nm" style="font-size:14px">assets.zip</div></div></div>
+    </div>
+    <div class="pane-r">
+      <div class="appbar" style="padding-top:12px"><div class="h1" style="font-size:15px">hero_shot.png</div><div class="grp"><span class="iconbtn" style="width:34px;height:34px"><span class="icon"><svg><use href="#i-share"/></svg></span></span><span class="iconbtn" style="width:34px;height:34px;color:var(--c-fav)"><span class="icon"><svg><use href="#i-star"/></svg></span></span></div></div>
+      <div style="margin:4px var(--lg);height:150px;border-radius:var(--r-lg);background:linear-gradient(135deg,#FF8FA8,#8FB4FF);box-shadow:var(--sh-2)"></div>
+      <div style="margin:2px var(--lg)">
+        <div class="row" style="min-height:44px;padding-left:0"><span class="mt" style="flex:1;color:var(--muted)">Size</span><span class="nm" style="font-size:13px">2.2 MB</span></div>
+        <div class="divider" style="margin:0"></div>
+        <div class="row" style="min-height:44px;padding-left:0"><span class="mt" style="flex:1;color:var(--muted)">Type</span><span class="nm" style="font-size:13px">PNG image</span></div>
+        <div class="divider" style="margin:0"></div>
+        <div class="row" style="min-height:44px;padding-left:0"><span class="mt" style="flex:1;color:var(--muted)">Modified</span><span class="nm" style="font-size:13px">3 days ago</span></div>
       </div>
     </div>
-    <div class="cap">Tablet — nav-rail + list/detail<span>Selected detail pane: Iris edge + elevation; brand mark in rail</span></div>
-  </div>
-</div>
-
-<!-- =================================================================
-     STORE SCREENSHOTS — CONVERSION SURFACES (taste principle #7)
-     Play Store shots are engineered to convert. Branded gradient +
-     confident marketing headline + real screen. Calm & ad-free — the
-     Filora differentiator vs InShot's ad-heavy monetization.
-     ================================================================= -->
-<div class="sectlabel">Store screenshots — conversion surfaces</div>
-<div class="sectnote">First-impression obsession: the store shots and Home are the surfaces that win the install. Confident hero headline + Iris gradient + a real screen — never a bare device on white.</div>
-<div class="gallery">
-
-  <!-- SHOT 1 — hero / Home -->
-  <div class="frame">
-    <div class="shot s-iris">
-      <div class="sh-hd">Every file,<br>beautifully organized</div>
-      <div class="sh-sub">Photos, videos, docs and downloads — sorted the moment you open the app.</div>
-      <div class="sh-dev"><div class="content">
-        <div class="hero" style="margin:10px 12px 4px">
-          <div class="htop"><div><div class="greet">Device storage</div><div class="htitle">128 GB total</div></div>
-            <span class="icon" style="color:#fff;opacity:.85"><svg><use href="#i-sparkle"/></svg></span></div>
-          <div class="hbody">
-            <div class="ring"><svg width="80" height="80" viewBox="0 0 80 80">
-              <circle cx="40" cy="40" r="34" stroke="rgba(255,255,255,.22)" stroke-width="9" fill="none"/>
-              <circle cx="40" cy="40" r="34" stroke="#fff" stroke-width="9" fill="none" stroke-linecap="round" stroke-dasharray="213.6" stroke-dashoffset="73"/></svg>
-              <div class="rc"><b>66%</b><s>used</s></div></div>
-            <div class="legend">
-              <div class="leg"><span class="dot" style="background:#FF9EB4"></span>Photos<span class="lv">28 GB</span></div>
-              <div class="leg"><span class="dot" style="background:#C7B4FF"></span>Video<span class="lv">31 GB</span></div>
-              <div class="leg"><span class="dot" style="background:#FFD79E"></span>Audio<span class="lv">9 GB</span></div>
-            </div>
-          </div>
-        </div>
-        <div class="catgrid" style="padding-top:8px">
-          <div class="cat"><div class="arc" style="background:var(--c-image)"></div><div class="ci" style="background:var(--c-image-c)"><span class="icon duo" style="color:var(--c-image)"><svg><use href="#i-image"/></svg></span></div><div class="cn">Images</div><div class="cm">4,120 · 28 GB</div></div>
-          <div class="cat"><div class="arc" style="background:var(--c-video)"></div><div class="ci" style="background:var(--c-video-c)"><span class="icon duo" style="color:var(--c-video)"><svg><use href="#i-video"/></svg></span></div><div class="cn">Videos</div><div class="cm">312 · 31 GB</div></div>
-        </div>
-      </div></div>
-    </div>
-    <div class="cap">01 · Hero shot<span>Benefit headline + Iris gradient + Home ring — the #1 conversion frame</span></div>
-  </div>
-
-  <!-- SHOT 2 — storage / clean up -->
-  <div class="frame">
-    <div class="shot s-teal">
-      <div class="sh-hd">See what's<br>eating your space</div>
-      <div class="sh-sub">A clear breakdown by type — then clean up the clutter in a tap.</div>
-      <div class="sh-dev"><div class="content">
-        <div style="padding:14px 12px 4px">
-          <div style="font-size:13px;font-weight:800;color:var(--ink);margin-bottom:8px">Storage breakdown</div>
-          <div style="height:16px;border-radius:var(--r-pill);overflow:hidden;display:flex;box-shadow:var(--sh-1)">
-            <span style="flex:28;background:var(--c-image)"></span><span style="flex:31;background:var(--c-video)"></span>
-            <span style="flex:9;background:var(--c-audio)"></span><span style="flex:17;background:var(--c-doc)"></span>
-            <span style="flex:15;background:var(--c-folder)"></span>
-          </div>
-          <div style="margin-top:12px;display:flex;flex-direction:column;gap:9px">
-            <div class="leg" style="color:var(--ink);font-size:12px"><span class="dot" style="background:var(--c-video);width:10px;height:10px;border-radius:3px"></span>Video<span class="lv" style="color:var(--muted)">31 GB</span></div>
-            <div class="leg" style="color:var(--ink);font-size:12px"><span class="dot" style="background:var(--c-image);width:10px;height:10px;border-radius:3px"></span>Images<span class="lv" style="color:var(--muted)">28 GB</span></div>
-            <div class="leg" style="color:var(--ink);font-size:12px"><span class="dot" style="background:var(--c-doc);width:10px;height:10px;border-radius:3px"></span>Documents<span class="lv" style="color:var(--muted)">17 GB</span></div>
-          </div>
-          <div style="margin-top:14px;background:var(--iris);color:#fff;text-align:center;font-weight:700;font-size:13px;padding:11px;border-radius:var(--r-md);box-shadow:var(--sh-brand)">Clean up 4.2 GB</div>
-        </div>
-      </div></div>
-    </div>
-    <div class="cap">02 · Utility as value<span>"Clean up" framed as a benefit — the storage-story surface</span></div>
-  </div>
-
-  <!-- SHOT 3 — search / find anything -->
-  <div class="frame">
-    <div class="shot s-rose">
-      <div class="sh-hd">Find anything<br>in a tap</div>
-      <div class="sh-sub">Search by name, type, size or date — results the instant you type.</div>
-      <div class="sh-dev"><div class="content">
-        <div style="padding:14px 12px 4px">
-          <div style="display:flex;align-items:center;gap:8px;background:var(--surface);border:1px solid var(--line-2);border-radius:var(--r-pill);padding:10px 14px;box-shadow:var(--sh-1)">
-            <span class="icon duo" style="color:var(--iris);width:18px;height:18px"><svg><use href="#i-search"/></svg></span>
-            <span style="font-size:13px;font-weight:600;color:var(--ink)">invoice</span>
-          </div>
-          <div class="chips" style="padding:12px 0 6px">
-            <span class="chip on" style="padding:6px 12px">Documents</span>
-            <span class="chip" style="padding:6px 12px">This month</span>
-          </div>
-          <div class="row" style="padding:8px 0"><div class="tile" style="background:var(--c-doc-c)"><span class="icon duo" style="color:var(--c-doc)"><svg><use href="#i-doc"/></svg></span></div><div class="gr"><div class="nm">Invoice_Q3.pdf</div><div class="mt">210 KB · 1h ago</div></div></div>
-          <div class="row" style="padding:8px 0"><div class="tile" style="background:var(--c-doc-c)"><span class="icon duo" style="color:var(--c-doc)"><svg><use href="#i-doc"/></svg></span></div><div class="gr"><div class="nm">Invoice_Aug.pdf</div><div class="mt">198 KB · Aug 3</div></div></div>
-        </div>
-      </div></div>
-    </div>
-    <div class="cap">03 · Instant search<span>Rose→violet gradient, Iris chips, live results — the "power" frame</span></div>
-  </div>
+  </div><div class="cap">Tablet — nav-rail + list/detail<span>Selected detail pane: blue edge + elevation; brand mark in rail</span></div></div>
 </div>
 
 <footer>
-  <b style="color:#c7c5ff">Filora premium craft pass — APP-134.</b> Every visual cue maps to a token/component in
-  <code>core-ui/theme</code> — see <code>docs/phase-1/design/06-premium-craft.md</code> for the full engineering map
-  (APP-117 / APP-118). Brand: Filora Iris <code>#5B5BD6</code>. Accessibility non-negotiables preserved: 48dp targets,
-  AA contrast, TalkBack labels, RTL. Hi-fi is illustrative — real thumbnails, dynamic color, and reduce-motion apply at runtime.
+  <b style="color:#bcd3ff">Filora — InShot-feel craft pass (APP-134).</b> Realigned from the retired Iris pass to the ratified
+  <code>#2563EB</code> blue system and the InShot/XFolder total feel, grounded in the Chief's benchmark study
+  (APP-112 <code>premium-design-reference</code>). Companion dark-first flow deck: <code>design/filora-screens/hifi-inshot/</code>
+  (APP-141). Engineering token/icon map: <code>docs/phase-1/design/06-premium-craft.md</code> → defers to canonical
+  <code>docs/phase-1/design/07-design-system.md</code> for APP-117/118. Kept: A-blend IA, 48dp / AA / TalkBack / RTL,
+  Compose + M3. Calmer &amp; ad-free — that's our edge over the reference.
 </footer>
 </body>
 </html>

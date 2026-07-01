@@ -1,8 +1,35 @@
 # Filora — Premium Craft Pass (A-blend) — engineering map
 
 **Issue:** APP-134 · **Owner:** UI/UX Designer · **Blocks:** APP-117, APP-118
-**Status:** proposed for board sign-off · **Supersedes the visual layer of:** `05-hifi-spec.md`
+**Status:** v3 — realigned to the ratified **blue / InShot-feel** direction · **Canonical system:** `07-design-system.md`
 **Hi-fi gallery:** `design/filora-screens/hifi/index.html` (live preview link in the APP-134 thread)
+
+> ## ⚠️ v3 REALIGNMENT (2026-07-02) — read this first
+> The board rejected the Iris/purple direction below and asked for the **total feel of InShot Inc's File
+> Manager (XFolder)**. The ratified direction is now **blue `#2563EB`**, tabs **Home · Recent · Cleaner**,
+> per the board-signed-off **`docs/phase-1/design/07-design-system.md`** (canonical) and the Chief's
+> benchmark study (APP-112 doc `premium-design-reference`, from the reference app's real screenshots).
+>
+> **What changed in this pass (the InShot cues the Iris version missed):**
+> 1. **Colorful custom per-type icons** — the #1 differentiator. Each category/file-type gets a distinct
+>    saturated glyph in its accent color (see the icon sprite in `hifi/index.html` — filled, not duotone-line).
+> 2. **Storage as the hero** — Home leads with the % ring + per-volume cards (Internal / SD) with used bars.
+> 3. **Content-type color-coded rows + mini content badges** — blue folders carry a small badge (camera on
+>    DCIM, music note on Music); files use per-type color. Tuned, not fully-saturated (our calmer edge).
+> 4. **Source-grouped media** — Images grouped by origin (Camera / WhatsApp / Screenshots / Downloads / …).
+> 5. **Cleaner / utility value surfaces** — junk / duplicates / large files / recycle framed as friendly
+>    cards with clear values and a "Clean up now" CTA (the `Cleaner` tab).
+> 6. **Brand = ratified BLUE** `#2563EB` (+ gradient `#2563EB → #4C7DF5 → #38BDF8`), **not** Iris/purple.
+> 7. **Nav = 3-tab Home · Recent · Cleaner** (Browse nests under Home + a Browse FAB), per §7.1 of the system.
+>
+> **Token/color values in §1 below are SUPERSEDED by `07-design-system.md` §6** (blue). Read §2–§8 for the
+> still-valid *component* guidance (icons, home, elevation, shape, states, motion, a11y) — apply them on the
+> blue palette, not the Iris table. Companion dark-first flow deck: `design/filora-screens/hifi-inshot/` (APP-141).
+> **Ad-free stays our differentiator vs the reference.**
+
+---
+
+### (below: original Iris pass — retained for the component/engineering map; palette superseded by blue)
 
 > **Scope.** This is a *craft* pass, not a redesign. A-blend's information architecture, density,
 > navigation, and accessibility are unchanged. What changes is the **visual layer**: brand color,
