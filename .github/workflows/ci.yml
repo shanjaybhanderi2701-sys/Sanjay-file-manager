@@ -103,11 +103,11 @@ jobs:
     name: Screenshot · Roborazzi (T171)
     runs-on: ubuntu-latest
     timeout-minutes: 45
-    # APP-154: Linux goldens are now committed under core/core-ui/src/test/screenshots/
-    # (recorded on this same ubuntu-latest/Robolectric image). Kept advisory for ONE
-    # confirming cycle to prove `verifyRoborazziDebug` is green against them before this
-    # `continue-on-error` is dropped and the job is promoted to a required gate.
-    continue-on-error: true
+    # APP-154: Linux goldens are committed under core/core-ui/src/test/screenshots/
+    # (recorded on this same ubuntu-latest/Robolectric image). `verifyRoborazziDebug` was
+    # confirmed green against them across two consecutive main runs (#37 7cc837f and
+    # #38 76a5ef6), so the confirming cycle is complete and this job is now a REQUIRED
+    # gate — `continue-on-error` dropped.
     steps:
       - name: Checkout
         uses: actions/checkout@v4
