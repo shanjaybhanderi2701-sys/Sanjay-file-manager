@@ -103,8 +103,10 @@ jobs:
     name: Screenshot · Roborazzi (T171)
     runs-on: ubuntu-latest
     timeout-minutes: 45
-    # Non-blocking until golden PNGs are recorded via `./gradlew :core:core-ui:recordRoborazziDebug`
-    # and committed. Remove once goldens are in the repo.
+    # APP-154: Linux goldens are now committed under core/core-ui/src/test/screenshots/
+    # (recorded on this same ubuntu-latest/Robolectric image). Kept advisory for ONE
+    # confirming cycle to prove `verifyRoborazziDebug` is green against them before this
+    # `continue-on-error` is dropped and the job is promoted to a required gate.
     continue-on-error: true
     steps:
       - name: Checkout
@@ -119,25 +121,12 @@ jobs:
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@v4
 
-      # APP-154 (one-shot golden bootstrap): Roborazzi goldens must be recorded on the
-      # CI OS/arch (Linux x86_64) — PNGs recorded on a dev's macOS/arm64 diff on font
-      # rendering and fail verify. This step records them here so they can be downloaded
-      # from the `roborazzi-goldens` artifact and committed under
-      # core/core-ui/src/test/screenshots/, after which this step reverts to
-      # `:core:core-ui:verifyRoborazziDebug` and the job is promoted to required
-      # (mirrors the APP-147 → APP-153 emulator-hardening approach). JVM-only via
-      # Robolectric — no emulator.
-      - name: Record screenshots (Linux goldens)
-        run: ./gradlew --no-daemon --stacktrace :core:core-ui:recordRoborazziDebug
-
-      - name: Upload recorded goldens
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: roborazzi-goldens
-          path: core/core-ui/src/test/screenshots/
-          if-no-files-found: warn
-          retention-days: 7
+      # Verifies core-ui component snapshots (light/dark/dynamic + content/loading/empty/
+      # error) against the committed Linux goldens. JVM-only via Robolectric — no emulator.
+      # Goldens were recorded on this same ubuntu-latest image (APP-154); refresh them with
+      # `./gradlew :core:core-ui:recordRoborazziDebug` (see docs/phase-1/testing/screenshot-and-coverage.md).
+      - name: Verify screenshots
+        run: ./gradlew --no-daemon --stacktrace :core:core-ui:verifyRoborazziDebug
 
       - name: Upload screenshot diffs
         if: always()
