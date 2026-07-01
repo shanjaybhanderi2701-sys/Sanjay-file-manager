@@ -155,6 +155,56 @@ class ZipExtractorTest {
         assertThat(summary.extractedFiles).isEqualTo(1)
     }
 
+    @Test
+    fun `rejects an entry over the per-entry uncompressed cap (zip-bomb guard)`() {
+        // Compresses to a few bytes but inflates to 50 KB — the classic bomb shape.
+        val archive = zip("bomb.txt" to "A".repeat(50_000))
+        val dest = temp.newFolder("out")
+        val guarded = ZipExtractor(
+            ExtractionLimits(
+                maxTotalUncompressedBytes = 1_000_000,
+                maxEntryUncompressedBytes = 1_024,
+                maxCompressionRatio = 10_000,
+            ),
+        )
+
+        val result = guarded.extract(archive, dest)
+
+        assertThat(result).isInstanceOf(Result.Error::class.java)
+        assertThat((result as Result.Error).error).isInstanceOf(OperationError.Io::class.java)
+    }
+
+    @Test
+    fun `rejects an archive over the total uncompressed cap`() {
+        val chunk = "B".repeat(2_000)
+        val archive = zip("a.txt" to chunk, "b.txt" to chunk, "c.txt" to chunk)
+        val dest = temp.newFolder("out")
+        val guarded = ZipExtractor(
+            ExtractionLimits(
+                maxTotalUncompressedBytes = 5_000, // 3 * 2_000 = 6_000 crosses this
+                maxEntryUncompressedBytes = 1_000_000,
+                maxCompressionRatio = 10_000,
+            ),
+        )
+
+        val result = guarded.extract(archive, dest)
+
+        assertThat(result).isInstanceOf(Result.Error::class.java)
+        assertThat((result as Result.Error).error).isInstanceOf(OperationError.Io::class.java)
+    }
+
+    @Test
+    fun `default limits extract an ordinary archive without tripping the guard`() {
+        val archive = zip("readme.txt" to "hello", "d/note.txt" to "world")
+        val dest = temp.newFolder("out")
+
+        val result = ZipExtractor().extract(archive, dest)
+
+        assertThat(result).isInstanceOf(Result.Success::class.java)
+        assertThat(File(dest, "readme.txt").readText()).isEqualTo("hello")
+        assertThat(File(dest, "d/note.txt").readText()).isEqualTo("world")
+    }
+
     private fun zip(vararg entries: Pair<String, String?>): File {
         val file = temp.newFile("archive-${entries.hashCode()}.zip")
         ZipOutputStream(file.outputStream()).use { zos ->

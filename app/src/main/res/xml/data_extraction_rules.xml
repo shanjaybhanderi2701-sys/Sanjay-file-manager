@@ -1,19 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  Backup/transfer rules for API 31+ (A5). Exclude sensitive local state: SAF grant
-  store, recents, and the thumbnail index/cache should not leave the device.
+  Backup/transfer rules for API 31+ (A5). Exclude sensitive local state so it never
+  leaves the device. These paths must match REAL on-disk storage (security-impl-audit F2):
+
+    - database `filora.db`  — the Room DB, excluded whole (favorites + recents).
+    - file `datastore/`     — the DataStore dir, excluded whole (settings + any
+                              SAF-grant-backed store).
+
+  Not listed on purpose:
+    - SAF grants live in the OS persisted-URI grant table, not an app file, so there is
+      nothing app-side to exclude (the old `sharedpref path="saf_grants.xml"` rule was a
+      phantom no-op — no such file exists).
+    - Thumbnails live in internal `cacheDir/media_thumbnails`; the cache domain is never
+      backed up by the platform, so no explicit rule is needed (the old
+      `external path="thumbnails/"` rule pointed at storage we never write — a no-op).
 -->
 <data-extraction-rules>
     <cloud-backup>
         <exclude domain="database" path="filora.db" />
-        <exclude domain="sharedpref" path="saf_grants.xml" />
         <exclude domain="file" path="datastore/" />
-        <exclude domain="external" path="thumbnails/" />
     </cloud-backup>
     <device-transfer>
         <exclude domain="database" path="filora.db" />
-        <exclude domain="sharedpref" path="saf_grants.xml" />
         <exclude domain="file" path="datastore/" />
-        <exclude domain="external" path="thumbnails/" />
     </device-transfer>
 </data-extraction-rules>

@@ -1,5 +1,6 @@
 package com.appblish.filora
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -18,7 +19,9 @@ import com.appblish.filora.core.domain.model.UserPreferences
 import com.appblish.filora.core.domain.repository.SettingsRepository
 import com.appblish.filora.core.ui.theme.FiloraTheme
 import com.appblish.filora.navigation.FiloraApp
+import com.appblish.filora.navigation.FiloraDeepLinks
 import com.appblish.filora.navigation.Route
+import com.appblish.filora.navigation.ViewIntentValidator
 import com.appblish.filora.permission.StoragePermissions
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -36,6 +39,10 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+
+        // B3 / security-impl-audit F1: neutralise a hostile exported deep link before
+        // Navigation consumes the launch intent (see [sanitizeInboundDeepLink]).
+        sanitizeInboundDeepLink(intent)
 
         // Gate the first run behind the permission rationale (FR-1.1); once media
         // access exists — or the user has already persisted a SAF tree grant that
@@ -74,6 +81,45 @@ class MainActivity : ComponentActivity() {
                         .semantics { testTagsAsResourceId = true },
                 )
             }
+        }
+    }
+
+    // A running app is re-delivered VIEW intents here; sanitise the same way and pin the
+    // cleaned intent back so any downstream deep-link handling sees the safe version.
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        sanitizeInboundDeepLink(intent)
+        setIntent(intent)
+    }
+
+    /**
+     * B3 / security-impl-audit F1. The `filora://` `VIEW` filter is exported + BROWSABLE,
+     * so any web page can fire a deep link. Before Navigation consumes it we run
+     * [ViewIntentValidator]; a link pointing outside public shared storage / a held SAF
+     * grant (e.g. `filora://browser?location=/data/data/…`, an un-granted `content://`, a
+     * `..` traversal, or an unknown category) is neutralised to a plain `MAIN` launch, so
+     * the graph falls back to its start destination (Home) instead of browsing an
+     * attacker-chosen location. Never crashes: a malformed link is simply dropped.
+     */
+    private fun sanitizeInboundDeepLink(intent: Intent?) {
+        if (intent == null || intent.action != Intent.ACTION_VIEW) return
+        val data = intent.data ?: return
+        if (!FiloraDeepLinks.SCHEME.equals(data.scheme, ignoreCase = true)) return
+
+        val validator = ViewIntentValidator(
+            grantedTreeUris = { safTreeAccess.persistedTreeUris().mapTo(HashSet<String>()) { it.toString() } },
+        )
+        val allowed = runCatching {
+            validator.isDeepLinkAllowed(
+                host = data.host,
+                locationArg = data.getQueryParameter("location"),
+                categoryArg = data.getQueryParameter("category"),
+            )
+        }.getOrDefault(false)
+
+        if (!allowed) {
+            intent.action = Intent.ACTION_MAIN
+            intent.data = null
         }
     }
 }

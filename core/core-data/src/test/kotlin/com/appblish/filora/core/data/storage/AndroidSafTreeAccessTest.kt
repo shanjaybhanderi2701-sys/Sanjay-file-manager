@@ -28,12 +28,37 @@ class AndroidSafTreeAccessTest {
     @Test
     fun `persist takes a persistable read and write grant`() {
         justRun { resolver.takePersistableUriPermission(any(), any()) }
+        // persist() now prunes toward the cap, which reads the grant table; a small table
+        // is well under the threshold, so no release happens here.
+        every { resolver.persistedUriPermissions } returns listOf(permission(treeUri, isRead = true))
 
         safTreeAccess.persist(treeUri)
 
         val expectedFlags =
             Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION
         verify { resolver.takePersistableUriPermission(treeUri, expectedFlags) }
+        verify(exactly = 0) { resolver.releasePersistableUriPermission(any(), any()) }
+    }
+
+    @Test
+    fun `persist prunes the oldest grants once the table approaches the cap`() {
+        justRun { resolver.takePersistableUriPermission(any(), any()) }
+        justRun { resolver.releasePersistableUriPermission(any(), any()) }
+
+        // 497 grants: 496 pre-existing (oldest..newest) plus the one just taken.
+        val kept = mockk<Uri>()
+        val oldest = (0 until 496).map { i -> mockk<Uri>() to i.toLong() }
+        val table =
+            oldest.map { (uri, time) -> permission(uri, isRead = true, persistedTime = time) } +
+                permission(kept, isRead = true, persistedTime = 10_000L)
+        every { resolver.persistedUriPermissions } returns table
+
+        safTreeAccess.persist(kept)
+
+        // 497 - 448 target = 49 oldest grants dropped; the just-taken grant is never touched.
+        verify(exactly = 49) { resolver.releasePersistableUriPermission(any(), any()) }
+        verify(exactly = 0) { resolver.releasePersistableUriPermission(kept, any()) }
+        verify { resolver.releasePersistableUriPermission(oldest.first().first, any()) }
     }
 
     @Test
@@ -82,9 +107,11 @@ class AndroidSafTreeAccessTest {
     private fun permission(
         uri: Uri,
         isRead: Boolean,
+        persistedTime: Long = 0L,
     ): UriPermission =
         mockk {
             every { this@mockk.uri } returns uri
             every { isReadPermission } returns isRead
+            every { this@mockk.persistedTime } returns persistedTime
         }
 }

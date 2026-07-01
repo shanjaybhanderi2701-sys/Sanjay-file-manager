@@ -78,7 +78,11 @@ fun FiloraNavHost(
         composable<Route.Media>(
             deepLinks = listOf(navDeepLink<Route.Media>(basePath = FiloraDeepLinks.CATEGORY)),
         ) { backStackEntry ->
-            val category = MediaCategory.valueOf(backStackEntry.toRoute<Route.Media>().category)
+            // Defense-in-depth (security-impl-audit F1, category mirror): the primary gate is
+            // ViewIntentValidator at the intent boundary, but never let an unknown category
+            // string reach `valueOf` and crash the graph — fall back to a benign default.
+            val requested = backStackEntry.toRoute<Route.Media>().category
+            val category = MediaCategory.entries.firstOrNull { it.name == requested } ?: MediaCategory.Other
             MediaCategoryDetailScreen(category = category)
         }
         composable<Route.Storage> {

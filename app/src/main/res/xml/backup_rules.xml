@@ -1,10 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
-  Legacy fullBackupContent rules for API <= 30 (A5). Mirror the modern exclusions:
-  local index/grant state must not be backed up.
+  Legacy fullBackupContent rules for API <= 30 (A5). Mirror the modern exclusions in
+  data_extraction_rules.xml and, like them, only reference REAL on-disk storage
+  (security-impl-audit F2): the Room DB and the DataStore dir are excluded whole. SAF
+  grants live in the OS grant table (no app file to exclude), so the old
+  `sharedpref path="saf_grants.xml"` phantom rule is dropped.
 -->
 <full-backup-content>
     <exclude domain="database" path="filora.db" />
-    <exclude domain="sharedpref" path="saf_grants.xml" />
     <exclude domain="file" path="datastore/" />
 </full-backup-content>
