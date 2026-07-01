@@ -11,24 +11,24 @@ import androidx.compose.animation.core.Easing
  *
  * | Pattern              | Duration            | Easing                 |
  * |----------------------|---------------------|------------------------|
- * | Open file/folder     | [containerTransform]| [Emphasized]           |
- * | Screen change        | [screenChange]      | [Emphasized]           |
- * | Dialog / sheet in    | [dialogEnter]       | [EmphasizedDecelerate] |
- * | Selection enter      | [selectionEnter]    | [Standard]             |
- * | Skeleton → content   | [stateCrossfade]    | [Standard]             |
- * | Storage-story reveal | [storyReveal] (cap) | [EmphasizedDecelerate] |
+ * | Open file/folder     | [CONTAINER_TRANSFORM]| [Emphasized]          |
+ * | Screen change        | [SCREEN_CHANGE]     | [Emphasized]           |
+ * | Dialog / sheet in    | [DIALOG_ENTER]      | [EmphasizedDecelerate] |
+ * | Selection enter      | [SELECTION_ENTER]   | [Standard]             |
+ * | Skeleton → content   | [STATE_CROSSFADE]   | [Standard]             |
+ * | Storage-story reveal | [STORY_REVEAL] (cap)| [EmphasizedDecelerate] |
  *
  * **Hard rule (principle #3):** no continuous/parallax motion, nothing that runs while
  * scrolling, thumbnails never animate in on scroll. The storage-story is one-shot on
  * first composition only and must honor the system animation scale / reduce-motion.
  */
 object FiloraMotion {
-    const val containerTransform = 350
-    const val screenChange = 300
-    const val dialogEnter = 200
-    const val selectionEnter = 150
-    const val stateCrossfade = 150
-    const val storyReveal = 600
+    const val CONTAINER_TRANSFORM = 350
+    const val SCREEN_CHANGE = 300
+    const val DIALOG_ENTER = 200
+    const val SELECTION_ENTER = 150
+    const val STATE_CROSSFADE = 150
+    const val STORY_REVEAL = 600
 
     /** M3 Expressive emphasized easing — standard in-and-out for high-emphasis motion. */
     val Emphasized: Easing = CubicBezierEasing(0.2f, 0f, 0f, 1f)

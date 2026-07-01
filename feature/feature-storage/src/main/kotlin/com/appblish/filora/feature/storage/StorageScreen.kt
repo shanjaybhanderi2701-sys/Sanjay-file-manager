@@ -177,7 +177,7 @@ private fun StorageStoryHero(
             reveal.snapTo(0f)
             reveal.animateTo(
                 targetValue = 1f,
-                animationSpec = tween(FiloraMotion.storyReveal, easing = FiloraMotion.EmphasizedDecelerate),
+                animationSpec = tween(FiloraMotion.STORY_REVEAL, easing = FiloraMotion.EmphasizedDecelerate),
             )
         } else {
             reveal.snapTo(1f)
