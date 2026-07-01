@@ -99,12 +99,15 @@ jobs:
     name: Baseline profile · Startup benchmark (NFR-1.1)
     runs-on: ubuntu-latest
     timeout-minutes: 60
-    # Advisory gate: the GitHub-hosted-runner emulator boot is chronically flaky
-    # ("Unable to connect to adb daemon" / "device offline") even with KVM enabled,
-    # so this perf-benchmark job must NOT block landing. The correctness gates
-    # (Build·Lint·Test, Release·R8) stay hard-blocking. Re-enable as a required gate
-    # once the emulator boot is stabilised (self-hosted runner / AVD cache) — tracked
-    # as a follow-up. The job still runs and uploads artifacts when the emulator boots.
+    # NFR-1.1 gate — task-name bug fixed (APP-148). The emulator boots fine on the
+    # GitHub-hosted runner ("Boot completed" in the runner log); the prior failures
+    # were a task-name bug, not emulator flakiness — the script invoked
+    # ':baselineprofile:generateBaselineProfile', but the androidx baseline-profile
+    # plugin registers generation on the consumer :app module (flavour-aware), so the
+    # real task is ':app:generateStandardBaselineProfile'.
+    # TEMPORARY advisory: kept for the first post-fix push-to-main run so the corrected
+    # job can be observed green on the emulator before it becomes hard-blocking. Removed
+    # in the immediate follow-up commit once verified (APP-148 phase 2).
     continue-on-error: true
     # Generates the baseline profile and measures cold start on a managed emulator.
     # Runs on push to main (and manual dispatch) — too heavy for every PR.
@@ -143,8 +146,8 @@ jobs:
           emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim
           disable-animations: true
           script: |
-            ./gradlew --no-daemon --stacktrace :baselineprofile:generateBaselineProfile
-            ./gradlew --no-daemon --stacktrace :baselineprofile:connectedStandardBenchmarkAndroidTest
+            ./gradlew --no-daemon --stacktrace :app:generateStandardBaselineProfile
+            ./gradlew --no-daemon --stacktrace :baselineprofile:connectedStandardBenchmarkReleaseAndroidTest
 
       - name: Upload baseline profile + benchmark results
         if: always()
