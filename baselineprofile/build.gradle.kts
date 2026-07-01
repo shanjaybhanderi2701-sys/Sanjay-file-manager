@@ -36,6 +36,14 @@ android {
                 .get()
                 .toInt()
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        // NFR-1.1 gate runs the macrobenchmark on a GitHub-hosted-runner emulator.
+        // Macrobenchmark refuses to measure on an emulator by default
+        // (AssertionError: "ERRORS (not suppressed): EMULATOR") because emulator timings
+        // are unreliable. Suppress ONLY the EMULATOR error so the job can regenerate the
+        // baseline profile and smoke-verify cold start in CI; on real hardware this is a
+        // no-op. Enforcing an actual cold-start budget stays deferred to a physical-device
+        // run (v1.1 scope cut, APP-108/110) — CI numbers here are indicative, not gating.
+        testInstrumentationRunnerArguments["androidx.benchmark.suppressErrors"] = "EMULATOR"
     }
 
     // Drives the "standard" Play-default flavor (least privilege) of the app.
