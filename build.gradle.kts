@@ -24,10 +24,9 @@ plugins {
 
 // T170 (M16) — Kover coverage aggregation.
 // Measured modules apply Kover and are aggregated into a single root report. The gate
-// THRESHOLD VALUES are a Product Manager decision (see APP-36 interaction c51ac274);
-// until PM confirms, the placeholder bounds below are wired but kept NON-ENFORCING in
-// CI (the coverage job runs `koverVerify` with continue-on-error). Proposed defaults
-// from the APP-122 spec: 70% line for core-domain/core-data, 50% line overall.
+// THRESHOLD VALUES were a Product Manager decision (APP-36 interaction c51ac274),
+// resolved 2026-07-01 → Option A: 70% line for core-domain/core-data, 50% line overall,
+// ENFORCED (fail-under). `koverVerify` is a blocking CI gate (continue-on-error dropped).
 // :app and :baselineprofile are intentionally excluded (product flavors / test-only
 // module complicate variant selection and carry little measurable logic).
 val koverMeasuredModules =
@@ -57,8 +56,8 @@ subprojects {
             extensions.configure<KoverProjectExtension> {
                 reports {
                     verify {
-                        // PLACEHOLDER — 70% line for domain/data. Flip to enforced once PM confirms.
-                        rule("Line coverage (placeholder — pending PM APP-36 c51ac274)") {
+                        // ENFORCED — PM APP-36 Option A: 70% line for core-domain/core-data.
+                        rule("Line coverage (core-domain/core-data — PM APP-36 Option A)") {
                             minBound(70)
                         }
                     }
@@ -116,8 +115,8 @@ tasks.register("checkModuleDependencies") {
 }
 
 // T170 — pull every measured module into the aggregated root Kover report and wire the
-// overall (aggregated) placeholder gate. `koverXmlReport` / `koverHtmlReport` produce the
-// CI artifact; `koverVerify` enforces the rules (non-blocking in CI pending PM sign-off).
+// overall (aggregated) gate. `koverXmlReport` / `koverHtmlReport` produce the CI artifact;
+// `koverVerify` enforces the rules (blocking in CI — PM APP-36 Option A, T172 sign-off).
 dependencies {
     koverMeasuredModules.forEach { add("kover", project(it)) }
 }
@@ -126,8 +125,8 @@ kover {
     reports {
         total {
             verify {
-                // PLACEHOLDER — 50% overall line coverage. Enforced once PM confirms values.
-                rule("Overall line coverage (placeholder — pending PM APP-36 c51ac274)") {
+                // ENFORCED — PM APP-36 Option A: 50% overall line coverage.
+                rule("Overall line coverage (PM APP-36 Option A)") {
                     minBound(50)
                 }
             }

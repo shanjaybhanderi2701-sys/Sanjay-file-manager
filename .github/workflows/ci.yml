@@ -82,12 +82,11 @@ jobs:
       - name: Kover aggregated report
         run: ./gradlew --no-daemon --stacktrace koverXmlReport koverHtmlReport
 
-      # Threshold enforcement is a Product Manager decision (APP-36 interaction c51ac274).
-      # The placeholder bounds (50% overall, 70% core-domain/core-data) are wired in
-      # build.gradle.kts but kept NON-BLOCKING until PM confirms. To turn the gate on,
-      # remove `continue-on-error` (and adjust the bounds to the confirmed values).
-      - name: Kover verify (placeholder thresholds — non-blocking pending PM)
-        continue-on-error: true
+      # Coverage gate — PM APP-36 Option A (resolved 2026-07-01): 70% line for
+      # core-domain/core-data, 50% overall, fail-under. Thresholds live in
+      # build.gradle.kts. `continue-on-error` dropped — this step now BLOCKS merges
+      # (T172 sign-off: koverVerify step passed green across the confirming main runs).
+      - name: Kover verify (coverage gate — 70% core / 50% overall)
         run: ./gradlew --no-daemon --stacktrace koverVerify
 
       - name: Upload coverage report
