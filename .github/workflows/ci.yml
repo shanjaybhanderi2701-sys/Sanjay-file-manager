@@ -246,14 +246,11 @@ jobs:
     # Emulator boots are heavy, so gate to push/dispatch (not every PR) — same
     # policy as baseline-profile. Provisioned in-house on GH Actions per APP-110.
     if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
-    # APP-154: temporary safety net (mirrors APP-147 → APP-153). The matrix was red on a
-    # single leaked-permission test isolation bug in PermissionFlowTest (HomeSmokeTest's
-    # GrantPermissionRule persists media grants package-wide for the whole run). This same
-    # commit revokes those grants in PermissionFlowTest to fix it; the job is held advisory
-    # for ONE cycle so `main` reaches required-green while that fix is confirmed on the
-    # actual emulator matrix, after which this `continue-on-error` is dropped to re-promote
-    # NFR-4 to a required gate. Owner: Founding Android Engineer (this issue).
-    continue-on-error: true
+    # APP-155: NFR-4 is a REQUIRED gate. The PermissionFlowTest isolation bug (HomeSmokeTest's
+    # GrantPermissionRule leaked media grants package-wide) was fixed via the MediaAccessChecker
+    # injection seam (`229b396` + `@UninstallModules` `190689f`); all three targets (API30 SAF,
+    # API35 phone, API35 tablet) confirmed green on run 28529551535. The APP-154 advisory
+    # `continue-on-error` safety net has been dropped — this job now blocks merges.
     strategy:
       # Don't let one image failing mask the others — each target reports on its own.
       fail-fast: false
