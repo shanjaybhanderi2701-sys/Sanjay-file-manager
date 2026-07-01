@@ -1,6 +1,7 @@
 package com.appblish.filora.core.data.operations
 
 import android.content.Context
+import androidx.annotation.VisibleForTesting
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import com.appblish.filora.core.common.result.OperationError
@@ -46,6 +47,17 @@ internal interface FileOperationWorkerEntryPoint {
     fun workRequestStore(): WorkRequestStore
 }
 
+/**
+ * The application-graph dependencies a [FileOperationWorker] needs at run time.
+ * Normally resolved from [FileOperationWorkerEntryPoint]; a test seam
+ * ([FileOperationWorker.injectedDependencies]) can supply fakes directly so the
+ * worker runs on the JVM without Hilt.
+ */
+internal data class OperationDependencies(
+    val fileRepository: FileRepository?,
+    val store: WorkRequestStore,
+)
+
 /** A copy/move batch call — both use cases share this shape, so the loop is kind-agnostic. */
 private typealias TransferBatch = suspend (List<FileItem>, String, ConflictStrategy) -> OpResult<List<TransferResult>>
 
@@ -77,16 +89,33 @@ internal abstract class FileOperationWorker(
             FileOperationWorkerEntryPoint::class.java,
         )
     }
-    private val store: WorkRequestStore get() = entryPoint.workRequestStore()
     private val notifier = OperationNotifier(appContext)
+
+    /**
+     * Test seam: when set, the worker draws its [FileRepository] + [WorkRequestStore]
+     * from here instead of the Hilt [FileOperationWorkerEntryPoint]. Lets JVM/Robolectric
+     * tests exercise [doWork] against a `FakeFileRepository` without standing up the
+     * application Hilt graph (the production `FileRepository` binding is an empty
+     * `@BindsOptionalOf` optional). `null` in production, where the entry point supplies
+     * the real bindings.
+     */
+    @VisibleForTesting
+    internal var injectedDependencies: OperationDependencies? = null
+
+    private fun resolveDependencies(): OperationDependencies =
+        injectedDependencies ?: OperationDependencies(
+            fileRepository = entryPoint.fileRepository().orElse(null),
+            store = entryPoint.workRequestStore(),
+        )
 
     override suspend fun getForegroundInfo() = notifier.foregroundInfo(OperationProgress.Pending(kind))
 
     final override suspend fun doWork(): WorkerResult {
-        val args = OperationWorkData.decodeInput(inputData) { store.get(it) }
+        val deps = resolveDependencies()
+        val args = OperationWorkData.decodeInput(inputData) { deps.store.get(it) }
             ?: return success(0) // nothing to do (e.g. stashed list evicted after a cold restart)
         // The FileRepository data binding is not wired yet; fail cleanly rather than crash.
-        val repository = entryPoint.fileRepository().orElse(null) ?: return failure(OperationError.Unknown())
+        val repository = deps.fileRepository ?: return failure(OperationError.Unknown())
 
         return try {
             setForeground(notifier.foregroundInfo(OperationProgress.Pending(kind)))
@@ -101,7 +130,7 @@ internal abstract class FileOperationWorker(
             // WorkManager stopped us) must propagate as CancellationException so WorkManager
             // records the cancelled state instead of swallowing it as success. The cleanup
             // below still runs on both the success and cancellation paths.
-            args.sourcesRefKey?.let { store.remove(it) }
+            args.sourcesRefKey?.let { deps.store.remove(it) }
         }
     }
 
