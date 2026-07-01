@@ -280,7 +280,10 @@ class HomeViewModelTest {
             favorites.favorites.value = listOf(file("/a/pinned.txt"))
             val vm = viewModel(FakeRepository(Result.Success(emptyMap())), FakeAccess(true), favorites)
             advanceUntilIdle()
-            assertThat(vm.uiState.value.favorites.map { it.path }).containsExactly("/a/pinned.txt")
+            assertThat(
+                vm.uiState.value.favorites
+                    .map { it.path }
+            ).containsExactly("/a/pinned.txt")
 
             vm.unpinFavorite(file("/a/pinned.txt"))
             advanceUntilIdle()

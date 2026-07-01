@@ -92,8 +92,7 @@ fun ImagePreviewScreen(
                         scaleY = transform.scale
                         translationX = transform.offsetX
                         translationY = transform.offsetY
-                    }
-                    .transformable(state = transformableState)
+                    }.transformable(state = transformableState)
                     .pointerInput(Unit) {
                         detectTapGestures(
                             onDoubleTap = { transform = ImageZoomMath.toggleDoubleTap(transform) },

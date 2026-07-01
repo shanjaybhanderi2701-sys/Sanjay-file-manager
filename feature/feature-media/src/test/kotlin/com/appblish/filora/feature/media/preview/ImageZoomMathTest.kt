@@ -39,7 +39,14 @@ class ImageZoomMathTest {
     fun `pan is clamped to the edge bounds at the current scale`() {
         // At 2x the bound is ±500; a 9999px drag is clamped to the edge.
         val dragged =
-            ImageZoomMath.apply(ImageTransform(scale = 2f), zoomChange = 1f, panX = 9999f, panY = -9999f, viewport, viewport)
+            ImageZoomMath.apply(
+                ImageTransform(scale = 2f),
+                zoomChange = 1f,
+                panX = 9999f,
+                panY = -9999f,
+                viewport,
+                viewport
+            )
         assertThat(dragged.offsetX).isEqualTo(500f)
         assertThat(dragged.offsetY).isEqualTo(-500f)
     }
