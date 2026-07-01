@@ -73,32 +73,10 @@ fun RecycleBinScreen(
         modifier = modifier.fillMaxSize(),
         snackbarHost = { SnackbarHost(snackbarHostState) },
         topBar = {
-            TopAppBar(
-                title = {
-                    Column {
-                        Text(stringResource(R.string.recycle_bin_title))
-                        if (uiState.items.isNotEmpty()) {
-                            Text(
-                                text = stringResource(
-                                    R.string.recycle_bin_size_summary,
-                                    Formatters.formatSize(uiState.totalSizeBytes),
-                                ),
-                                style = MaterialTheme.typography.labelMedium,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            )
-                        }
-                    }
-                },
-                actions = {
-                    if (uiState.items.isNotEmpty()) {
-                        IconButton(onClick = { confirmEmpty = true }) {
-                            Icon(
-                                imageVector = Icons.Outlined.DeleteForever,
-                                contentDescription = stringResource(R.string.recycle_bin_empty),
-                            )
-                        }
-                    }
-                },
+            RecycleBinTopBar(
+                hasItems = uiState.items.isNotEmpty(),
+                totalSizeBytes = uiState.totalSizeBytes,
+                onEmptyClick = { confirmEmpty = true },
             )
         },
     ) { innerPadding ->
@@ -128,16 +106,79 @@ fun RecycleBinScreen(
         }
     }
 
+    RecycleBinConfirmations(
+        confirmEmpty = confirmEmpty,
+        pendingDelete = pendingDelete,
+        onConfirmEmpty = {
+            confirmEmpty = false
+            viewModel.emptyBin()
+        },
+        onDismissEmpty = { confirmEmpty = false },
+        onConfirmDelete = { target ->
+            pendingDelete = null
+            viewModel.deleteForever(target.id)
+        },
+        onDismissDelete = { pendingDelete = null },
+    )
+}
+
+/** Recycle Bin app bar: title, total-footprint subtitle, and empty-bin action. */
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun RecycleBinTopBar(
+    hasItems: Boolean,
+    totalSizeBytes: Long,
+    onEmptyClick: () -> Unit,
+) {
+    TopAppBar(
+        title = {
+            Column {
+                Text(stringResource(R.string.recycle_bin_title))
+                if (hasItems) {
+                    Text(
+                        text = stringResource(
+                            R.string.recycle_bin_size_summary,
+                            Formatters.formatSize(totalSizeBytes),
+                        ),
+                        style = MaterialTheme.typography.labelMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    )
+                }
+            }
+        },
+        actions = {
+            if (hasItems) {
+                IconButton(onClick = onEmptyClick) {
+                    Icon(
+                        imageVector = Icons.Outlined.DeleteForever,
+                        contentDescription = stringResource(R.string.recycle_bin_empty),
+                    )
+                }
+            }
+        },
+    )
+}
+
+/**
+ * The empty-bin and per-item permanent-delete confirmations, hoisted out of
+ * [RecycleBinScreen] to keep that composable within the length budget.
+ */
+@Composable
+private fun RecycleBinConfirmations(
+    confirmEmpty: Boolean,
+    pendingDelete: TrashedItem?,
+    onConfirmEmpty: () -> Unit,
+    onDismissEmpty: () -> Unit,
+    onConfirmDelete: (TrashedItem) -> Unit,
+    onDismissDelete: () -> Unit,
+) {
     if (confirmEmpty) {
         ConfirmDialog(
             title = stringResource(R.string.recycle_bin_empty_dialog_title),
             body = stringResource(R.string.recycle_bin_empty_dialog_body),
             confirmLabel = stringResource(R.string.recycle_bin_empty),
-            onConfirm = {
-                confirmEmpty = false
-                viewModel.emptyBin()
-            },
-            onDismiss = { confirmEmpty = false },
+            onConfirm = onConfirmEmpty,
+            onDismiss = onDismissEmpty,
         )
     }
 
@@ -146,11 +187,8 @@ fun RecycleBinScreen(
             title = stringResource(R.string.recycle_bin_delete_dialog_title),
             body = stringResource(R.string.recycle_bin_delete_dialog_body, target.name),
             confirmLabel = stringResource(R.string.recycle_bin_action_delete),
-            onConfirm = {
-                pendingDelete = null
-                viewModel.deleteForever(target.id)
-            },
-            onDismiss = { pendingDelete = null },
+            onConfirm = { onConfirmDelete(target) },
+            onDismiss = onDismissDelete,
         )
     }
 }
