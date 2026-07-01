@@ -50,8 +50,8 @@
     --sh-3:0 16px 34px rgba(21,20,43,.12), 0 5px 12px rgba(21,20,43,.06);
     --sh-brand:0 12px 26px rgba(91,91,214,.30), 0 3px 8px rgba(91,91,214,.20);
 
-    /* --- Shape: larger, more considered radii --- */
-    --r-sm:12px; --r-md:16px; --r-lg:20px; --r-xl:26px; --r-2xl:32px; --r-pill:999px;
+    /* --- Shape: compact/native radii (density pass, APP-134) --- */
+    --r-sm:10px; --r-md:12px; --r-lg:14px; --r-xl:18px; --r-2xl:22px; --r-pill:999px;
 
     /* --- Spacing (4dp base — unchanged from A-blend) --- */
     --xs:4px; --sm:8px; --md:12px; --lg:16px; --xl:24px; --xxl:32px;
@@ -99,8 +99,8 @@
   .duo .tone{opacity:.28}
 
   /* ---------- App bar ---------- */
-  .appbar{padding:16px var(--lg) 6px;display:flex;align-items:center;justify-content:space-between;gap:10px}
-  .appbar .title{font-size:22px;font-weight:800;letter-spacing:-.4px}
+  .appbar{padding:12px var(--lg) 6px;display:flex;align-items:center;justify-content:space-between;gap:10px}
+  .appbar .title{font-size:19px;font-weight:800;letter-spacing:-.4px}
   .appbar .grp{display:flex;gap:6px;align-items:center}
   .iconbtn{width:40px;height:40px;border-radius:var(--r-pill);display:flex;align-items:center;justify-content:center;
     color:var(--ink-2);background:transparent}
@@ -111,26 +111,26 @@
 
   /* ---------- Generic building blocks ---------- */
   .pad{padding:0 var(--lg)}
-  .sec{display:flex;align-items:center;justify-content:space-between;margin:20px var(--lg) 10px}
-  .sec h3{font-size:16.5px;font-weight:800;letter-spacing:-.2px}
+  .sec{display:flex;align-items:center;justify-content:space-between;margin:16px var(--lg) 8px}
+  .sec h3{font-size:15.5px;font-weight:800;letter-spacing:-.2px}
   .sec a{font-size:12.5px;font-weight:700;color:var(--iris)}
   .muted{color:var(--muted)}
 
   /* card */
   .card{background:var(--surface);border-radius:var(--r-lg);box-shadow:var(--sh-2);border:1px solid var(--line)}
 
-  /* file row */
-  .row{display:flex;align-items:center;gap:var(--md);padding:11px var(--lg);min-height:60px}
-  .row .nm{font-size:15.5px;font-weight:600;line-height:20px}
-  .row .mt{font-size:12px;line-height:16px;color:var(--muted);margin-top:2px;font-weight:500}
+  /* file row — compact native density (~56dp) */
+  .row{display:flex;align-items:center;gap:var(--md);padding:8px var(--lg);min-height:56px}
+  .row .nm{font-size:14.5px;font-weight:600;line-height:19px}
+  .row .mt{font-size:12px;line-height:15px;color:var(--muted);margin-top:1px;font-weight:500}
   .row .gr{flex:1;min-width:0}
   .row .nm,.row .mt{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   .row .tail{color:var(--muted);display:flex;align-items:center;gap:10px}
   .divider{height:1px;background:var(--line);margin:0 var(--lg)}
 
-  /* leading icon tile — duotone, per-type accent */
-  .tile{width:44px;height:44px;border-radius:14px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
-  .tile .icon{width:22px;height:22px}
+  /* leading icon tile — duotone, per-type accent (40dp visual, ≥48dp row touch target) */
+  .tile{width:40px;height:40px;border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+  .tile .icon{width:20px;height:20px}
 
   /* chips */
   .chips{display:flex;gap:8px;flex-wrap:wrap;padding:2px var(--lg) 4px}
@@ -140,19 +140,19 @@
   .chip .icon{width:16px;height:16px}
 
   /* ---------- HOME: hero storage ring ---------- */
-  .hero{margin:8px var(--lg) 4px;padding:20px;border-radius:var(--r-2xl);color:#fff;position:relative;overflow:hidden;
+  .hero{margin:8px var(--lg) 4px;padding:15px 16px;border-radius:var(--r-2xl);color:#fff;position:relative;overflow:hidden;
     background:linear-gradient(135deg,#5B5BD6 0%,#7C5CF7 48%,#B067E6 100%);box-shadow:var(--sh-brand)}
   .hero::after{content:"";position:absolute;right:-40px;top:-50px;width:180px;height:180px;border-radius:50%;
     background:radial-gradient(circle,rgba(255,255,255,.22),transparent 70%)}
   .hero .htop{display:flex;align-items:center;justify-content:space-between;position:relative;z-index:1}
-  .hero .greet{font-size:12.5px;font-weight:600;opacity:.85}
-  .hero .htitle{font-size:18px;font-weight:800;margin-top:2px;letter-spacing:-.3px}
-  .hero .hbody{display:flex;align-items:center;gap:18px;margin-top:16px;position:relative;z-index:1}
-  .ring{width:104px;height:104px;flex-shrink:0;position:relative}
+  .hero .greet{font-size:12px;font-weight:600;opacity:.85}
+  .hero .htitle{font-size:15.5px;font-weight:800;margin-top:1px;letter-spacing:-.3px}
+  .hero .hbody{display:flex;align-items:center;gap:14px;margin-top:12px;position:relative;z-index:1}
+  .ring{width:80px;height:80px;flex-shrink:0;position:relative}
   .ring svg{transform:rotate(-90deg)}
   .ring .rc{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
-  .ring .rc b{font-size:23px;font-weight:800;letter-spacing:-.5px}
-  .ring .rc s{font-size:10px;opacity:.85;text-decoration:none;font-weight:600;margin-top:1px}
+  .ring .rc b{font-size:19px;font-weight:800;letter-spacing:-.5px}
+  .ring .rc s{font-size:9.5px;opacity:.85;text-decoration:none;font-weight:600;margin-top:0}
   .legend{flex:1;display:flex;flex-direction:column;gap:8px}
   .leg{display:flex;align-items:center;gap:8px;font-size:12px;font-weight:600}
   .leg .dot{width:9px;height:9px;border-radius:3px;flex-shrink:0}
@@ -167,14 +167,14 @@
   .qt span{font-size:11px;font-weight:700;color:var(--ink-2)}
 
   /* category grid */
-  .catgrid{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:4px var(--lg)}
-  .cat{border-radius:var(--r-lg);padding:14px;display:flex;flex-direction:column;gap:10px;position:relative;
+  .catgrid{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:4px var(--lg)}
+  .cat{border-radius:var(--r-lg);padding:12px;display:flex;flex-direction:column;gap:8px;position:relative;
     overflow:hidden;box-shadow:var(--sh-1);border:1px solid var(--line);background:var(--surface)}
-  .cat .ci{width:42px;height:42px;border-radius:13px;display:flex;align-items:center;justify-content:center}
-  .cat .ci .icon{width:22px;height:22px}
-  .cat .cn{font-size:14.5px;font-weight:800;letter-spacing:-.2px}
-  .cat .cm{font-size:11.5px;font-weight:600;color:var(--muted);margin-top:-6px}
-  .cat .arc{position:absolute;right:-24px;bottom:-24px;width:78px;height:78px;border-radius:50%;opacity:.14}
+  .cat .ci{width:36px;height:36px;border-radius:11px;display:flex;align-items:center;justify-content:center}
+  .cat .ci .icon{width:20px;height:20px}
+  .cat .cn{font-size:14px;font-weight:800;letter-spacing:-.2px}
+  .cat .cm{font-size:11.5px;font-weight:600;color:var(--muted);margin-top:-5px}
+  .cat .arc{position:absolute;right:-24px;bottom:-24px;width:70px;height:70px;border-radius:50%;opacity:.14}
 
   /* recents strip */
   .strip{display:flex;gap:12px;padding:4px var(--lg) 8px;overflow:hidden}
@@ -300,6 +300,24 @@
   .navrail .r.act{color:var(--iris)}
   .navrail .r.act .b{background:var(--iris-container)}
 
+  /* ---------- STORE SCREENSHOTS — conversion surfaces (taste principle #7) ---------- */
+  .shot{width:288px;border-radius:30px;padding:26px 20px 0;overflow:hidden;position:relative;
+    display:flex;flex-direction:column;align-items:center;box-shadow:var(--sh-3)}
+  .shot::after{content:"";position:absolute;right:-70px;top:-70px;width:220px;height:220px;border-radius:50%;
+    background:radial-gradient(circle,rgba(255,255,255,.20),transparent 70%)}
+  .shot .sh-hd{color:#fff;text-align:center;font-weight:800;font-size:21px;line-height:1.22;letter-spacing:-.5px;
+    position:relative;z-index:1}
+  .shot .sh-sub{color:rgba(255,255,255,.9);text-align:center;font-weight:600;font-size:12.5px;margin-top:8px;
+    max-width:236px;position:relative;z-index:1}
+  .shot .sh-dev{width:200px;height:300px;background:var(--bg);border-radius:26px 26px 0 0;margin-top:20px;
+    border:7px solid #0a0a1c;border-bottom:none;overflow:hidden;position:relative;z-index:1;
+    box-shadow:0 20px 40px rgba(0,0,0,.35)}
+  .shot .sh-dev .content{transform:scale(.62);transform-origin:top left;width:161%}
+  /* Iris store frame variants */
+  .shot.s-iris{background:linear-gradient(150deg,#5B5BD6 0%,#7C5CF7 52%,#B067E6 100%)}
+  .shot.s-teal{background:linear-gradient(150deg,#12A46B 0%,#2E7CF6 100%)}
+  .shot.s-rose{background:linear-gradient(150deg,#F43F6E 0%,#8B5CF6 100%)}
+
   footer{max-width:1240px;margin:60px auto 0;color:#6c6a95;font-size:12.5px;line-height:1.7;border-top:1px solid #23223f;padding-top:20px}
   footer code{background:#1a1934;color:#c7c5ff;padding:2px 6px;border-radius:6px;font-size:11.5px}
 </style>
@@ -318,9 +336,13 @@
   <p class="sub">Craft pass on the approved <b>A-blend</b> direction (APP-134). Same IA, density and accessibility — elevated
   from stock Material-3 to a <b>branded product</b>: a signature <b>Iris</b> color story, a per-category accent wheel, a custom
   duotone icon set, layered soft elevation, larger radii, a display type scale, and states with character. Nothing copied
-  from the reference app; A-blend's rejected extremes (dense / heavy visual) are still avoided.</p>
+  from the reference app; A-blend's rejected extremes (dense / heavy visual) are still avoided. Applies the standing
+  <b>InShot-portfolio taste principles</b> — signature color + custom icons + compact native density + first-impression
+  conversion surfaces — while keeping Filora calm and ad-free.</p>
   <span class="pill">Direction A-blend · craft pass</span>
   <span class="pill">Brand: Filora Iris</span>
+  <span class="pill">Compact native density</span>
+  <span class="pill">+ Store conversion surfaces</span>
   <span class="pill">AA · 48dp · TalkBack · RTL preserved</span>
   <span class="pill">Compose + M3 (custom theme/shapes/icons)</span>
 </header>
@@ -395,10 +417,10 @@
           </div>
           <div class="hbody">
             <div class="ring">
-              <svg width="104" height="104" viewBox="0 0 104 104">
-                <circle cx="52" cy="52" r="44" stroke="rgba(255,255,255,.22)" stroke-width="12" fill="none"/>
-                <circle cx="52" cy="52" r="44" stroke="#fff" stroke-width="12" fill="none" stroke-linecap="round"
-                  stroke-dasharray="276.5" stroke-dashoffset="94"/>
+              <svg width="80" height="80" viewBox="0 0 80 80">
+                <circle cx="40" cy="40" r="34" stroke="rgba(255,255,255,.22)" stroke-width="9" fill="none"/>
+                <circle cx="40" cy="40" r="34" stroke="#fff" stroke-width="9" fill="none" stroke-linecap="round"
+                  stroke-dasharray="213.6" stroke-dashoffset="73"/>
               </svg>
               <div class="rc"><b>66%</b><s>used</s></div>
             </div>
@@ -701,6 +723,95 @@
       </div>
     </div>
     <div class="cap">Tablet — nav-rail + list/detail<span>Selected detail pane: Iris edge + elevation; brand mark in rail</span></div>
+  </div>
+</div>
+
+<!-- =================================================================
+     STORE SCREENSHOTS — CONVERSION SURFACES (taste principle #7)
+     Play Store shots are engineered to convert. Branded gradient +
+     confident marketing headline + real screen. Calm & ad-free — the
+     Filora differentiator vs InShot's ad-heavy monetization.
+     ================================================================= -->
+<div class="sectlabel">Store screenshots — conversion surfaces</div>
+<div class="sectnote">First-impression obsession: the store shots and Home are the surfaces that win the install. Confident hero headline + Iris gradient + a real screen — never a bare device on white.</div>
+<div class="gallery">
+
+  <!-- SHOT 1 — hero / Home -->
+  <div class="frame">
+    <div class="shot s-iris">
+      <div class="sh-hd">Every file,<br>beautifully organized</div>
+      <div class="sh-sub">Photos, videos, docs and downloads — sorted the moment you open the app.</div>
+      <div class="sh-dev"><div class="content">
+        <div class="hero" style="margin:10px 12px 4px">
+          <div class="htop"><div><div class="greet">Device storage</div><div class="htitle">128 GB total</div></div>
+            <span class="icon" style="color:#fff;opacity:.85"><svg><use href="#i-sparkle"/></svg></span></div>
+          <div class="hbody">
+            <div class="ring"><svg width="80" height="80" viewBox="0 0 80 80">
+              <circle cx="40" cy="40" r="34" stroke="rgba(255,255,255,.22)" stroke-width="9" fill="none"/>
+              <circle cx="40" cy="40" r="34" stroke="#fff" stroke-width="9" fill="none" stroke-linecap="round" stroke-dasharray="213.6" stroke-dashoffset="73"/></svg>
+              <div class="rc"><b>66%</b><s>used</s></div></div>
+            <div class="legend">
+              <div class="leg"><span class="dot" style="background:#FF9EB4"></span>Photos<span class="lv">28 GB</span></div>
+              <div class="leg"><span class="dot" style="background:#C7B4FF"></span>Video<span class="lv">31 GB</span></div>
+              <div class="leg"><span class="dot" style="background:#FFD79E"></span>Audio<span class="lv">9 GB</span></div>
+            </div>
+          </div>
+        </div>
+        <div class="catgrid" style="padding-top:8px">
+          <div class="cat"><div class="arc" style="background:var(--c-image)"></div><div class="ci" style="background:var(--c-image-c)"><span class="icon duo" style="color:var(--c-image)"><svg><use href="#i-image"/></svg></span></div><div class="cn">Images</div><div class="cm">4,120 · 28 GB</div></div>
+          <div class="cat"><div class="arc" style="background:var(--c-video)"></div><div class="ci" style="background:var(--c-video-c)"><span class="icon duo" style="color:var(--c-video)"><svg><use href="#i-video"/></svg></span></div><div class="cn">Videos</div><div class="cm">312 · 31 GB</div></div>
+        </div>
+      </div></div>
+    </div>
+    <div class="cap">01 · Hero shot<span>Benefit headline + Iris gradient + Home ring — the #1 conversion frame</span></div>
+  </div>
+
+  <!-- SHOT 2 — storage / clean up -->
+  <div class="frame">
+    <div class="shot s-teal">
+      <div class="sh-hd">See what's<br>eating your space</div>
+      <div class="sh-sub">A clear breakdown by type — then clean up the clutter in a tap.</div>
+      <div class="sh-dev"><div class="content">
+        <div style="padding:14px 12px 4px">
+          <div style="font-size:13px;font-weight:800;color:var(--ink);margin-bottom:8px">Storage breakdown</div>
+          <div style="height:16px;border-radius:var(--r-pill);overflow:hidden;display:flex;box-shadow:var(--sh-1)">
+            <span style="flex:28;background:var(--c-image)"></span><span style="flex:31;background:var(--c-video)"></span>
+            <span style="flex:9;background:var(--c-audio)"></span><span style="flex:17;background:var(--c-doc)"></span>
+            <span style="flex:15;background:var(--c-folder)"></span>
+          </div>
+          <div style="margin-top:12px;display:flex;flex-direction:column;gap:9px">
+            <div class="leg" style="color:var(--ink);font-size:12px"><span class="dot" style="background:var(--c-video);width:10px;height:10px;border-radius:3px"></span>Video<span class="lv" style="color:var(--muted)">31 GB</span></div>
+            <div class="leg" style="color:var(--ink);font-size:12px"><span class="dot" style="background:var(--c-image);width:10px;height:10px;border-radius:3px"></span>Images<span class="lv" style="color:var(--muted)">28 GB</span></div>
+            <div class="leg" style="color:var(--ink);font-size:12px"><span class="dot" style="background:var(--c-doc);width:10px;height:10px;border-radius:3px"></span>Documents<span class="lv" style="color:var(--muted)">17 GB</span></div>
+          </div>
+          <div style="margin-top:14px;background:var(--iris);color:#fff;text-align:center;font-weight:700;font-size:13px;padding:11px;border-radius:var(--r-md);box-shadow:var(--sh-brand)">Clean up 4.2 GB</div>
+        </div>
+      </div></div>
+    </div>
+    <div class="cap">02 · Utility as value<span>"Clean up" framed as a benefit — the storage-story surface</span></div>
+  </div>
+
+  <!-- SHOT 3 — search / find anything -->
+  <div class="frame">
+    <div class="shot s-rose">
+      <div class="sh-hd">Find anything<br>in a tap</div>
+      <div class="sh-sub">Search by name, type, size or date — results the instant you type.</div>
+      <div class="sh-dev"><div class="content">
+        <div style="padding:14px 12px 4px">
+          <div style="display:flex;align-items:center;gap:8px;background:var(--surface);border:1px solid var(--line-2);border-radius:var(--r-pill);padding:10px 14px;box-shadow:var(--sh-1)">
+            <span class="icon duo" style="color:var(--iris);width:18px;height:18px"><svg><use href="#i-search"/></svg></span>
+            <span style="font-size:13px;font-weight:600;color:var(--ink)">invoice</span>
+          </div>
+          <div class="chips" style="padding:12px 0 6px">
+            <span class="chip on" style="padding:6px 12px">Documents</span>
+            <span class="chip" style="padding:6px 12px">This month</span>
+          </div>
+          <div class="row" style="padding:8px 0"><div class="tile" style="background:var(--c-doc-c)"><span class="icon duo" style="color:var(--c-doc)"><svg><use href="#i-doc"/></svg></span></div><div class="gr"><div class="nm">Invoice_Q3.pdf</div><div class="mt">210 KB · 1h ago</div></div></div>
+          <div class="row" style="padding:8px 0"><div class="tile" style="background:var(--c-doc-c)"><span class="icon duo" style="color:var(--c-doc)"><svg><use href="#i-doc"/></svg></span></div><div class="gr"><div class="nm">Invoice_Aug.pdf</div><div class="mt">198 KB · Aug 3</div></div></div>
+        </div>
+      </div></div>
+    </div>
+    <div class="cap">03 · Instant search<span>Rose→violet gradient, Iris chips, live results — the "power" frame</span></div>
   </div>
 </div>
 

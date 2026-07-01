@@ -242,3 +242,49 @@ so reduce-motion users get instant states.
 
 Nothing here changes data, navigation, or feature behavior — it is a theme + component-styling pass on
 top of the shipped A-blend structure.
+
+---
+
+## 10 · Standing design direction — InShot-portfolio taste principles
+
+Board directive (APP-112): study the InShot Inc. portfolio (~22 apps, many 100M+ installs) to **develop
+the team's taste — not copy it**. Full study: `APP-112 → inshot-taste-study`. These seven principles are
+**standing direction for every Filora screen**, not a one-off — this craft pass is their first application.
+
+1. **Consumer warmth, not enterprise minimalism** — inviting on first open, never a settings page.
+2. **Signature color + gradients** — a brand recognizable in a thumbnail. *Filora Iris* violet + the
+   Iris→violet→orchid hero gradient deliver this.
+3. **Custom colorful iconography, always** — `FiloraIcons` duotone set; never stock `Icons.Default.*`.
+4. **Confident type on hero moments, compact type in working screens** — display scale on the Home hero
+   and store shots only; functional lists stay tight and native.
+5. **Delight without clutter** — micro-motion + character in empty/loading/error states, content stays
+   scannable and compact.
+6. **Utility framed as value** — "Clean up", "Analyze", "Safe box", "Share fast" surfaced as benefits.
+7. **First-impression obsession** — **Home** and **Play Store screenshots** are conversion surfaces; they
+   get best-in-class polish (see §11).
+
+**Reconciliation with the board's "too big" note:** InShot's *functional* screens are actually **compact
+/ native density** — their vibrance lives in color, icons and gradients, *not* in oversized spacing. So
+"develop their taste" and "stop being so big" point the **same way**: *more brand + tighter density.* The
+density values in §3–4 already reflect this (≈56dp rows, compact radii, tightened section spacing).
+
+**Our differentiator:** keep Filora **calm and ad-free**. We learn the taste; we do **not** adopt their
+ad-heavy monetization clutter. Restraint is our edge over the reference portfolio.
+
+---
+
+## 11 · Store screenshots — conversion surfaces (taste principle #7)
+
+Play Store shots are engineered to convert; a bare device on white is not acceptable. Each shot =
+**branded gradient panel + one confident benefit headline + a real screen** (gallery section
+"Store screenshots — conversion surfaces" in the hi-fi). v1 set:
+
+| # | Headline | Screen | Gradient | Purpose |
+|---|----------|--------|----------|---------|
+| 01 | Every file, beautifully organized | Home (Iris ring + categories) | Iris → violet → orchid | Hero / first impression |
+| 02 | See what's eating your space | Storage breakdown + "Clean up N GB" CTA | Emerald → blue | Utility-as-value |
+| 03 | Find anything in a tap | Search filters + live results | Rose → violet | Power / speed |
+
+**Rules:** headline ≤ 4 words per line, benefit-led (not feature-led); real UI, never lorem; one Iris CTA
+max per shot; calm — no burst badges, no "AD-FREE!!!" shouting. Production graphics (final copy, localized
+strings, 1080×1920 export) are an M7 release-assets task (APP-87), not part of this design pass.
