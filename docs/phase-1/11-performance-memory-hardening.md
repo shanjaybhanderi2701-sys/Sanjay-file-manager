@@ -74,6 +74,52 @@ step 4 (jank/10k-frame) still need a manual/instrumented device pass.
 
 ---
 
+## T2.6 — Large-directory performance (APP-62, NFR-1.2 / NFR-1.3)
+
+Owner: Founding Android Engineer · Parent: APP-41 (M2) · Dep: T2.2 (browse listing, resolved).
+**AC:** NFR-1.2 and NFR-1.3 met on a 10,000-entry directory.
+
+### How the targets are met (in the browse code)
+
+- **NFR-1.2 (first frame ≤ 300 ms warm / ≤ 800 ms cold).** The directory read *and* sort run off
+  the main thread — `FileRepositoryImpl.listDirectory` streams on a cold `flow { … }.flowOn(ioDispatcher)`
+  and `ordered(sortOrder)` sorts inside that flow (NFR-1.4). The Browser shows a loading state until the
+  snapshot arrives, so the main thread never blocks on the 10k `stat` walk. Rendering is a `LazyColumn` /
+  `LazyVerticalGrid`, so only the ~visible rows compose on first frame regardless of directory size.
+- **NFR-1.3 (scroll ≥ 58 fps, no sustained jank > 16 ms).** Both lists key each item by
+  `FileItem::path` (`items(entries, key = FileItem::path)`), so Compose reuses row nodes across scroll
+  instead of re-laying-out the window on every fling. Row content (`FileRow` / `GridTile`) is flat and
+  allocation-light; subtitles format lazily per visible row only.
+
+### Acceptance harness (landed — `:baselineprofile:LargeDirectoryBenchmark`)
+
+`LargeDirectoryBenchmark` seeds a **10,000-entry** directory once into the app's external-files dir
+(`/sdcard/Android/data/<pkg>/files/bench10k` — shell-writable, app-readable under scoped storage),
+deep-links the Browser straight onto it (`filora://browser?location=…`), and scrolls it under
+`FrameTimingMetric`:
+
+- `frameDurationCpuMs` **P50** is the render-side NFR-1.2 budget (pair with `StartupBenchmark` for the
+  cold end-to-end number).
+- `frameDurationCpuMs` **P90 / P99 ≤ 16 ms** (58 fps ⇒ 17.2 ms/frame) is the NFR-1.3 jank gate.
+
+The `LazyColumn` / `LazyVerticalGrid` carry `testTag`s (`browser_list` / `browser_grid`, exposed as
+resource-ids by `MainActivity`) so the benchmark addresses the scroll container deterministically.
+
+Run it (already covered by the CI `baseline-profile` job's `connectedStandardBenchmarkAndroidTest`,
+which runs *every* benchmark class in the module — no workflow change needed):
+
+```
+./gradlew :baselineprofile:connectedStandardBenchmarkAndroidTest \
+    -Pandroid.testInstrumentationRunnerArguments.class=com.appblish.filora.baselineprofile.LargeDirectoryBenchmark
+```
+
+**Remaining (needs execution hardware):** capture the `frameDurationCpuMs` percentiles from the CI
+emulator run and assert them against the budgets above. Same gate as the rest of NFR-1 on-device
+validation — the CI Android-emulator runner behind the GitHub Actions write-access blocker
+(APP-52). No device/emulator is available in the headless agent workspace.
+
+---
+
 ## T7.5 — R8 / minify + release config (APP-85)
 
 Owner: Founding Android Engineer · Parent: APP-46 (M7) · Dep: T7.4 (APP-84).
