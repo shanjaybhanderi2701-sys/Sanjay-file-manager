@@ -1,5 +1,6 @@
 package com.appblish.filora.feature.browser
 
+import app.cash.turbine.test
 import com.appblish.filora.core.common.result.OperationError
 import com.appblish.filora.core.common.result.Result
 import com.appblish.filora.core.domain.model.DeleteOutcome
@@ -173,6 +174,45 @@ class BrowserViewModelTest {
         val settings: FakeSettingsRepository,
         val favorites: FakeFavoritesRepository,
     )
+
+    @Test
+    fun `binding a directory emits the loading then content sequence through the state flow`() =
+        runTest(dispatcher) {
+            val (vm, _, _) =
+                viewModel(Result.Success(listOf(file("Docs", isDirectory = true), file("a.txt"))))
+
+            vm.uiState.test {
+                assertThat(awaitItem().phase).isEqualTo(BrowserUiState.Phase.Loading) // initial seed
+
+                vm.bindLocation("/root")
+                var state = awaitItem()
+                while (state.phase == BrowserUiState.Phase.Loading) state = awaitItem()
+
+                assertThat(state.isContent).isTrue()
+                assertThat(state.entries.map { it.name }).containsExactly("Docs", "a.txt")
+
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
+
+    @Test
+    fun `binding a directory emits an error phase through the state flow on failure`() =
+        runTest(dispatcher) {
+            val (vm, _, _) = viewModel(Result.Error(OperationError.PermissionDenied()))
+
+            vm.uiState.test {
+                assertThat(awaitItem().phase).isEqualTo(BrowserUiState.Phase.Loading)
+
+                vm.bindLocation("/root")
+                var state = awaitItem()
+                while (state.phase == BrowserUiState.Phase.Loading) state = awaitItem()
+
+                assertThat(state.isError).isTrue()
+                assertThat(state.errorMessageRes).isNotNull()
+
+                cancelAndIgnoreRemainingEvents()
+            }
+        }
 
     @Test
     fun `successful listing moves to content`() =
