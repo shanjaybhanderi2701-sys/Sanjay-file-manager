@@ -142,6 +142,10 @@ dependencies {
     androidTestImplementation(libs.hilt.android.testing)
     kspAndroidTest(libs.hilt.compiler)
 
+    // APP-149: the test-only DataStore override needs the DataStore factory on the
+    // instrumentation classpath to back each per-test Hilt graph with its own file.
+    androidTestImplementation(libs.androidx.datastore.preferences)
+
     // T054 navigation integration tests: TestNavHostController drives the real Route
     // graph contract (back stack, multi-back-stack restoration, typed-arg deep links).
     androidTestImplementation(libs.androidx.navigation.testing)
