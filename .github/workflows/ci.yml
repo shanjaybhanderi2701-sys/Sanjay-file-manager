@@ -150,3 +150,83 @@ jobs:
             **/build/outputs/androidTest-results/
           if-no-files-found: ignore
           retention-days: 14
+
+  instrumented-matrix:
+    name: Instrumented · ${{ matrix.label }} (NFR-4)
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    # NFR-4 device matrix: runs connectedStandardDebugAndroidTest across the
+    # legacy scoped-storage, baseline phone, and large-screen tablet targets.
+    # Emulator boots are heavy, so gate to push/dispatch (not every PR) — same
+    # policy as baseline-profile. Provisioned in-house on GH Actions per APP-110.
+    if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
+    strategy:
+      # Don't let one image failing mask the others — each target reports on its own.
+      fail-fast: false
+      matrix:
+        include:
+          # Legacy / scoped-storage flows (NFR-4.2) — highest functional risk.
+          - label: API30 phone (scoped storage)
+            api-level: 30
+            target: google_apis
+            profile: pixel_6
+          # Baseline phone — core flows.
+          - label: API35 phone
+            api-level: 35
+            target: google_apis
+            profile: pixel_6
+          # Large-screen / partial-media UI.
+          - label: API35 tablet
+            api-level: 35
+            target: google_apis
+            profile: pixel_tablet
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      # KVM is required for hardware-accelerated emulation on ubuntu-latest.
+      - name: Enable KVM
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' \
+            | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+
+      # Runs the instrumented (androidTest) suite on this matrix target. Safe/green
+      # when only the APP-82 AccessibilityTest (or no charters) exist — Gradle exits
+      # 0 with zero connected tests; QA lands more charters against this same matrix.
+      - name: Instrumented tests (${{ matrix.label }})
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: ${{ matrix.api-level }}
+          target: ${{ matrix.target }}
+          # x86_64 + google_apis (NOT playstore) is required for API 30 images.
+          arch: x86_64
+          profile: ${{ matrix.profile }}
+          force-avd-creation: false
+          emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim
+          disable-animations: true
+          script: |
+            ./gradlew --no-daemon --stacktrace connectedStandardDebugAndroidTest
+
+      - name: Upload instrumented test results (${{ matrix.label }})
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          # Slashes/spaces aren't allowed in artifact names — key on api-level + profile.
+          name: androidTest-results-api${{ matrix.api-level }}-${{ matrix.profile }}
+          path: |
+            **/build/outputs/androidTest-results/
+            **/build/reports/androidTests/
+            **/build/outputs/connected_android_test_additional_output/
+          if-no-files-found: ignore
+          retention-days: 14
