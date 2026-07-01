@@ -11,6 +11,7 @@ import com.appblish.filora.core.domain.model.OperationProgress
 import com.appblish.filora.core.domain.model.TransferOutcome
 import com.appblish.filora.core.domain.model.TransferResult
 import com.appblish.filora.core.domain.repository.FileRepository
+import com.appblish.filora.core.domain.repository.TrashRepository
 import com.appblish.filora.core.domain.usecase.CopyUseCase
 import com.appblish.filora.core.domain.usecase.DeleteUseCase
 import com.appblish.filora.core.domain.usecase.MoveUseCase
@@ -43,6 +44,8 @@ import com.appblish.filora.core.common.result.Result as OpResult
 @InstallIn(SingletonComponent::class)
 internal interface FileOperationWorkerEntryPoint {
     fun fileRepository(): Optional<FileRepository>
+
+    fun trashRepository(): TrashRepository
 
     fun workRequestStore(): WorkRequestStore
 }
@@ -92,7 +95,8 @@ internal abstract class FileOperationWorker(
         return try {
             setForeground(notifier.foregroundInfo(OperationProgress.Pending(kind)))
             when (args.kind) {
-                FileOperationKind.Delete -> runDelete(args, DeleteUseCase(repository))
+                FileOperationKind.Delete ->
+                    runDelete(args, DeleteUseCase(repository, entryPoint.trashRepository()))
                 FileOperationKind.Copy -> runTransfer(args, repository, CopyUseCase(repository)::invoke)
                 FileOperationKind.Move ->
                     runTransfer(args, repository, MoveUseCase(CopyUseCase(repository), repository)::invoke)

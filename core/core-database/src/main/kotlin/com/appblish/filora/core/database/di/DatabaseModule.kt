@@ -5,6 +5,7 @@ import androidx.room.Room
 import com.appblish.filora.core.database.FiloraDatabase
 import com.appblish.filora.core.database.dao.FavoriteDao
 import com.appblish.filora.core.database.dao.RecentDao
+import com.appblish.filora.core.database.dao.TrashDao
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -33,4 +34,7 @@ object DatabaseModule {
 
     @Provides
     fun provideRecentDao(database: FiloraDatabase): RecentDao = database.recentDao()
+
+    @Provides
+    fun provideTrashDao(database: FiloraDatabase): TrashDao = database.trashDao()
 }

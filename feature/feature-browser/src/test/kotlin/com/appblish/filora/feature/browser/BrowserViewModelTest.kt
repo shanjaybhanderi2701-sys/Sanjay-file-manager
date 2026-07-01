@@ -204,11 +204,42 @@ class BrowserViewModelTest {
         }
     }
 
+    /**
+     * In-memory recycle bin. Local paths are trashable (mirroring the app-managed
+     * trash), so the default delete records a move here rather than a permanent delete.
+     */
+    private class FakeTrashRepository : com.appblish.filora.core.domain.repository.TrashRepository {
+        var moveResult: Result<Int> = Result.Success(0)
+        val movedPaths = mutableListOf<List<String>>()
+
+        override fun observeTrash() = flow { emit(emptyList<com.appblish.filora.core.domain.model.TrashedItem>()) }
+
+        override fun observeTrashSize() = flow { emit(0L) }
+
+        override fun canTrash(path: String): Boolean = !path.startsWith("content://")
+
+        override suspend fun moveToTrash(paths: List<String>): Result<Int> {
+            movedPaths.add(paths)
+            return moveResult
+        }
+
+        override suspend fun restore(ids: List<String>) = Result.Success(0)
+
+        override suspend fun deleteForever(ids: List<String>) = Result.Success(0)
+
+        override suspend fun emptyTrash() = Result.Success(0)
+
+        override suspend fun purgeExpired(
+            retention: com.appblish.filora.core.domain.model.TrashRetention,
+        ) = Result.Success(0)
+    }
+
     private fun viewModel(
         snapshot: Result<List<FileItem>> = Result.Success(emptyList()),
         prefs: UserPreferences = UserPreferences.Default,
         favorites: FakeFavoritesRepository = FakeFavoritesRepository(),
         scheduler: FakeFileOperationsScheduler = FakeFileOperationsScheduler(),
+        trash: FakeTrashRepository = FakeTrashRepository(),
     ): BrowserFixture {
         val repo = FakeFileRepository().apply { this.snapshot = snapshot }
         val settings = FakeSettingsRepository(prefs)
@@ -220,10 +251,10 @@ class BrowserViewModelTest {
                 ObserveFavoritesUseCase(favorites),
                 CreateFolderUseCase(repo),
                 RenameUseCase(repo),
-                DeleteUseCase(repo),
+                DeleteUseCase(repo, trash),
                 scheduler,
             )
-        return BrowserFixture(vm, repo, settings, favorites, scheduler)
+        return BrowserFixture(vm, repo, settings, favorites, scheduler, trash)
     }
 
     private data class BrowserFixture(
@@ -232,6 +263,7 @@ class BrowserViewModelTest {
         val settings: FakeSettingsRepository,
         val favorites: FakeFavoritesRepository,
         val scheduler: FakeFileOperationsScheduler,
+        val trash: FakeTrashRepository,
     )
 
     @Test
@@ -488,10 +520,12 @@ class BrowserViewModelTest {
     @Test
     fun `deleting the selection removes the rows in place`() =
         runTest(dispatcher) {
-            val (vm, repo, _) = viewModel(Result.Success(listOf(file("a.txt"), file("b.txt"))))
+            val fixture = viewModel(Result.Success(listOf(file("a.txt"), file("b.txt"))))
+            val vm = fixture.vm
             vm.bindLocation("/root")
             advanceUntilIdle()
-            repo.deleteResult = Result.Success(DeleteOutcome(1, true))
+            // Local paths are trashable, so the default delete moves them to the bin.
+            fixture.trash.moveResult = Result.Success(1)
             val target = vm.uiState.value.entries
                 .first { it.name == "a.txt" }
 
@@ -501,7 +535,8 @@ class BrowserViewModelTest {
             advanceUntilIdle()
 
             assertThat(visibleNames(vm)).containsExactly("b.txt")
-            assertThat(repo.deletedPaths).contains(listOf("/root/a.txt"))
+            assertThat(fixture.trash.movedPaths).contains(listOf("/root/a.txt"))
+            assertThat(fixture.repo.deletedPaths).isEmpty()
             assertThat(vm.uiState.value.inSelectionMode).isFalse()
             assertThat(vm.uiState.value.messageRes).isNotNull()
         }

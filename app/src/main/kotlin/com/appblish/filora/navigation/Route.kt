@@ -34,6 +34,9 @@ sealed interface Route {
         val volumeId: String? = null
     ) : Route
 
+    /** App-managed recycle bin: restore or permanently remove deleted files (FR-3.4). */
+    @Serializable data object RecycleBin : Route
+
     @Serializable data object Settings : Route
 
     @Serializable data object About : Route

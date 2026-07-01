@@ -18,6 +18,7 @@ import com.appblish.filora.feature.search.SearchScreen
 import com.appblish.filora.feature.settings.AboutScreen
 import com.appblish.filora.feature.settings.SettingsScreen
 import com.appblish.filora.feature.storage.LargestFilesScreen
+import com.appblish.filora.feature.storage.RecycleBinScreen
 import com.appblish.filora.feature.storage.StorageScreen
 import com.appblish.filora.permission.PermissionRationaleScreen
 
@@ -87,10 +88,14 @@ fun FiloraNavHost(
                 // for now a category tap opens that category's hub (FR-8.1 interaction).
                 onOpenCategory = { _, category -> navController.navigate(Route.Media(category.name)) },
                 onOpenLargestFiles = { navController.navigate(Route.LargestFiles()) },
+                onOpenRecycleBin = { navController.navigate(Route.RecycleBin) },
             )
         }
         composable<Route.LargestFiles> { backStackEntry ->
             LargestFilesScreen(volumeId = backStackEntry.toRoute<Route.LargestFiles>().volumeId)
+        }
+        composable<Route.RecycleBin> {
+            RecycleBinScreen(onNavigateUp = { navController.navigateUp() })
         }
         composable<Route.Settings> {
             SettingsScreen(onOpenAbout = { navController.navigate(Route.About) })

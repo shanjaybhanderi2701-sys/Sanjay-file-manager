@@ -16,6 +16,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.outlined.KeyboardArrowRight
 import androidx.compose.material.icons.outlined.Android
 import androidx.compose.material.icons.outlined.Assessment
+import androidx.compose.material.icons.outlined.DeleteOutline
 import androidx.compose.material.icons.outlined.Description
 import androidx.compose.material.icons.outlined.Download
 import androidx.compose.material.icons.outlined.FolderZip
@@ -84,6 +85,7 @@ fun StorageScreen(
     modifier: Modifier = Modifier,
     onOpenCategory: (StorageVolume, MediaCategory) -> Unit = { _, _ -> },
     onOpenLargestFiles: () -> Unit = {},
+    onOpenRecycleBin: () -> Unit = {},
     viewModel: StorageViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -91,6 +93,7 @@ fun StorageScreen(
         uiState = uiState,
         onOpenCategory = onOpenCategory,
         onOpenLargestFiles = onOpenLargestFiles,
+        onOpenRecycleBin = onOpenRecycleBin,
         modifier = modifier,
     )
 }
@@ -100,6 +103,7 @@ internal fun StorageContent(
     uiState: StorageUiState,
     onOpenCategory: (StorageVolume, MediaCategory) -> Unit,
     onOpenLargestFiles: () -> Unit,
+    onOpenRecycleBin: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val volumes = uiState.breakdown?.volumes.orEmpty()
@@ -139,6 +143,9 @@ internal fun StorageContent(
                 }
                 item(key = "largest-files") {
                     LargestFilesCard(onClick = onOpenLargestFiles)
+                }
+                item(key = "recycle-bin") {
+                    RecycleBinCard(onClick = onOpenRecycleBin)
                 }
                 items(volumes, key = { it.volume.id }) { volume ->
                     VolumeCard(volume = volume, onOpenCategory = onOpenCategory)
@@ -338,6 +345,40 @@ private fun LargestFilesCard(onClick: () -> Unit) {
                 )
                 Text(
                     text = stringResource(R.string.storage_largest_files_subtitle),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                )
+            }
+            Icon(
+                imageVector = Icons.AutoMirrored.Outlined.KeyboardArrowRight,
+                contentDescription = null,
+                tint = MaterialTheme.colorScheme.onSurfaceVariant,
+            )
+        }
+    }
+}
+
+/** Entry tile that drills into the recycle bin (FR-3.4). */
+@Composable
+private fun RecycleBinCard(onClick: () -> Unit) {
+    Card(modifier = Modifier.fillMaxWidth().clickable(onClick = onClick)) {
+        Row(
+            modifier = Modifier.fillMaxWidth().padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Icon(
+                imageVector = Icons.Outlined.DeleteOutline,
+                contentDescription = null,
+                modifier = Modifier.size(28.dp),
+                tint = MaterialTheme.colorScheme.primary,
+            )
+            Column(modifier = Modifier.weight(1f).padding(start = 12.dp)) {
+                Text(
+                    text = stringResource(R.string.recycle_bin_entry_title),
+                    style = MaterialTheme.typography.titleMedium,
+                )
+                Text(
+                    text = stringResource(R.string.recycle_bin_entry_subtitle),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )

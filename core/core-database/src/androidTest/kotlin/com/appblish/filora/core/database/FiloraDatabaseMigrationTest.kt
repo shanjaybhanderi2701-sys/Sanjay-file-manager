@@ -86,4 +86,33 @@ class FiloraDatabaseMigrationTest {
             database.close()
         }
     }
+
+    @Test
+    @Throws(IOException::class)
+    fun migratesFromVersion1To2_addsTrashTable_preservingRows() {
+        helper.createDatabase(testDb, 1).use { db ->
+            db.execSQL(
+                "INSERT INTO favorites (path, name, isDirectory, addedAtEpochMillis) " +
+                    "VALUES ('/sdcard/Docs', 'Docs', 1, 100)",
+            )
+        }
+
+        // Run only the v1→v2 migration and let Room validate the resulting schema
+        // (including the new `trash` table) against the compiled entities.
+        helper.runMigrationsAndValidate(testDb, 2, true, FiloraDatabase.MIGRATION_1_2).use { db ->
+            // Pre-existing rows survive the additive migration.
+            db.query("SELECT path FROM favorites WHERE path = '/sdcard/Docs'").use { cursor ->
+                assertThat(cursor.count).isEqualTo(1)
+            }
+            // The new trash table exists and is writable/queryable.
+            db.execSQL(
+                "INSERT INTO trash (id, originalPath, name, isDirectory, sizeBytes, deletedAtEpochMillis) " +
+                    "VALUES ('abc', '/sdcard/a.txt', 'a.txt', 0, 42, 500)",
+            )
+            db.query("SELECT sizeBytes FROM trash WHERE id = 'abc'").use { cursor ->
+                assertThat(cursor.moveToFirst()).isTrue()
+                assertThat(cursor.getLong(0)).isEqualTo(42)
+            }
+        }
+    }
 }

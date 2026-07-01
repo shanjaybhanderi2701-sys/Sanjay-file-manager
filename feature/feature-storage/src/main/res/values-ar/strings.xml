@@ -53,4 +53,32 @@
     <string name="storage_story_top_category">%1$s يستهلك أكبر مساحة</string>
     <string name="storage_story_used_summary">%1$s مستخدم من أصل %2$s</string>
     <string name="storage_story_bar_a11y">%1$s مستخدم من أصل %2$s</string>
+
+    <!-- Recycle bin entry tile (FR-3.4) -->
+    <string name="recycle_bin_entry_title">سلة المحذوفات</string>
+    <string name="recycle_bin_entry_subtitle">استعِد الملفات المحذوفة أو أزِلها نهائيًا</string>
+
+    <!-- Recycle Bin screen (FR-3.4, M12) -->
+    <string name="recycle_bin_title">سلة المحذوفات</string>
+    <string name="recycle_bin_size_summary">تستخدم %1$s</string>
+    <string name="recycle_bin_empty">إفراغ سلة المحذوفات</string>
+    <string name="recycle_bin_empty_title">سلة المحذوفات فارغة</string>
+    <string name="recycle_bin_empty_body">ستظهر هنا الملفات المحذوفة التي يمكن استعادتها.</string>
+    <string name="recycle_bin_item_meta">%1$s · حُذف في %2$s</string>
+    <string name="recycle_bin_item_actions">إجراءات العنصر</string>
+    <string name="recycle_bin_action_restore">استعادة</string>
+    <string name="recycle_bin_action_delete">حذف نهائي</string>
+    <string name="recycle_bin_action_cancel">إلغاء</string>
+    <string name="recycle_bin_empty_dialog_title">إفراغ سلة المحذوفات؟</string>
+    <string name="recycle_bin_empty_dialog_body">سيتم حذف كل ما في سلة المحذوفات نهائيًا. لا يمكن التراجع عن ذلك.</string>
+    <string name="recycle_bin_delete_dialog_title">حذف نهائي؟</string>
+    <string name="recycle_bin_delete_dialog_body">سيتم حذف «%1$s» نهائيًا. لا يمكن التراجع عن ذلك.</string>
+
+    <!-- Recycle bin action results -->
+    <string name="recycle_bin_restored">تمت الاستعادة</string>
+    <string name="recycle_bin_restore_failed">تعذّرت الاستعادة. قد يوجد ملف بالاسم نفسه بالفعل.</string>
+    <string name="recycle_bin_deleted">تم الحذف نهائيًا</string>
+    <string name="recycle_bin_delete_failed">تعذّر حذف هذا العنصر</string>
+    <string name="recycle_bin_emptied">تم إفراغ سلة المحذوفات</string>
+    <string name="recycle_bin_empty_failed">تعذّر إفراغ سلة المحذوفات</string>
 </resources>

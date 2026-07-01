@@ -55,4 +55,32 @@
     <string name="storage_story_top_category">%1$s is using the most space</string>
     <string name="storage_story_used_summary">%1$s used of %2$s</string>
     <string name="storage_story_bar_a11y">%1$s used of %2$s</string>
+
+    <!-- Recycle bin entry tile (FR-3.4) -->
+    <string name="recycle_bin_entry_title">Recycle bin</string>
+    <string name="recycle_bin_entry_subtitle">Restore or permanently remove deleted files</string>
+
+    <!-- Recycle Bin screen (FR-3.4, M12) -->
+    <string name="recycle_bin_title">Recycle bin</string>
+    <string name="recycle_bin_size_summary">Using %1$s</string>
+    <string name="recycle_bin_empty">Empty recycle bin</string>
+    <string name="recycle_bin_empty_title">Recycle bin is empty</string>
+    <string name="recycle_bin_empty_body">Deleted files you can restore will appear here.</string>
+    <string name="recycle_bin_item_meta">%1$s · deleted %2$s</string>
+    <string name="recycle_bin_item_actions">Item actions</string>
+    <string name="recycle_bin_action_restore">Restore</string>
+    <string name="recycle_bin_action_delete">Delete permanently</string>
+    <string name="recycle_bin_action_cancel">Cancel</string>
+    <string name="recycle_bin_empty_dialog_title">Empty recycle bin?</string>
+    <string name="recycle_bin_empty_dialog_body">Everything in the recycle bin will be permanently deleted. This can\'t be undone.</string>
+    <string name="recycle_bin_delete_dialog_title">Delete permanently?</string>
+    <string name="recycle_bin_delete_dialog_body">\"%1$s\" will be permanently deleted. This can\'t be undone.</string>
+
+    <!-- Recycle bin action results -->
+    <string name="recycle_bin_restored">Restored</string>
+    <string name="recycle_bin_restore_failed">Couldn\'t restore. A file with that name may already exist.</string>
+    <string name="recycle_bin_deleted">Deleted permanently</string>
+    <string name="recycle_bin_delete_failed">Couldn\'t delete this item</string>
+    <string name="recycle_bin_emptied">Recycle bin emptied</string>
+    <string name="recycle_bin_empty_failed">Couldn\'t empty the recycle bin</string>
 </resources>
