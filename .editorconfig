@@ -23,6 +23,11 @@ ktlint_standard_trailing-comma-on-declaration-site = disabled
 ktlint_standard_multiline-expression-wrapping = disabled
 # Allow an EOL section comment (e.g. `// Light scheme`) to follow a file-level KDoc.
 ktlint_standard_no-consecutive-comments = disabled
+# The function-signature / expression-body wrapping rules are finicky and contentious
+# (where the `=` body lands, when params collapse to one line); they add churn without
+# real readability wins here — same spirit as the multiline-expression-wrapping opt-out.
+ktlint_standard_function-signature = disabled
+ktlint_standard_function-expression-body = disabled
 
 [*.{yml,yaml,toml,json}]
 indent_size = 2
