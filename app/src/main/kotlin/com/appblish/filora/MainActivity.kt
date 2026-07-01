@@ -19,7 +19,7 @@ import com.appblish.filora.core.domain.repository.SettingsRepository
 import com.appblish.filora.core.ui.theme.FiloraTheme
 import com.appblish.filora.navigation.FiloraNavHost
 import com.appblish.filora.navigation.Route
-import com.appblish.filora.permission.StoragePermissions
+import com.appblish.filora.permission.MediaAccessChecker
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -28,6 +28,9 @@ import javax.inject.Inject
 class MainActivity : ComponentActivity() {
     @Inject
     lateinit var safTreeAccess: SafTreeAccess
+
+    @Inject
+    lateinit var mediaAccessChecker: MediaAccessChecker
 
     @Inject
     lateinit var settingsRepository: SettingsRepository
@@ -43,7 +46,7 @@ class MainActivity : ComponentActivity() {
         // per launch; re-grants/revokes mid-session are handled by the surfaces
         // that read media.
         val hasAccess =
-            StoragePermissions.hasMediaAccess(this) || safTreeAccess.hasPersistedTree()
+            mediaAccessChecker.hasMediaAccess() || safTreeAccess.hasPersistedTree()
         val startDestination = if (hasAccess) Route.Home else Route.Permission
 
         setContent {
