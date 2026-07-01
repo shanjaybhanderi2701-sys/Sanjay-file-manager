@@ -6,9 +6,11 @@ import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performScrollTo
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.appblish.filora.permission.MediaAccessChecker
+import com.appblish.filora.permission.MediaAccessModule
 import dagger.hilt.android.testing.BindValue
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
+import dagger.hilt.android.testing.UninstallModules
 import org.junit.Rule
 import org.junit.Test
 import org.junit.rules.RuleChain
@@ -30,9 +32,14 @@ import org.junit.runner.RunWith
  * gate's ungranted branch hermetically regardless of sibling-test order. No test persists a
  * SAF tree, so `hasPersistedTree()` stays false and the gate is shown.
  *
+ * [UninstallModules] removes the production [MediaAccessModule] from this test's Hilt graph so
+ * the [BindValue] fake is the *sole* [MediaAccessChecker] binding — without it, Hilt sees both
+ * the production `@Binds` and the `@BindValue` and fails to compile with `Dagger/DuplicateBindings`.
+ *
  * Runs on an emulator/device (`connectedAndroidTest`); it is not a JVM unit test.
  */
 @HiltAndroidTest
+@UninstallModules(MediaAccessModule::class)
 @RunWith(AndroidJUnit4::class)
 class PermissionFlowTest {
     private val hiltRule = HiltAndroidRule(this)
