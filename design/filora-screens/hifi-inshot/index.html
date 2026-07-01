@@ -1,0 +1,985 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Filora — InShot-grade hi-fi flow (dark-first · blue · Home·Recent·Cleaner)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   FILORA — InShot-grade high-fidelity flow (recovery pass · APP-141)
+   Dark-first canvas · blue #2563EB accent · category accent wheel.
+   Tokens map to core-ui/theme + design-system §6 (dark family).
+   Personality: dark, bold, media-forward, chunky, premium depth.
+   ============================================================ */
+:root{
+  /* Brand accent (ratified BLUE) */
+  --blue:#2563EB; --blue-600:#1D4FD7; --blue-400:#4C7DF5; --cyan:#38BDF8;
+  --blue-grad:linear-gradient(135deg,#2563EB,#4C7DF5 52%,#38BDF8);
+  --blue-soft:rgba(76,125,245,.16); --blue-line:rgba(76,125,245,.34);
+
+  /* Dark canvas (charcoal / near-black, cool indigo tint — not flat grey) */
+  --bg:#0A0E17;                 /* app background */
+  --bg-2:#0E1320;               /* scroll base */
+  --surface:#141A28;            /* raised card */
+  --surface-2:#1A2233;          /* higher card / sheet */
+  --surface-3:#212B40;          /* pressed / chip */
+  --line:rgba(255,255,255,.07); --line-2:rgba(255,255,255,.11);
+
+  /* Ink hierarchy on dark */
+  --ink:#F3F6FC; --ink-2:#C0C8D9; --muted:#7B8598; --faint:#59637A;
+
+  /* Category accent wheel (fixed encoding — design-system §6) */
+  --c-image:#F43F6E;    --c-image-c:rgba(244,63,110,.16);
+  --c-video:#7C5CF7;    --c-video-c:rgba(124,92,247,.18);
+  --c-audio:#F5921B;    --c-audio-c:rgba(245,146,27,.16);
+  --c-doc:#2E7CF6;      --c-doc-c:rgba(46,124,246,.18);
+  --c-download:#12A46B; --c-download-c:rgba(18,164,107,.16);
+  --c-app:#5B8CF7;      --c-app-c:rgba(91,140,247,.18);
+  --c-archive:#B44BC9;  --c-archive-c:rgba(180,75,201,.16);
+  --c-folder:#8A93A8;   --c-folder-c:rgba(138,147,168,.14);
+  --c-fav:#F5A524;      --c-fav-c:rgba(245,165,36,.16);
+  --success:#22C58B; --error:#F26D72; --error-soft:rgba(242,109,114,.16);
+
+  /* Depth (real shadow on dark = subtle black + inner top highlight) */
+  --sh-1:0 2px 6px rgba(0,0,0,.35);
+  --sh-2:0 10px 24px rgba(0,0,0,.45), 0 2px 6px rgba(0,0,0,.35);
+  --sh-3:0 22px 48px rgba(0,0,0,.55), 0 6px 16px rgba(0,0,0,.4);
+  --sh-blue:0 14px 30px rgba(37,99,235,.42), 0 4px 10px rgba(37,99,235,.32);
+  --hair:inset 0 1px 0 rgba(255,255,255,.05);
+
+  /* Shape */
+  --r-sm:10px; --r-md:14px; --r-lg:18px; --r-xl:22px; --r-2xl:28px; --r-pill:999px;
+  /* Spacing (8pt-forward) */
+  --xs:4px; --sm:8px; --md:12px; --lg:16px; --xl:24px; --xxl:32px;
+  --font:'Manrope',-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+}
+
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font);
+  background:
+    radial-gradient(1100px 620px at 12% -8%, #16203c 0%, rgba(22,32,60,0) 55%),
+    radial-gradient(1000px 560px at 92% 4%, #191436 0%, rgba(25,20,54,0) 50%),
+    #05060c;
+  color:#c8cee0;padding:44px 20px 100px;-webkit-font-smoothing:antialiased;
+  background-attachment:fixed}
+
+/* ---------------- Page chrome ---------------- */
+header.page{max-width:1360px;margin:0 auto 8px}
+.brandline{display:flex;align-items:center;gap:14px}
+.logo{width:46px;height:46px;border-radius:14px;background:var(--blue-grad);
+  box-shadow:var(--sh-blue);display:flex;align-items:center;justify-content:center}
+.logo svg{width:26px;height:26px;color:#fff}
+header.page h1{font-size:30px;color:#f5f7ff;font-weight:800;letter-spacing:-.7px}
+header.page .sub{color:#9aa2bd;margin-top:12px;font-size:14.5px;line-height:1.65;max-width:960px}
+header.page .sub b{color:#d5daea;font-weight:700}
+.pillrow{margin-top:16px}
+.pill{display:inline-flex;align-items:center;gap:6px;background:var(--blue-soft);color:#bcd3ff;
+  border:1px solid var(--blue-line);padding:5px 13px;border-radius:var(--r-pill);
+  font-size:12px;font-weight:600;margin-right:8px;margin-bottom:8px}
+.pill.warm{background:rgba(245,165,36,.14);border-color:rgba(245,165,36,.32);color:#f6cf93}
+
+.sectlabel{max-width:1360px;margin:52px auto 6px;color:#8d93b4;font-size:12px;font-weight:800;
+  letter-spacing:1.6px;text-transform:uppercase;display:flex;align-items:center;gap:12px}
+.sectlabel::before{content:"";width:26px;height:3px;border-radius:2px;background:var(--blue-grad)}
+.sectnote{max-width:1360px;margin:0 auto 22px;color:#767c9a;font-size:13px;line-height:1.6}
+
+.gallery{max-width:1360px;margin:0 auto;display:flex;flex-wrap:wrap;gap:44px;align-items:flex-start}
+.frame{display:flex;flex-direction:column;gap:14px}
+.frame > .cap{color:#c4c9e0;font-size:14px;font-weight:700;text-align:center;letter-spacing:-.2px}
+.frame > .cap span{display:block;color:#797f9e;font-weight:500;font-size:11.5px;margin-top:4px;
+  max-width:340px;line-height:1.5}
+
+/* ---------------- Device shell ---------------- */
+.phone{width:352px;height:762px;background:var(--bg);border-radius:44px;
+  border:11px solid #05060d;overflow:hidden;position:relative;color:var(--ink);
+  box-shadow:0 40px 90px rgba(0,0,0,.6), 0 0 0 2px #191d2c, var(--hair)}
+.scroll{position:absolute;inset:0 0 74px 0;overflow:hidden;background:var(--bg-2)}
+.scroll.nonav{inset:0}
+.content{padding-bottom:22px}
+.notch{position:absolute;top:9px;left:50%;transform:translateX(-50%);width:118px;height:26px;
+  background:#05060d;border-radius:0 0 16px 16px;z-index:40}
+
+/* status bar */
+.status{height:44px;display:flex;align-items:flex-end;justify-content:space-between;
+  padding:0 22px 6px;font-size:12px;font-weight:700;color:var(--ink)}
+.status .r{display:flex;gap:6px;align-items:center}
+.status .bat{width:22px;height:11px;border:1.5px solid var(--ink-2);border-radius:3px;position:relative}
+.status .bat::after{content:"";position:absolute;inset:1.5px;width:70%;border-radius:1px;background:var(--ink)}
+.status .bat::before{content:"";position:absolute;top:3px;right:-3px;width:2px;height:5px;border-radius:1px;background:var(--ink-2)}
+
+/* icons */
+.icon{width:24px;height:24px;display:inline-flex;vertical-align:middle;flex-shrink:0}
+.icon svg{width:100%;height:100%;display:block}
+
+/* ---------------- App bar (custom, not M3) ---------------- */
+.appbar{padding:10px 16px 8px;display:flex;align-items:center;gap:10px}
+.appbar .grp{display:flex;gap:4px;align-items:center;margin-left:auto}
+.iconbtn{width:42px;height:42px;border-radius:14px;display:flex;align-items:center;justify-content:center;
+  color:var(--ink-2);background:var(--surface);box-shadow:var(--sh-1),var(--hair)}
+.iconbtn .icon{width:21px;height:21px}
+.iconbtn.ghost{background:transparent;box-shadow:none}
+
+/* greeting header */
+.greet{padding:6px 20px 4px}
+.greet .over{font-size:13px;font-weight:600;color:var(--muted)}
+.greet .ttl{display:flex;align-items:center;gap:12px;margin-top:2px}
+.greet h2{font-size:27px;font-weight:800;color:var(--ink);letter-spacing:-.6px;flex:1}
+.avatar{width:44px;height:44px;border-radius:14px;background:var(--blue-grad);
+  box-shadow:var(--sh-blue);display:flex;align-items:center;justify-content:center;
+  color:#fff;font-weight:800;font-size:16px}
+
+/* breadcrumb */
+.crumbs{display:flex;align-items:center;gap:6px;font-size:14px;color:var(--muted);
+  font-weight:600;overflow:hidden;white-space:nowrap;flex:1;min-width:0}
+.crumbs b{color:var(--ink);font-weight:800}
+.crumbs .sep{opacity:.45;font-size:12px}
+
+/* search */
+.searchbar{margin:8px 20px 12px;display:flex;align-items:center;gap:12px;background:var(--surface);
+  border:1px solid var(--line);border-radius:var(--r-pill);padding:15px 18px;box-shadow:var(--sh-1),var(--hair)}
+.searchbar .icon{width:20px;height:20px;color:var(--muted)}
+.searchbar .ph{flex:1;font-size:15px;font-weight:500;color:var(--muted)}
+.searchbar.active{border-color:var(--blue-line);box-shadow:0 0 0 3px var(--blue-soft),var(--sh-1)}
+.searchbar.active .ph{color:var(--ink)}
+.searchbar .cursor{width:2px;height:18px;background:var(--blue-400);border-radius:2px;animation:blink 1s steps(1) infinite}
+@keyframes blink{50%{opacity:0}}
+
+/* section header */
+.shead{display:flex;align-items:baseline;gap:10px;padding:18px 20px 10px}
+.shead h3{font-size:18px;font-weight:800;color:var(--ink);letter-spacing:-.3px}
+.shead .link{margin-left:auto;font-size:13px;font-weight:700;color:var(--blue-400)}
+.shead .cnt{font-size:13px;font-weight:600;color:var(--muted)}
+
+.muted{color:var(--muted)}
+
+/* ---------------- Storage ring hero ---------------- */
+.hero{margin:6px 20px 4px;border-radius:var(--r-2xl);padding:22px;position:relative;overflow:hidden;
+  background:linear-gradient(150deg,#1b2c58 0%,#142145 46%,#141a2e 100%);
+  box-shadow:var(--sh-2),var(--hair);border:1px solid rgba(120,160,255,.14)}
+.hero::before{content:"";position:absolute;right:-40px;top:-50px;width:200px;height:200px;border-radius:50%;
+  background:radial-gradient(circle,rgba(56,189,248,.30),transparent 65%);filter:blur(6px)}
+.hero .htop{display:flex;align-items:center;gap:18px;position:relative;z-index:2}
+.ring{width:106px;height:106px;flex-shrink:0;position:relative}
+.ring svg{transform:rotate(-90deg)}
+.ring .lbl{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.ring .lbl b{font-size:26px;font-weight:800;color:#fff;line-height:1}
+.ring .lbl span{font-size:10.5px;font-weight:700;color:#a9c2ff;letter-spacing:.6px;margin-top:2px}
+.hero .hinfo{flex:1}
+.hero .hinfo .big{font-size:21px;font-weight:800;color:#fff;letter-spacing:-.3px}
+.hero .hinfo .sm{font-size:13px;color:#aab8d8;margin-top:3px;font-weight:500}
+.hero .legend{display:flex;gap:8px;margin-top:18px;position:relative;z-index:2}
+.seg{flex:1;display:flex;flex-direction:column;gap:6px}
+.seg .bar{height:7px;border-radius:4px}
+.seg .k{display:flex;align-items:center;gap:5px;font-size:11px;font-weight:600;color:#c3cbe0}
+.seg .k i{width:8px;height:8px;border-radius:3px;display:block}
+
+/* ---------------- Quick actions ---------------- */
+.quick{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;padding:12px 20px 4px}
+.qa{background:var(--surface);border-radius:var(--r-lg);padding:14px 8px 12px;display:flex;
+  flex-direction:column;align-items:center;gap:9px;box-shadow:var(--sh-1),var(--hair);border:1px solid var(--line)}
+.qa .qi{width:46px;height:46px;border-radius:15px;display:flex;align-items:center;justify-content:center}
+.qa .qi .icon{width:23px;height:23px}
+.qa .ql{font-size:11.5px;font-weight:700;color:var(--ink-2);text-align:center;line-height:1.2}
+
+/* ---------------- Storage location rows ---------------- */
+.loc{margin:6px 20px;background:var(--surface);border-radius:var(--r-lg);padding:16px;
+  display:flex;align-items:center;gap:14px;box-shadow:var(--sh-1),var(--hair);border:1px solid var(--line)}
+.loc + .loc{margin-top:10px}
+.loc .li{width:48px;height:48px;border-radius:15px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.loc .li .icon{width:24px;height:24px}
+.loc .lg{flex:1;min-width:0}
+.loc .lg .ln{font-size:15px;font-weight:700;color:var(--ink)}
+.loc .lg .lb{height:7px;border-radius:4px;background:var(--surface-3);margin-top:9px;overflow:hidden}
+.loc .lg .lb i{display:block;height:100%;border-radius:4px;background:var(--blue-grad)}
+.loc .lg .lm{font-size:12px;color:var(--muted);margin-top:7px;font-weight:600}
+.loc .chev{color:var(--faint)}
+.loc .chev .icon{width:22px;height:22px}
+
+/* ---------------- Category tiles ---------------- */
+.cats{display:grid;grid-template-columns:repeat(4,1fr);gap:11px;padding:8px 20px 4px}
+.cat{background:var(--surface);border-radius:var(--r-lg);padding:13px 8px;display:flex;flex-direction:column;
+  align-items:center;gap:8px;box-shadow:var(--sh-1),var(--hair);border:1px solid var(--line)}
+.cat .ci{width:44px;height:44px;border-radius:15px;display:flex;align-items:center;justify-content:center}
+.cat .ci .icon{width:22px;height:22px}
+.cat .cl{font-size:11px;font-weight:700;color:var(--ink-2)}
+.cat .cc{font-size:10.5px;font-weight:600;color:var(--muted)}
+
+/* ---------------- Recent strip ---------------- */
+.recent{display:flex;gap:12px;padding:6px 20px 4px;overflow:hidden}
+.rcard{width:120px;flex-shrink:0}
+.rthumb{width:120px;height:120px;border-radius:var(--r-lg);position:relative;overflow:hidden;
+  box-shadow:var(--sh-1)}
+.rcard .rn{font-size:12.5px;font-weight:700;color:var(--ink);margin-top:8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rcard .rm{font-size:11px;color:var(--muted);margin-top:2px;font-weight:600}
+
+/* ---------------- File list rows ---------------- */
+.list{padding:2px 12px}
+.row{display:flex;align-items:center;gap:14px;padding:10px 10px;min-height:66px;border-radius:var(--r-md)}
+.row.sel{background:var(--blue-soft);box-shadow:inset 0 0 0 1px var(--blue-line)}
+.row .nm{font-size:15.5px;font-weight:700;line-height:20px;color:var(--ink)}
+.row .mt{font-size:12.5px;line-height:16px;color:var(--muted);margin-top:3px;font-weight:600}
+.row .gr{flex:1;min-width:0}
+.row .nm,.row .mt{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.row .tail{color:var(--faint);display:flex;align-items:center;justify-content:center;width:34px;height:34px}
+.row .tail .icon{width:20px;height:20px}
+.tile{width:50px;height:50px;border-radius:15px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.tile .icon{width:24px;height:24px}
+/* selection check */
+.selcheck{width:26px;height:26px;border-radius:50%;background:var(--blue);display:flex;align-items:center;
+  justify-content:center;box-shadow:0 2px 6px rgba(37,99,235,.5);flex-shrink:0}
+.selcheck .icon{width:16px;height:16px;color:#fff}
+.selring{width:26px;height:26px;border-radius:50%;border:2px solid var(--line-2);flex-shrink:0}
+
+/* ---------------- Media thumbnails (real-looking) ---------------- */
+.thumb{position:relative;overflow:hidden;background:#0d1320}
+.thumb .badge{position:absolute;bottom:6px;right:6px;background:rgba(0,0,0,.62);color:#fff;
+  font-size:10.5px;font-weight:700;padding:2px 7px;border-radius:7px;backdrop-filter:blur(4px)}
+.thumb .badge.tl{left:6px;right:auto}
+.thumb .play{position:absolute;inset:0;display:flex;align-items:center;justify-content:center}
+.thumb .play i{width:38px;height:38px;border-radius:50%;background:rgba(0,0,0,.42);backdrop-filter:blur(3px);
+  display:flex;align-items:center;justify-content:center;border:1.5px solid rgba(255,255,255,.55)}
+.thumb .play i::after{content:"";border-left:12px solid #fff;border-top:8px solid transparent;
+  border-bottom:8px solid transparent;margin-left:3px}
+.thumb .dur{position:absolute;bottom:6px;right:6px;background:rgba(0,0,0,.7);color:#fff;
+  font-size:10px;font-weight:700;padding:2px 6px;border-radius:6px}
+/* photographic gradient fills */
+.ph-beach{background:linear-gradient(180deg,#7ec8f0 0%,#bfe6f5 42%,#f2e2b8 62%,#e6c98f 100%)}
+.ph-sunset{background:linear-gradient(180deg,#ff9a6b 0%,#ff6b8a 45%,#7a4d9e 100%)}
+.ph-forest{background:linear-gradient(160deg,#2f6b45 0%,#5aa06a 50%,#a7c98a 100%)}
+.ph-city{background:linear-gradient(180deg,#233b6e 0%,#3f5a94 50%,#f0b46b 100%)}
+.ph-portrait{background:linear-gradient(160deg,#e8b48f 0%,#c98f6b 55%,#3a2b3f 100%)}
+.ph-mountain{background:linear-gradient(180deg,#8fb6d9 0%,#c9d9e6 46%,#e8eef2 60%,#5a6b7a 100%)}
+.ph-food{background:linear-gradient(150deg,#e6a04b 0%,#c95a3f 55%,#7a2f2f 100%)}
+.ph-night{background:linear-gradient(180deg,#1a2452 0%,#3a2f6e 55%,#c95a8f 100%)}
+.ph-doc{background:linear-gradient(160deg,#f4f6fb 0%,#dbe4f0 100%)}
+.ph-doc::after{content:"";position:absolute;left:16%;right:16%;top:20%;height:3px;border-radius:2px;
+  background:#9fb0c8;box-shadow:0 10px 0 #b8c6d8,0 20px 0 #b8c6d8,0 30px 0 #cdd8e6,0 40px 0 #cdd8e6}
+.ph-audio{background:linear-gradient(150deg,#6b2f8f 0%,#3a2f6e 55%,#12203f 100%)}
+
+/* ---------------- Grid view ---------------- */
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:6px 16px}
+.gcard{border-radius:var(--r-lg);overflow:hidden;background:var(--surface);box-shadow:var(--sh-1),var(--hair);
+  border:1px solid var(--line);position:relative}
+.gcard .gthumb{height:132px;position:relative}
+.gcard .gmeta{padding:10px 12px 11px}
+.gcard .gn{font-size:13.5px;font-weight:700;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.gcard .gm{font-size:11px;color:var(--muted);margin-top:3px;font-weight:600}
+.gcard.folder .gthumb{height:132px;display:flex;align-items:center;justify-content:center;background:var(--c-folder-c)}
+.gcard .gsel{position:absolute;top:8px;right:8px}
+
+/* ---------------- FAB ---------------- */
+.fab{position:absolute;right:18px;bottom:90px;height:56px;border-radius:20px;padding:0 20px;
+  background:var(--blue-grad);box-shadow:var(--sh-blue);display:flex;align-items:center;gap:9px;
+  color:#fff;z-index:5;font-weight:800;font-size:15px}
+.fab .icon{width:23px;height:23px;color:#fff}
+.fab.round{width:58px;padding:0;justify-content:center}
+
+/* ---------------- Bottom nav (3 tabs) ---------------- */
+.bnav{position:absolute;left:0;right:0;bottom:0;height:74px;background:rgba(13,18,30,.86);
+  backdrop-filter:blur(18px);border-top:1px solid var(--line);display:flex;padding:8px 14px 12px;z-index:20}
+.nav{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;color:var(--faint)}
+.nav .icon{width:24px;height:24px}
+.nav .nl{font-size:11px;font-weight:700}
+.nav.on{color:#fff}
+.nav.on .navpill{background:var(--blue-soft);box-shadow:inset 0 0 0 1px var(--blue-line)}
+.navpill{width:64px;height:34px;border-radius:var(--r-pill);display:flex;align-items:center;justify-content:center;color:inherit}
+.nav.on .navpill .icon{color:var(--cyan)}
+
+/* ---------------- Bottom action bar (multi-select hero) ---------------- */
+.actionbar{position:absolute;left:12px;right:12px;bottom:12px;background:var(--surface-2);
+  border-radius:var(--r-xl);padding:14px 8px 12px;box-shadow:var(--sh-3),var(--hair);
+  border:1px solid var(--line-2);display:flex;justify-content:space-around;z-index:30}
+.act{display:flex;flex-direction:column;align-items:center;gap:7px;flex:1}
+.act .ai{width:52px;height:52px;border-radius:17px;background:var(--blue-soft);display:flex;
+  align-items:center;justify-content:center;box-shadow:var(--hair)}
+.act .ai .icon{width:24px;height:24px;color:var(--cyan)}
+.act .al{font-size:11px;font-weight:700;color:var(--ink-2)}
+.act.danger .ai{background:var(--error-soft)}
+.act.danger .ai .icon{color:var(--error)}
+
+/* selection top bar */
+.selbar{padding:12px 16px 10px;display:flex;align-items:center;gap:14px;background:var(--surface);
+  border-bottom:1px solid var(--line)}
+.selbar .sc{font-size:18px;font-weight:800;color:var(--ink);flex:1}
+
+/* ---------------- Chips ---------------- */
+.chips{display:flex;gap:9px;padding:8px 20px 12px;flex-wrap:wrap}
+.chip{display:inline-flex;align-items:center;gap:7px;background:var(--surface);border:1px solid var(--line);
+  border-radius:var(--r-pill);padding:9px 15px;font-size:13px;font-weight:700;color:var(--ink-2)}
+.chip.on{background:var(--blue-soft);border-color:var(--blue-line);color:#bcd3ff}
+.chip .icon{width:15px;height:15px}
+.chip .x{opacity:.7}
+
+/* ---------------- Onboarding / permission ---------------- */
+.center-scr{display:flex;flex-direction:column;height:100%;padding:0 26px}
+.hero-art{flex:1;display:flex;align-items:center;justify-content:center;position:relative}
+.orb{width:150px;height:150px;border-radius:38px;background:var(--blue-grad);box-shadow:var(--sh-blue);
+  display:flex;align-items:center;justify-content:center;position:relative;transform:rotate(-6deg)}
+.orb .icon{width:74px;height:74px;color:#fff}
+.orb::after{content:"";position:absolute;inset:-30px;border-radius:50px;border:1.5px dashed rgba(120,160,255,.3);z-index:-1}
+.float-c{position:absolute;border-radius:16px;display:flex;align-items:center;justify-content:center;
+  box-shadow:var(--sh-2)}
+.ob-copy{padding-bottom:14px}
+.ob-copy h2{font-size:27px;font-weight:800;color:var(--ink);letter-spacing:-.5px;line-height:1.2}
+.ob-copy p{font-size:14.5px;color:var(--ink-2);margin-top:12px;line-height:1.6;font-weight:500}
+.trust{background:var(--surface);border-radius:var(--r-lg);padding:16px;margin-top:18px;border:1px solid var(--line)}
+.trust .tr{display:flex;align-items:center;gap:12px;padding:8px 0}
+.trust .tr .ti{width:34px;height:34px;border-radius:11px;background:rgba(34,197,139,.15);display:flex;
+  align-items:center;justify-content:center;flex-shrink:0}
+.trust .tr .ti .icon{width:18px;height:18px;color:var(--success)}
+.trust .tr .tt{font-size:13.5px;font-weight:600;color:var(--ink-2)}
+.btn-primary{background:var(--blue-grad);color:#fff;font-weight:800;font-size:16px;text-align:center;
+  padding:17px;border-radius:var(--r-lg);box-shadow:var(--sh-blue);margin-top:8px}
+.btn-text{text-align:center;color:var(--muted);font-weight:700;font-size:14px;padding:16px}
+.dots{display:flex;gap:7px;justify-content:center;padding:14px 0 4px}
+.dots i{width:7px;height:7px;border-radius:50%;background:var(--line-2)}
+.dots i.on{width:22px;background:var(--blue-400)}
+
+/* ---------------- Empty / Error ---------------- */
+.state{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;
+  padding:0 34px;text-align:center;gap:6px}
+.state .art{width:130px;height:130px;border-radius:34px;display:flex;align-items:center;justify-content:center;
+  margin-bottom:8px}
+.state .art .icon{width:64px;height:64px}
+.state h2{font-size:21px;font-weight:800;color:var(--ink)}
+.state p{font-size:14px;color:var(--muted);line-height:1.6;font-weight:500;max-width:260px;margin-top:2px}
+.state .cta{margin-top:20px;display:flex;flex-direction:column;gap:10px;align-self:stretch}
+.btn-tonal{background:var(--surface-2);color:var(--ink);font-weight:800;font-size:15px;text-align:center;
+  padding:15px;border-radius:var(--r-lg);border:1px solid var(--line-2)}
+.btn-outline{border:1.5px solid var(--blue-line);color:#bcd3ff;font-weight:800;font-size:15px;text-align:center;
+  padding:14px;border-radius:var(--r-lg)}
+
+/* ---------------- Preview ---------------- */
+.pv{position:absolute;inset:0;background:#05060c;display:flex;flex-direction:column}
+.pv .pbar{padding:10px 16px;display:flex;align-items:center;gap:14px;color:#fff;
+  background:linear-gradient(180deg,rgba(0,0,0,.6),transparent)}
+.pv .pbar .pt{flex:1;min-width:0}
+.pv .pbar .pt .pn{font-size:15px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pv .pbar .pt .pm{font-size:12px;color:#aeb6c9;font-weight:600}
+.pv .pbar .iconbtn{background:rgba(255,255,255,.1)}
+.pv .pbar .iconbtn .icon{color:#fff}
+.pv .pimg{flex:1;position:relative}
+.pv .pactions{background:linear-gradient(0deg,rgba(0,0,0,.7),transparent);padding:20px 16px 22px;
+  display:flex;justify-content:space-around}
+.pv .pa{display:flex;flex-direction:column;align-items:center;gap:6px;color:#fff}
+.pv .pa .icon{width:24px;height:24px}
+.pv .pa .pl{font-size:11px;font-weight:700}
+
+/* ---------------- Progress sheet ---------------- */
+.scrim{position:absolute;inset:0;background:rgba(0,0,0,.55);z-index:35}
+.sheet{position:absolute;left:0;right:0;bottom:0;background:var(--surface-2);border-radius:var(--r-2xl) var(--r-2xl) 0 0;
+  padding:10px 20px 26px;z-index:36;box-shadow:var(--sh-3);border-top:1px solid var(--line-2)}
+.handle{width:40px;height:5px;border-radius:3px;background:var(--line-2);margin:6px auto 16px}
+.sheet h3{font-size:18px;font-weight:800;color:var(--ink)}
+.prog-row{display:flex;align-items:center;gap:14px;margin-top:18px}
+.prog-ic{width:52px;height:52px;border-radius:16px;background:var(--blue-soft);display:flex;align-items:center;justify-content:center}
+.prog-ic .icon{width:26px;height:26px;color:var(--cyan)}
+.prog-t{flex:1}
+.prog-t .pf{font-size:14px;font-weight:700;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.prog-t .ps{font-size:12.5px;color:var(--muted);font-weight:600;margin-top:2px}
+.pbar-track{height:9px;border-radius:5px;background:var(--surface-3);margin-top:18px;overflow:hidden}
+.pbar-track i{display:block;height:100%;border-radius:5px;background:var(--blue-grad);box-shadow:0 0 12px rgba(56,189,248,.6)}
+.pbar-meta{display:flex;justify-content:space-between;margin-top:10px;font-size:12.5px;font-weight:700;color:var(--muted)}
+.pbar-meta b{color:var(--ink)}
+.sheet .sbtn{margin-top:20px;text-align:center;padding:14px;border-radius:var(--r-lg);border:1px solid var(--line-2);
+  font-weight:800;color:var(--ink-2);font-size:14px}
+
+/* toast */
+.toast{position:absolute;left:14px;right:14px;bottom:88px;background:var(--surface-2);border-radius:var(--r-md);
+  padding:14px 16px;display:flex;align-items:center;gap:12px;box-shadow:var(--sh-2);z-index:25;border:1px solid var(--line-2)}
+.toast .tm{flex:1;font-size:13.5px;font-weight:600;color:var(--ink)}
+.toast .tu{font-size:13.5px;font-weight:800;color:var(--cyan)}
+.toast .tdot{width:32px;height:32px;border-radius:50%;background:rgba(34,197,139,.18);display:flex;align-items:center;justify-content:center}
+.toast .tdot .icon{width:18px;height:18px;color:var(--success)}
+
+/* settings */
+.set-group{margin:10px 16px;background:var(--surface);border-radius:var(--r-lg);overflow:hidden;border:1px solid var(--line)}
+.set-row{display:flex;align-items:center;gap:14px;padding:15px 16px;border-bottom:1px solid var(--line)}
+.set-row:last-child{border-bottom:0}
+.set-row .si{width:40px;height:40px;border-radius:13px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.set-row .si .icon{width:21px;height:21px}
+.set-row .sg{flex:1}
+.set-row .st{font-size:14.5px;font-weight:700;color:var(--ink)}
+.set-row .ss{font-size:12px;color:var(--muted);font-weight:600;margin-top:2px}
+.toggle{width:48px;height:28px;border-radius:14px;background:var(--blue);position:relative;flex-shrink:0}
+.toggle::after{content:"";position:absolute;top:3px;right:3px;width:22px;height:22px;border-radius:50%;background:#fff}
+.toggle.off{background:var(--surface-3)}
+.toggle.off::after{right:auto;left:3px}
+.set-label{padding:16px 20px 6px;font-size:12px;font-weight:800;letter-spacing:1.2px;text-transform:uppercase;color:var(--muted)}
+.theme-swatches{display:flex;gap:12px;padding:12px 20px 6px}
+.sw{flex:1;border-radius:var(--r-lg);height:88px;position:relative;overflow:hidden;border:1px solid var(--line);
+  display:flex;flex-direction:column;box-shadow:var(--sh-1)}
+.sw .swtop{flex:1}
+.sw .swlbl{padding:8px;font-size:11.5px;font-weight:800;text-align:center}
+.sw.on{outline:2.5px solid var(--blue);outline-offset:2px}
+.sw .swcheck{position:absolute;top:7px;right:7px;width:22px;height:22px;border-radius:50%;background:var(--blue);
+  display:flex;align-items:center;justify-content:center}
+.sw .swcheck .icon{width:14px;height:14px;color:#fff}
+
+.mini{max-width:1360px;margin:20px auto 0;color:#6f7590;font-size:12.5px;line-height:1.6}
+.legend-note{max-width:1360px;margin:34px auto 0;background:rgba(20,26,40,.7);border:1px solid var(--line);
+  border-radius:16px;padding:22px 26px;color:#aab2c8;font-size:13.5px;line-height:1.75}
+.legend-note h4{color:#eef1f9;font-size:15px;font-weight:800;margin-bottom:10px;letter-spacing:-.2px}
+.legend-note b{color:#d5daea}
+.legend-note .src{color:var(--cyan);font-weight:700}
+</style>
+</head>
+<body>
+
+<header class="page">
+  <div class="brandline">
+    <div class="logo"><span class="icon"><svg viewBox="0 0 24 24" fill="none"><path d="M4 7a2 2 0 0 1 2-2h4l2 2h6a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V7Z" fill="currentColor"/></svg></span></div>
+    <h1>Filora — InShot-grade hi-fi flow</h1>
+  </div>
+  <div class="sub">
+    Recovery pass (APP-141). A <b>dark-first, media-forward</b> take on the board-ratified foundation —
+    primary blue <b>#2563EB</b>, <b>Home · Recent · Cleaner</b> bottom nav, Browse nested under Home.
+    Pushes real InShot personality (charcoal canvas, real-looking thumbnails, chunky single-purpose controls,
+    soft depth) <b>without going garish</b> — one accent + the fixed category wheel, consistent radii.
+  </div>
+  <div class="pillrow">
+    <span class="pill">● Dark-first charcoal</span>
+    <span class="pill">Blue #2563EB · one accent</span>
+    <span class="pill">Home · Recent · Cleaner</span>
+    <span class="pill">Category accent wheel</span>
+    <span class="pill warm">⌘ For Chief fidelity review — pre-board</span>
+  </div>
+</header>
+
+<div class="sectlabel">First run · trust-first onboarding</div>
+<div class="sectnote">Warm, media-forward welcome then a trust-first permission gate — access is earned before the system dialog (Mobile_V5 “native &amp; trustworthy”, BetterApp warmth).</div>
+<div class="gallery">
+
+  <!-- 1. ONBOARDING -->
+  <div class="frame">
+    <div class="phone">
+      <div class="notch"></div>
+      <div class="scroll nonav">
+        <div class="status"><span>9:41</span><span class="r"><span class="icon"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M2 20h.01M6 20v-4M10 20v-8M14 20V8M18 20V4" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg></span><span class="bat"></span></span></div>
+        <div class="center-scr">
+          <div class="hero-art">
+            <div class="orb">
+              <span class="icon"><svg viewBox="0 0 24 24" fill="none"><path d="M4 7a2 2 0 0 1 2-2h4l2 2h6a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V7Z" fill="currentColor"/></svg></span>
+              <div class="float-c" style="width:58px;height:58px;top:6px;left:-10px;transform:rotate(9deg)"><div class="thumb ph-beach" style="width:100%;height:100%;border-radius:16px"></div></div>
+              <div class="float-c" style="width:52px;height:52px;bottom:2px;right:-14px;transform:rotate(-11deg)"><div class="thumb ph-sunset" style="width:100%;height:100%;border-radius:14px"><span class="dur">0:14</span></div></div>
+              <div class="float-c" style="width:46px;height:46px;bottom:-16px;left:22px;background:var(--surface-2);transform:rotate(6deg)"><span class="icon" style="width:24px;height:24px;color:var(--c-doc)"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 2h8l4 4v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2Z"/></svg></span></div>
+            </div>
+          </div>
+          <div class="ob-copy">
+            <div class="dots"><i class="on"></i><i></i><i></i></div>
+            <h2>Every file, beautifully in reach.</h2>
+            <p>Photos, videos, docs and downloads — organised, searchable, and fast. No clutter, no ads mid-task.</p>
+            <div class="btn-primary">Get started</div>
+            <div class="btn-text">I already use Filora</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="cap">1 · Onboarding<span>Media-forward welcome — real thumbnails float around the brand glyph, not grey boxes.</span></div>
+  </div>
+
+  <!-- 2. PERMISSION GATE -->
+  <div class="frame">
+    <div class="phone">
+      <div class="notch"></div>
+      <div class="scroll nonav">
+        <div class="status"><span>9:41</span><span class="r"><span class="icon"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M2 20h.01M6 20v-4M10 20v-8M14 20V8M18 20V4" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg></span><span class="bat"></span></span></div>
+        <div class="center-scr">
+          <div style="flex:1;display:flex;flex-direction:column;justify-content:center">
+            <div style="width:88px;height:88px;border-radius:26px;background:var(--blue-grad);box-shadow:var(--sh-blue);display:flex;align-items:center;justify-content:center;margin-bottom:22px">
+              <span class="icon" style="width:44px;height:44px;color:#fff"><svg viewBox="0 0 24 24" fill="none"><path d="M12 2 4 5v6c0 5 3.5 8.5 8 10 4.5-1.5 8-5 8-10V5l-8-3Z" fill="currentColor"/></svg></span>
+            </div>
+            <h2 style="font-size:25px;font-weight:800;color:var(--ink);letter-spacing:-.5px;line-height:1.25">Filora needs access to your files</h2>
+            <p style="font-size:14.5px;color:var(--ink-2);margin-top:12px;line-height:1.6;font-weight:500">To show and manage your media, Filora reads files stored on this device. Everything stays on your phone.</p>
+            <div class="trust">
+              <div class="tr"><span class="ti"><span class="icon"><svg viewBox="0 0 24 24" fill="none"><path d="m5 13 4 4L19 7" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span></span><span class="tt">We never upload or share your files</span></div>
+              <div class="tr"><span class="ti"><span class="icon"><svg viewBox="0 0 24 24" fill="none"><path d="m5 13 4 4L19 7" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span></span><span class="tt">No account, no ads mid-task</span></div>
+              <div class="tr"><span class="ti"><span class="icon"><svg viewBox="0 0 24 24" fill="none"><path d="m5 13 4 4L19 7" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span></span><span class="tt">Revoke access anytime in Settings</span></div>
+            </div>
+          </div>
+          <div class="ob-copy">
+            <div class="btn-primary">Allow access</div>
+            <div class="btn-text">Why is this needed?</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="cap">2 · Permission gate<span>Trust-first: reassurance bullets before the OS prompt. Error color absent — this is a calm ask.</span></div>
+  </div>
+
+</div>
+
+<div class="sectlabel">Home — the complete §6.5 landing (carries Browse)</div>
+<div class="sectnote">Greeting → storage-ring hero → quick actions → Storage locations (the Browse entry) → categories → recent. Browse is not a tab; it opens from the location rows and the Browse FAB.</div>
+<div class="gallery">
+
+  <!-- 3. HOME -->
+  <div class="frame">
+    <div class="phone">
+      <div class="notch"></div>
+      <div class="scroll">
+        <div class="content">
+          <div class="status"><span>9:41</span><span class="r"><span class="icon"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M2 20h.01M6 20v-4M10 20v-8M14 20V8M18 20V4" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg></span><span class="bat"></span></span></div>
+          <!-- greeting -->
+          <div class="greet">
+            <div class="over">Good evening</div>
+            <div class="ttl">
+              <h2>Filora</h2>
+              <span class="iconbtn"><span class="icon"><svg viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2.2"/><path d="m20 20-3-3" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg></span></span>
+              <div class="avatar">S</div>
+            </div>
+          </div>
+          <!-- storage ring hero -->
+          <div class="hero">
+            <div class="htop">
+              <div class="ring">
+                <svg width="106" height="106" viewBox="0 0 106 106">
+                  <circle cx="53" cy="53" r="46" stroke="rgba(255,255,255,.12)" stroke-width="11" fill="none"/>
+                  <circle cx="53" cy="53" r="46" stroke="url(#g)" stroke-width="11" fill="none" stroke-linecap="round" stroke-dasharray="289" stroke-dashoffset="90"/>
+                  <defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#2563EB"/><stop offset="1" stop-color="#38BDF8"/></linearGradient></defs>
+                </svg>
+                <div class="lbl"><b>69%</b><span>USED</span></div>
+              </div>
+              <div class="hinfo">
+                <div class="big">88.4 GB free</div>
+                <div class="sm">of 256 GB · Internal storage</div>
+                <div class="sm" style="color:#8fd4ff;margin-top:8px;font-weight:700">↑ 2.1 GB to clean up</div>
+              </div>
+            </div>
+            <div class="legend">
+              <div class="seg"><div class="bar" style="background:var(--c-image)"></div><div class="k"><i style="background:var(--c-image)"></i>Photos 42GB</div></div>
+              <div class="seg"><div class="bar" style="background:var(--c-video)"></div><div class="k"><i style="background:var(--c-video)"></i>Video 78GB</div></div>
+              <div class="seg"><div class="bar" style="background:var(--c-audio)"></div><div class="k"><i style="background:var(--c-audio)"></i>Audio 12GB</div></div>
+              <div class="seg"><div class="bar" style="background:var(--c-folder)"></div><div class="k"><i style="background:var(--c-folder)"></i>Other 35GB</div></div>
+            </div>
+          </div>
+          <!-- quick actions -->
+          <div class="quick">
+            <div class="qa"><div class="qi" style="background:var(--blue-soft)"><span class="icon" style="color:var(--cyan)"><svg viewBox="0 0 24 24" fill="none"><path d="M4 7h16M7 7 8 4h8l1 3M6 7v11a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V7" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><path d="M14 3l1 1.5M17 5l1.5-.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></span></div><div class="ql">Clean up</div></div>
+            <div class="qa"><div class="qi" style="background:var(--c-doc-c)"><span class="icon" style="color:var(--c-doc)"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M4 6h7v5H4zM13 6h7v9h-7zM4 13h7v5H4z"/></svg></span></div><div class="ql">Large files</div></div>
+            <div class="qa"><div class="qi" style="background:var(--c-fav-c)"><span class="icon" style="color:var(--c-fav)"><svg viewBox="0 0 24 24" fill="currentColor"><path d="m12 3 2.6 5.6 6.1.7-4.5 4.2 1.2 6-5.4-3-5.4 3 1.2-6L3.3 9.3l6.1-.7L12 3Z"/></svg></span></div><div class="ql">Favourites</div></div>
+            <div class="qa"><div class="qi" style="background:var(--c-folder-c)"><span class="icon" style="color:var(--c-folder)"><svg viewBox="0 0 24 24" fill="none"><path d="M6 7h12l-1 13H7L6 7Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M9 7V5h6v2" stroke="currentColor" stroke-width="2"/></svg></span></div><div class="ql">Trash</div></div>
+          </div>
+          <!-- storage locations (the Browse entry) -->
+          <div class="shead"><h3>Storage</h3><span class="link">Browse all ›</span></div>
+          <div class="loc">
+            <div class="li" style="background:var(--blue-soft)"><span class="icon" style="color:var(--cyan)"><svg viewBox="0 0 24 24" fill="none"><rect x="3" y="4" width="18" height="16" rx="2.5" stroke="currentColor" stroke-width="2"/><path d="M3 9h18" stroke="currentColor" stroke-width="2"/><circle cx="7" cy="6.5" r="1" fill="currentColor"/></svg></span></div>
+            <div class="lg"><div class="ln">Internal storage</div><div class="lb"><i style="width:69%"></i></div><div class="lm">167 GB used · 88.4 GB free</div></div>
+            <div class="chev"><span class="icon"><svg viewBox="0 0 24 24" fill="none"><path d="m9 6 6 6-6 6" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span></div>
+          </div>
+          <div class="loc">
+            <div class="li" style="background:var(--c-download-c)"><span class="icon" style="color:var(--c-download)"><svg viewBox="0 0 24 24" fill="none"><rect x="4" y="4" width="16" height="16" rx="2.5" stroke="currentColor" stroke-width="2"/><rect x="9" y="9" width="6" height="6" rx="1" fill="currentColor"/></svg></span></div>
+            <div class="lg"><div class="ln">SD card</div><div class="lb"><i style="width:34%;background:var(--c-download)"></i></div><div class="lm">21 GB used · 43 GB free</div></div>
+            <div class="chev"><span class="icon"><svg viewBox="0 0 24 24" fill="none"><path d="m9 6 6 6-6 6" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span></div>
+          </div>
+          <!-- categories -->
+          <div class="shead"><h3>Categories</h3></div>
+          <div class="cats">
+            <div class="cat"><div class="ci" style="background:var(--c-image-c)"><span class="icon" style="color:var(--c-image)"><svg viewBox="0 0 24 24" fill="none"><rect x="3" y="4" width="18" height="16" rx="3" stroke="currentColor" stroke-width="2"/><circle cx="8.5" cy="9" r="1.6" fill="currentColor"/><path d="m4 18 5-5 4 4 3-3 4 4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span></div><div class="cl">Images</div><div class="cc">4,218</div></div>
+            <div class="cat"><div class="ci" style="background:var(--c-video-c)"><span class="icon" style="color:var(--c-video)"><svg viewBox="0 0 24 24" fill="none"><rect x="3" y="5" width="18" height="14" rx="3" stroke="currentColor" stroke-width="2"/><path d="m10 9 5 3-5 3V9Z" fill="currentColor"/></svg></span></div><div class="cl">Videos</div><div class="cc">312</div></div>
+            <div class="cat"><div class="ci" style="background:var(--c-audio-c)"><span class="icon" style="color:var(--c-audio)"><svg viewBox="0 0 24 24" fill="none"><path d="M9 18V6l10-2v12" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><circle cx="6.5" cy="18" r="2.5" fill="currentColor"/><circle cx="16.5" cy="16" r="2.5" fill="currentColor"/></svg></span></div><div class="cl">Audio</div><div class="cc">867</div></div>
+            <div class="cat"><div class="ci" style="background:var(--c-doc-c)"><span class="icon" style="color:var(--c-doc)"><svg viewBox="0 0 24 24" fill="none"><path d="M7 3h7l4 4v14H7V3Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M14 3v4h4M9 13h6M9 16h6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span></div><div class="cl">Docs</div><div class="cc">1,043</div></div>
+            <div class="cat"><div class="ci" style="background:var(--c-download-c)"><span class="icon" style="color:var(--c-download)"><svg viewBox="0 0 24 24" fill="none"><path d="M12 4v10m0 0 4-4m-4 4-4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M5 18h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span></div><div class="cl">Downloads</div><div class="cc">96</div></div>
+            <div class="cat"><div class="ci" style="background:var(--c-app-c)"><span class="icon" style="color:var(--c-app)"><svg viewBox="0 0 24 24" fill="none"><rect x="4" y="4" width="7" height="7" rx="1.6" stroke="currentColor" stroke-width="2"/><rect x="13" y="4" width="7" height="7" rx="1.6" stroke="currentColor" stroke-width="2"/><rect x="4" y="13" width="7" height="7" rx="1.6" stroke="currentColor" stroke-width="2"/><rect x="13" y="13" width="7" height="7" rx="1.6" stroke="currentColor" stroke-width="2"/></svg></span></div><div class="cl">Apps</div><div class="cc">58</div></div>
+            <div class="cat"><div class="ci" style="background:var(--c-archive-c)"><span class="icon" style="color:var(--c-archive)"><svg viewBox="0 0 24 24" fill="none"><rect x="5" y="3" width="14" height="18" rx="2" stroke="currentColor" stroke-width="2"/><path d="M12 3v4m0 2v2m0 2v3" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span></div><div class="cl">Archives</div><div class="cc">24</div></div>
+            <div class="cat"><div class="ci" style="background:var(--c-folder-c)"><span class="icon" style="color:var(--c-folder)"><svg viewBox="0 0 24 24" fill="none"><circle cx="6" cy="12" r="2" fill="currentColor"/><circle cx="12" cy="12" r="2" fill="currentColor"/><circle cx="18" cy="12" r="2" fill="currentColor"/></svg></span></div><div class="cl">More</div><div class="cc">›</div></div>
+          </div>
+          <!-- recent -->
+          <div class="shead"><h3>Recent</h3><span class="link">See all ›</span></div>
+          <div class="recent">
+            <div class="rcard"><div class="rthumb thumb ph-beach"></div><div class="rn">IMG_4821.jpg</div><div class="rm">2 min ago</div></div>
+            <div class="rcard"><div class="rthumb thumb ph-sunset"><div class="play"><i></i></div><span class="dur">1:24</span></div><div class="rn">Trip_reel.mp4</div><div class="rm">1 hr ago</div></div>
+            <div class="rcard"><div class="rthumb thumb ph-doc"></div><div class="rn">Invoice_Q3.pdf</div><div class="rm">Today</div></div>
+          </div>
+        </div>
+      </div>
+      <div class="fab round"><span class="icon"><svg viewBox="0 0 24 24" fill="none"><path d="M4 7a2 2 0 0 1 2-2h4l2 2h6a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V7Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M12 11v5M9.5 13.5h5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span></div>
+      <div class="bnav">
+        <div class="nav on"><div class="navpill"><span class="icon"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 11 12 3l9 8v9a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1v-9Z"/></svg></span></div><span class="nl">Home</span></div>
+        <div class="nav"><div class="navpill"><span class="icon"><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2"/><path d="M12 7v5l3 2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span></div><span class="nl">Recent</span></div>
+        <div class="nav"><div class="navpill"><span class="icon"><svg viewBox="0 0 24 24" fill="none"><path d="M5 20 14 7l3 3L8 23l-3-3Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M15 4l1 2 2 1-2 1-1 2-1-2-2-1 2-1 1-2Z" fill="currentColor"/></svg></span></div><span class="nl">Cleaner</span></div>
+      </div>
+    </div>
+    <div class="cap">3 · Home (complete, §6.5)<span>Confident gradient storage ring hero · chunky quick tiles · location rows are the Browse entry · real recent thumbnails.</span></div>
+  </div>
+
+</div>
+
+<div class="sectlabel">Browse — the content-first heart (list · grid)</div>
+<div class="sectnote">Opened from a Storage location. Content is the hero, chrome is quiet. List for mixed folders, grid for media-dense ones — one-tap toggle, state persists.</div>
+<div class="gallery">
+
+  <!-- 4. BROWSE LIST -->
+  <div class="frame">
+    <div class="phone">
+      <div class="notch"></div>
+      <div class="scroll">
+        <div class="content">
+          <div class="status"><span>9:41</span><span class="r"><span class="icon"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M2 20h.01M6 20v-4M10 20v-8M14 20V8M18 20V4" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg></span><span class="bat"></span></span></div>
+          <div class="appbar">
+            <span class="iconbtn"><span class="icon"><svg viewBox="0 0 24 24" fill="none"><path d="m15 6-6 6 6 6" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span></span>
+            <div class="crumbs"><span>Internal</span><span class="sep">/</span><b>DCIM</b></div>
+            <div class="grp">
+              <span class="iconbtn"><span class="icon"><svg viewBox="0 0 24 24" fill="currentColor"><rect x="4" y="4" width="7" height="7" rx="1.6"/><rect x="13" y="4" width="7" height="7" rx="1.6"/><rect x="4" y="13" width="7" height="7" rx="1.6"/><rect x="13" y="13" width="7" height="7" rx="1.6"/></svg></span></span>
+              <span class="iconbtn"><span class="icon"><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="5" r="1.7" fill="currentColor"/><circle cx="12" cy="12" r="1.7" fill="currentColor"/><circle cx="12" cy="19" r="1.7" fill="currentColor"/></svg></span></span>
+            </div>
+          </div>
+          <div class="searchbar"><span class="icon"><svg viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2.2"/><path d="m20 20-3-3" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg></span><span class="ph">Search in DCIM</span></div>
+          <div class="list">
+            <div class="row"><div class="tile" style="background:var(--c-folder-c)"><span class="icon" style="color:var(--c-folder)"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7Z"/></svg></span></div><div class="gr"><div class="nm">Camera</div><div class="mt">1,204 items · 12.4 GB</div></div><div class="tail"><span class="icon"><svg viewBox="0 0 24 24" fill="none"><path d="m9 6 6 6-6 6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span></div></div>
+            <div class="row"><div class="tile" style="background:var(--c-folder-c)"><span class="icon" style="color:var(--c-folder)"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7Z"/></svg></span></div><div class="gr"><div class="nm">Screenshots</div><div class="mt">318 items · 1.1 GB</div></div><div class="tail"><span class="icon"><svg viewBox="0 0 24 24" fill="none"><path d="m9 6 6 6-6 6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span></div></div>
+            <div class="row"><div class="tile thumb ph-beach" style="border-radius:15px"></div><div class="gr"><div class="nm">IMG_4821.jpg</div><div class="mt">4.2 MB · Today, 9:38</div></div><div class="tail"><span class="icon"><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="5" r="1.7" fill="currentColor"/><circle cx="12" cy="12" r="1.7" fill="currentColor"/><circle cx="12" cy="19" r="1.7" fill="currentColor"/></svg></span></div></div>
+            <div class="row"><div class="tile thumb ph-sunset" style="border-radius:15px"><span class="dur" style="bottom:3px;right:3px;font-size:9px">1:24</span></div><div class="gr"><div class="nm">Trip_reel.mp4</div><div class="mt">86 MB · Yesterday</div></div><div class="tail"><span class="icon"><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="5" r="1.7" fill="currentColor"/><circle cx="12" cy="12" r="1.7" fill="currentColor"/><circle cx="12" cy="19" r="1.7" fill="currentColor"/></svg></span></div></div>
+            <div class="row"><div class="tile thumb ph-mountain" style="border-radius:15px"></div><div class="gr"><div class="nm">IMG_4790.jpg</div><div class="mt">3.8 MB · Yesterday</div></div><div class="tail"><span class="icon"><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="5" r="1.7" fill="currentColor"/><circle cx="12" cy="12" r="1.7" fill="currentColor"/><circle cx="12" cy="19" r="1.7" fill="currentColor"/></svg></span></div></div>
+            <div class="row"><div class="tile thumb ph-portrait" style="border-radius:15px"></div><div class="gr"><div class="nm">IMG_4788.jpg</div><div class="mt">5.1 MB · Mon</div></div><div class="tail"><span class="icon"><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="5" r="1.7" fill="currentColor"/><circle cx="12" cy="12" r="1.7" fill="currentColor"/><circle cx="12" cy="19" r="1.7" fill="currentColor"/></svg></span></div></div>
+            <div class="row"><div class="tile" style="background:var(--c-archive-c)"><span class="icon" style="color:var(--c-archive)"><svg viewBox="0 0 24 24" fill="none"><rect x="5" y="3" width="14" height="18" rx="2" stroke="currentColor" stroke-width="2"/><path d="M12 3v3m0 2v2m0 2v3" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span></div><div class="gr"><div class="nm">old_photos.zip</div><div class="mt">240 MB · Last week</div></div><div class="tail"><span class="icon"><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="5" r="1.7" fill="currentColor"/><circle cx="12" cy="12" r="1.7" fill="currentColor"/><circle cx="12" cy="19" r="1.7" fill="currentColor"/></svg></span></div></div>
+          </div>
+        </div>
+      </div>
+      <div class="fab"><span class="icon"><svg viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg></span>New folder</div>
+      <div class="bnav">
+        <div class="nav on"><div class="navpill"><span class="icon"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 11 12 3l9 8v9a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1v-9Z"/></svg></span></div><span class="nl">Home</span></div>
+        <div class="nav"><div class="navpill"><span class="icon"><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2"/><path d="M12 7v5l3 2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span></div><span class="nl">Recent</span></div>
+        <div class="nav"><div class="navpill"><span class="icon"><svg viewBox="0 0 24 24" fill="none"><path d="M5 20 14 7l3 3L8 23l-3-3Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M15 4l1 2 2 1-2 1-1 2-1-2-2-1 2-1 1-2Z" fill="currentColor"/></svg></span></div><span class="nl">Cleaner</span></div>
+      </div>
+    </div>
+    <div class="cap">4 · Browse — list<span>Real thumbnail leading tiles for media; tinted category squares for folders/archives. Custom app bar, not M3.</span></div>
+  </div>
+
+  <!-- 5. BROWSE GRID -->
+  <div class="frame">
+    <div class="phone">
+      <div class="notch"></div>
+      <div class="scroll">
+        <div class="content">
+          <div class="status"><span>9:41</span><span class="r"><span class="icon"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M2 20h.01M6 20v-4M10 20v-8M14 20V8M18 20V4" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg></span><span class="bat"></span></span></div>
+          <div class="appbar">
+            <span class="iconbtn"><span class="icon"><svg viewBox="0 0 24 24" fill="none"><path d="m15 6-6 6 6 6" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span></span>
+            <div class="crumbs"><span>DCIM</span><span class="sep">/</span><b>Camera</b></div>
+            <div class="grp">
+              <span class="iconbtn" style="background:var(--blue-soft)"><span class="icon" style="color:var(--cyan)"><svg viewBox="0 0 24 24" fill="none"><path d="M4 6h16M4 12h16M4 18h16" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg></span></span>
+              <span class="iconbtn"><span class="icon"><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="5" r="1.7" fill="currentColor"/><circle cx="12" cy="12" r="1.7" fill="currentColor"/><circle cx="12" cy="19" r="1.7" fill="currentColor"/></svg></span></span>
+            </div>
+          </div>
+          <div class="chips">
+            <span class="chip on">All</span>
+            <span class="chip">Photos</span>
+            <span class="chip">Videos</span>
+            <span class="chip"><span class="icon"><svg viewBox="0 0 24 24" fill="none"><path d="M4 6h16M7 12h10M10 18h4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span>Newest</span>
+          </div>
+          <div class="grid">
+            <div class="gcard"><div class="gthumb thumb ph-beach"></div><div class="gmeta"><div class="gn">IMG_4821.jpg</div><div class="gm">4.2 MB · Today</div></div></div>
+            <div class="gcard"><div class="gthumb thumb ph-sunset"><div class="play"><i></i></div><span class="dur">1:24</span></div><div class="gmeta"><div class="gn">Trip_reel.mp4</div><div class="gm">86 MB · Video</div></div></div>
+            <div class="gcard"><div class="gthumb thumb ph-mountain"></div><div class="gmeta"><div class="gn">IMG_4790.jpg</div><div class="gm">3.8 MB · Yest.</div></div></div>
+            <div class="gcard"><div class="gthumb thumb ph-portrait"></div><div class="gmeta"><div class="gn">IMG_4788.jpg</div><div class="gm">5.1 MB · Mon</div></div></div>
+            <div class="gcard"><div class="gthumb thumb ph-city"></div><div class="gmeta"><div class="gn">IMG_4760.jpg</div><div class="gm">4.0 MB · Mon</div></div></div>
+            <div class="gcard"><div class="gthumb thumb ph-night"><div class="play"><i></i></div><span class="dur">0:32</span></div><div class="gmeta"><div class="gn">Concert.mp4</div><div class="gm">120 MB · Video</div></div></div>
+            <div class="gcard"><div class="gthumb thumb ph-forest"></div><div class="gmeta"><div class="gn">IMG_4712.jpg</div><div class="gm">3.5 MB · Sun</div></div></div>
+            <div class="gcard"><div class="gthumb thumb ph-food"></div><div class="gmeta"><div class="gn">IMG_4699.jpg</div><div class="gm">2.9 MB · Sun</div></div></div>
+          </div>
+        </div>
+      </div>
+      <div class="fab round"><span class="icon"><svg viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg></span></div>
+      <div class="bnav">
+        <div class="nav on"><div class="navpill"><span class="icon"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 11 12 3l9 8v9a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1v-9Z"/></svg></span></div><span class="nl">Home</span></div>
+        <div class="nav"><div class="navpill"><span class="icon"><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2"/><path d="M12 7v5l3 2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span></div><span class="nl">Recent</span></div>
+        <div class="nav"><div class="navpill"><span class="icon"><svg viewBox="0 0 24 24" fill="none"><path d="M5 20 14 7l3 3L8 23l-3-3Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M15 4l1 2 2 1-2 1-1 2-1-2-2-1 2-1 1-2Z" fill="currentColor"/></svg></span></div><span class="nl">Cleaner</span></div>
+      </div>
+    </div>
+    <div class="cap">5 · Browse — grid<span>Media-forward: big 16px-radius thumbnails, play glyphs + duration badges. Filter chips ride above.</span></div>
+  </div>
+
+  <!-- 6. MULTI-SELECT + ACTION BAR -->
+  <div class="frame">
+    <div class="phone">
+      <div class="notch"></div>
+      <div class="scroll nonav">
+        <div class="content">
+          <div class="status"><span>9:41</span><span class="r"><span class="icon"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M2 20h.01M6 20v-4M10 20v-8M14 20V8M18 20V4" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg></span><span class="bat"></span></span></div>
+          <div class="selbar">
+            <span class="iconbtn ghost"><span class="icon"><svg viewBox="0 0 24 24" fill="none"><path d="M6 6l12 12M18 6 6 18" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg></span></span>
+            <span class="sc">3 selected</span>
+            <span class="iconbtn ghost"><span class="icon"><svg viewBox="0 0 24 24" fill="none"><path d="M4 7h16M4 12h16M4 17h10" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/><path d="m17 16 2 2 3-3" stroke="var(--cyan)" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span></span>
+          </div>
+          <div class="list">
+            <div class="row sel"><div class="selcheck"><span class="icon"><svg viewBox="0 0 24 24" fill="none"><path d="m5 13 4 4L19 7" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span></div><div class="tile thumb ph-beach" style="border-radius:15px"></div><div class="gr"><div class="nm">IMG_4821.jpg</div><div class="mt">4.2 MB · Today</div></div></div>
+            <div class="row"><div class="selring"></div><div class="tile thumb ph-sunset" style="border-radius:15px"><span class="dur" style="bottom:3px;right:3px;font-size:9px">1:24</span></div><div class="gr"><div class="nm">Trip_reel.mp4</div><div class="mt">86 MB · Yesterday</div></div></div>
+            <div class="row sel"><div class="selcheck"><span class="icon"><svg viewBox="0 0 24 24" fill="none"><path d="m5 13 4 4L19 7" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span></div><div class="tile thumb ph-mountain" style="border-radius:15px"></div><div class="gr"><div class="nm">IMG_4790.jpg</div><div class="mt">3.8 MB · Yesterday</div></div></div>
+            <div class="row sel"><div class="selcheck"><span class="icon"><svg viewBox="0 0 24 24" fill="none"><path d="m5 13 4 4L19 7" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span></div><div class="tile thumb ph-portrait" style="border-radius:15px"></div><div class="gr"><div class="nm">IMG_4788.jpg</div><div class="mt">5.1 MB · Mon</div></div></div>
+            <div class="row"><div class="selring"></div><div class="tile thumb ph-city" style="border-radius:15px"></div><div class="gr"><div class="nm">IMG_4760.jpg</div><div class="mt">4.0 MB · Mon</div></div></div>
+            <div class="row"><div class="selring"></div><div class="tile thumb ph-food" style="border-radius:15px"></div><div class="gr"><div class="nm">IMG_4699.jpg</div><div class="mt">2.9 MB · Sun</div></div></div>
+          </div>
+        </div>
+        <!-- action bar (hero piece) -->
+        <div class="actionbar">
+          <div class="act"><div class="ai"><span class="icon"><svg viewBox="0 0 24 24" fill="none"><path d="M4 8a2 2 0 0 1 2-2h4l2 2h6a2 2 0 0 1 2 2v6a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V8Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M12 11v4m2-2h-4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span></div><div class="al">Move</div></div>
+          <div class="act"><div class="ai"><span class="icon"><svg viewBox="0 0 24 24" fill="none"><rect x="8" y="8" width="12" height="12" rx="2.5" stroke="currentColor" stroke-width="2"/><path d="M4 16V6a2 2 0 0 1 2-2h8" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span></div><div class="al">Copy</div></div>
+          <div class="act"><div class="ai"><span class="icon"><svg viewBox="0 0 24 24" fill="none"><circle cx="6" cy="12" r="2.4" stroke="currentColor" stroke-width="2"/><circle cx="18" cy="6" r="2.4" stroke="currentColor" stroke-width="2"/><circle cx="18" cy="18" r="2.4" stroke="currentColor" stroke-width="2"/><path d="m8 11 8-4M8 13l8 4" stroke="currentColor" stroke-width="2"/></svg></span></div><div class="al">Share</div></div>
+          <div class="act danger"><div class="ai"><span class="icon"><svg viewBox="0 0 24 24" fill="none"><path d="M6 7h12l-1 13H7L6 7Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M9 7V5h6v2M10 11v5M14 11v5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span></div><div class="al">Delete</div></div>
+          <div class="act"><div class="ai"><span class="icon"><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="1.8" fill="currentColor"/><circle cx="5" cy="12" r="1.8" fill="currentColor"/><circle cx="19" cy="12" r="1.8" fill="currentColor"/></svg></span></div><div class="al">More</div></div>
+        </div>
+      </div>
+    </div>
+    <div class="cap">6 · Multi-select + action bar<span>The InShot hero: long-press → the object is the interface. Big single-purpose tiles in the thumb zone; Delete alone carries error tint.</span></div>
+  </div>
+
+</div>
+
+<div class="sectlabel">Find · preview · act</div>
+<div class="sectnote">Search with AND-combining filter chips · immersive dark file preview · honest move/copy progress with reversible feedback.</div>
+<div class="gallery">
+
+  <!-- 7. SEARCH -->
+  <div class="frame">
+    <div class="phone">
+      <div class="notch"></div>
+      <div class="scroll">
+        <div class="content">
+          <div class="status"><span>9:41</span><span class="r"><span class="icon"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M2 20h.01M6 20v-4M10 20v-8M14 20V8M18 20V4" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg></span><span class="bat"></span></span></div>
+          <div class="appbar" style="padding-bottom:2px">
+            <span class="iconbtn"><span class="icon"><svg viewBox="0 0 24 24" fill="none"><path d="m15 6-6 6 6 6" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span></span>
+            <div class="crumbs"><b style="font-size:19px">Search</b></div>
+          </div>
+          <div class="searchbar active"><span class="icon" style="color:var(--cyan)"><svg viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="2.2"/><path d="m20 20-3-3" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg></span><span class="ph" style="color:var(--ink);font-weight:700">invoice</span><span class="cursor"></span></div>
+          <div class="chips">
+            <span class="chip on">Documents <span class="x">✕</span></span>
+            <span class="chip on">This month <span class="x">✕</span></span>
+            <span class="chip">&gt; 1 MB</span>
+            <span class="chip"><span class="icon"><svg viewBox="0 0 24 24" fill="none"><path d="M4 6h16M7 12h10M10 18h4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span>Filters</span>
+          </div>
+          <div class="shead" style="padding-top:6px"><h3 style="font-size:14px">4 results</h3></div>
+          <div class="list">
+            <div class="row"><div class="tile thumb ph-doc" style="border-radius:15px"></div><div class="gr"><div class="nm">Invoice_Q3.pdf</div><div class="mt">240 KB · Documents · Today</div></div><div class="tail"><span class="icon"><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="5" r="1.7" fill="currentColor"/><circle cx="12" cy="12" r="1.7" fill="currentColor"/><circle cx="12" cy="19" r="1.7" fill="currentColor"/></svg></span></div></div>
+            <div class="row"><div class="tile thumb ph-doc" style="border-radius:15px"></div><div class="gr"><div class="nm">Invoice_Aug.pdf</div><div class="mt">198 KB · Documents · Aug 3</div></div><div class="tail"><span class="icon"><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="5" r="1.7" fill="currentColor"/><circle cx="12" cy="12" r="1.7" fill="currentColor"/><circle cx="12" cy="19" r="1.7" fill="currentColor"/></svg></span></div></div>
+            <div class="row"><div class="tile" style="background:var(--c-doc-c)"><span class="icon" style="color:var(--c-doc)"><svg viewBox="0 0 24 24" fill="none"><path d="M7 3h7l4 4v14H7V3Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M9 12h6M9 16h4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span></div><div class="gr"><div class="nm">invoice_notes.docx</div><div class="mt">44 KB · Documents · Aug 1</div></div><div class="tail"><span class="icon"><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="5" r="1.7" fill="currentColor"/><circle cx="12" cy="12" r="1.7" fill="currentColor"/><circle cx="12" cy="19" r="1.7" fill="currentColor"/></svg></span></div></div>
+            <div class="row"><div class="tile" style="background:var(--c-archive-c)"><span class="icon" style="color:var(--c-archive)"><svg viewBox="0 0 24 24" fill="none"><rect x="5" y="3" width="14" height="18" rx="2" stroke="currentColor" stroke-width="2"/><path d="M12 3v3m0 2v2m0 2v3" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span></div><div class="gr"><div class="nm">invoices_2024.zip</div><div class="mt">2.1 MB · Archive · Jul 28</div></div><div class="tail"><span class="icon"><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="5" r="1.7" fill="currentColor"/><circle cx="12" cy="12" r="1.7" fill="currentColor"/><circle cx="12" cy="19" r="1.7" fill="currentColor"/></svg></span></div></div>
+          </div>
+        </div>
+      </div>
+      <div class="bnav">
+        <div class="nav on"><div class="navpill"><span class="icon"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 11 12 3l9 8v9a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1v-9Z"/></svg></span></div><span class="nl">Home</span></div>
+        <div class="nav"><div class="navpill"><span class="icon"><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2"/><path d="M12 7v5l3 2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span></div><span class="nl">Recent</span></div>
+        <div class="nav"><div class="navpill"><span class="icon"><svg viewBox="0 0 24 24" fill="none"><path d="M5 20 14 7l3 3L8 23l-3-3Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M15 4l1 2 2 1-2 1-1 2-1-2-2-1 2-1 1-2Z" fill="currentColor"/></svg></span></div><span class="nl">Cleaner</span></div>
+      </div>
+    </div>
+    <div class="cap">7 · Search<span>Live query + removable AND-combining chips (type · date · size). Active field gets a blue focus ring.</span></div>
+  </div>
+
+  <!-- 8. FILE PREVIEW -->
+  <div class="frame">
+    <div class="phone">
+      <div class="notch"></div>
+      <div class="pv">
+        <div class="status" style="color:#fff"><span>9:41</span><span class="r"><span class="icon"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M2 20h.01M6 20v-4M10 20v-8M14 20V8M18 20V4" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg></span><span class="bat"></span></span></div>
+        <div class="pbar">
+          <span class="iconbtn"><span class="icon"><svg viewBox="0 0 24 24" fill="none"><path d="m15 6-6 6 6 6" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span></span>
+          <div class="pt"><div class="pn">IMG_4821.jpg</div><div class="pm">4.2 MB · 4032 × 3024 · Today 9:38</div></div>
+          <span class="iconbtn"><span class="icon"><svg viewBox="0 0 24 24" fill="currentColor"><path d="m12 3 2.6 5.6 6.1.7-4.5 4.2 1.2 6-5.4-3-5.4 3 1.2-6L3.3 9.3l6.1-.7L12 3Z" fill="none" stroke="currentColor" stroke-width="2"/></svg></span></span>
+        </div>
+        <div class="pimg thumb ph-beach">
+          <div class="badge tl" style="top:12px;bottom:auto;left:12px;background:rgba(0,0,0,.5)">1 / 4,218</div>
+        </div>
+        <div class="pactions">
+          <div class="pa"><span class="icon"><svg viewBox="0 0 24 24" fill="none"><circle cx="6" cy="12" r="2.4" stroke="currentColor" stroke-width="2"/><circle cx="18" cy="6" r="2.4" stroke="currentColor" stroke-width="2"/><circle cx="18" cy="18" r="2.4" stroke="currentColor" stroke-width="2"/><path d="m8 11 8-4M8 13l8 4" stroke="currentColor" stroke-width="2"/></svg></span><span class="pl">Share</span></div>
+          <div class="pa"><span class="icon"><svg viewBox="0 0 24 24" fill="none"><path d="M4 8a2 2 0 0 1 2-2h4l2 2h6a2 2 0 0 1 2 2v6a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V8Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></svg></span><span class="pl">Move</span></div>
+          <div class="pa"><span class="icon"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 3 2.6 8.6l6.1.7L12 3Z" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="12" cy="14" r="6" fill="none" stroke="currentColor" stroke-width="2"/></svg></span><span class="pl">Info</span></div>
+          <div class="pa"><span class="icon"><svg viewBox="0 0 24 24" fill="none"><path d="M6 7h12l-1 13H7L6 7Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M9 7V5h6v2" stroke="currentColor" stroke-width="2"/></svg></span><span class="pl">Delete</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="cap">8 · File preview<span>Immersive true-black canvas, media fills the frame edge-to-edge, chrome fades over gradients. Pinch-zoom + swipe implied by the counter.</span></div>
+  </div>
+
+  <!-- 9. MOVE/COPY PROGRESS -->
+  <div class="frame">
+    <div class="phone">
+      <div class="notch"></div>
+      <div class="scroll">
+        <div class="content">
+          <div class="status"><span>9:41</span><span class="r"><span class="icon"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M2 20h.01M6 20v-4M10 20v-8M14 20V8M18 20V4" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg></span><span class="bat"></span></span></div>
+          <div class="appbar">
+            <span class="iconbtn"><span class="icon"><svg viewBox="0 0 24 24" fill="none"><path d="m15 6-6 6 6 6" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span></span>
+            <div class="crumbs"><span>Internal</span><span class="sep">/</span><b>Pictures</b></div>
+          </div>
+          <div class="list" style="opacity:.4;filter:blur(.4px)">
+            <div class="row"><div class="tile" style="background:var(--c-folder-c)"><span class="icon" style="color:var(--c-folder)"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7Z"/></svg></span></div><div class="gr"><div class="nm">Albums</div><div class="mt">12 items</div></div></div>
+            <div class="row"><div class="tile thumb ph-mountain" style="border-radius:15px"></div><div class="gr"><div class="nm">IMG_4501.jpg</div><div class="mt">3.1 MB</div></div></div>
+            <div class="row"><div class="tile thumb ph-forest" style="border-radius:15px"></div><div class="gr"><div class="nm">IMG_4488.jpg</div><div class="mt">3.9 MB</div></div></div>
+          </div>
+        </div>
+      </div>
+      <div class="scrim"></div>
+      <div class="sheet">
+        <div class="handle"></div>
+        <h3>Moving 3 items</h3>
+        <div class="prog-row">
+          <div class="prog-ic"><span class="icon"><svg viewBox="0 0 24 24" fill="none"><path d="M4 8a2 2 0 0 1 2-2h4l2 2h6a2 2 0 0 1 2 2v6a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V8Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="m10 13 2 2 4-4" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span></div>
+          <div class="prog-t"><div class="pf">IMG_4790.jpg → Pictures/</div><div class="ps">2 of 3 · 42 MB of 94 MB</div></div>
+        </div>
+        <div class="pbar-track"><i style="width:64%"></i></div>
+        <div class="pbar-meta"><span><b>64%</b> complete</span><span>~4s left</span></div>
+        <div class="sbtn">Cancel</div>
+      </div>
+      <div class="bnav">
+        <div class="nav on"><div class="navpill"><span class="icon"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 11 12 3l9 8v9a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1v-9Z"/></svg></span></div><span class="nl">Home</span></div>
+        <div class="nav"><div class="navpill"><span class="icon"><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2"/><path d="M12 7v5l3 2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span></div><span class="nl">Recent</span></div>
+        <div class="nav"><div class="navpill"><span class="icon"><svg viewBox="0 0 24 24" fill="none"><path d="M5 20 14 7l3 3L8 23l-3-3Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M15 4l1 2 2 1-2 1-1 2-1-2-2-1 2-1 1-2Z" fill="currentColor"/></svg></span></div><span class="nl">Cleaner</span></div>
+      </div>
+    </div>
+    <div class="cap">9 · Move / Copy progress<span>Live bottom-sheet with a determinate glowing bar, per-item detail + time left, cancel always present. Snackbar-undo follows.</span></div>
+  </div>
+
+</div>
+
+<div class="sectlabel">Settings · themes · edge states</div>
+<div class="sectnote">Dark-first is the default; light is offered. Every flow ships its non-happy states — empty, error, and the permission gate already shown up top.</div>
+<div class="gallery">
+
+  <!-- 10. SETTINGS / THEMES -->
+  <div class="frame">
+    <div class="phone">
+      <div class="notch"></div>
+      <div class="scroll">
+        <div class="content">
+          <div class="status"><span>9:41</span><span class="r"><span class="icon"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M2 20h.01M6 20v-4M10 20v-8M14 20V8M18 20V4" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg></span><span class="bat"></span></span></div>
+          <div class="appbar">
+            <span class="iconbtn"><span class="icon"><svg viewBox="0 0 24 24" fill="none"><path d="m15 6-6 6 6 6" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span></span>
+            <div class="crumbs"><b style="font-size:19px">Settings</b></div>
+          </div>
+          <div class="set-label">Appearance</div>
+          <div class="theme-swatches">
+            <div class="sw on"><div class="swtop" style="background:linear-gradient(160deg,#0e1320,#141a28)"></div><div class="swlbl" style="background:#141a28;color:#fff">Dark</div><div class="swcheck"><span class="icon"><svg viewBox="0 0 24 24" fill="none"><path d="m5 13 4 4L19 7" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span></div></div>
+            <div class="sw"><div class="swtop" style="background:linear-gradient(160deg,#f5f7fc,#e6ecf7)"></div><div class="swlbl" style="background:#fff;color:#15142b">Light</div></div>
+            <div class="sw"><div class="swtop" style="background:linear-gradient(160deg,#0e1320 50%,#f5f7fc 50%)"></div><div class="swlbl" style="background:#1a2233;color:#fff">System</div></div>
+          </div>
+          <div class="set-group" style="margin-top:14px">
+            <div class="set-row"><div class="si" style="background:var(--blue-soft)"><span class="icon" style="color:var(--cyan)"><svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="9"/></svg></span></div><div class="sg"><div class="st">Dynamic color</div><div class="ss">Match wallpaper (Android 12+)</div></div><div class="toggle"></div></div>
+            <div class="set-row"><div class="si" style="background:var(--c-image-c)"><span class="icon" style="color:var(--c-image)"><svg viewBox="0 0 24 24" fill="none"><rect x="4" y="6" width="16" height="12" rx="2" stroke="currentColor" stroke-width="2"/><path d="M4 15l4-4 3 3 3-3 6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span></div><div class="sg"><div class="st">Show hidden files</div><div class="ss">Files starting with a dot</div></div><div class="toggle off"></div></div>
+          </div>
+          <div class="set-label">Browsing</div>
+          <div class="set-group">
+            <div class="set-row"><div class="si" style="background:var(--c-folder-c)"><span class="icon" style="color:var(--c-folder)"><svg viewBox="0 0 24 24" fill="currentColor"><rect x="4" y="4" width="7" height="7" rx="1.6"/><rect x="13" y="4" width="7" height="7" rx="1.6"/><rect x="4" y="13" width="7" height="7" rx="1.6"/><rect x="13" y="13" width="7" height="7" rx="1.6"/></svg></span></div><div class="sg"><div class="st">Default view</div><div class="ss">Grid</div></div><span class="icon" style="color:var(--faint)"><svg viewBox="0 0 24 24" fill="none"><path d="m9 6 6 6-6 6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg></span></div>
+            <div class="set-row"><div class="si" style="background:var(--c-doc-c)"><span class="icon" style="color:var(--c-doc)"><svg viewBox="0 0 24 24" fill="none"><path d="M4 6h16M7 12h10M10 18h4" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span></div><div class="sg"><div class="st">Sort files by</div><div class="ss">Name · A–Z</div></div><span class="icon" style="color:var(--faint)"><svg viewBox="0 0 24 24" fill="none"><path d="m9 6 6 6-6 6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg></span></div>
+            <div class="set-row"><div class="si" style="background:var(--c-download-c)"><span class="icon" style="color:var(--c-download)"><svg viewBox="0 0 24 24" fill="none"><path d="M6 7h12l-1 13H7L6 7Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M9 7V5h6v2" stroke="currentColor" stroke-width="2"/></svg></span></div><div class="sg"><div class="st">Auto-empty Trash</div><div class="ss">After 30 days</div></div><div class="toggle"></div></div>
+          </div>
+          <div class="set-label">About</div>
+          <div class="set-group">
+            <div class="set-row"><div class="si" style="background:var(--blue-soft)"><span class="icon" style="color:var(--cyan)"><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2"/><path d="M12 11v5M12 8h.01" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg></span></div><div class="sg"><div class="st">Filora</div><div class="ss">Version 1.0 · Privacy policy</div></div><span class="icon" style="color:var(--faint)"><svg viewBox="0 0 24 24" fill="none"><path d="m9 6 6 6-6 6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg></span></div>
+          </div>
+        </div>
+      </div>
+      <div class="bnav">
+        <div class="nav on"><div class="navpill"><span class="icon"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 11 12 3l9 8v9a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1v-9Z"/></svg></span></div><span class="nl">Home</span></div>
+        <div class="nav"><div class="navpill"><span class="icon"><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2"/><path d="M12 7v5l3 2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span></div><span class="nl">Recent</span></div>
+        <div class="nav"><div class="navpill"><span class="icon"><svg viewBox="0 0 24 24" fill="none"><path d="M5 20 14 7l3 3L8 23l-3-3Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M15 4l1 2 2 1-2 1-1 2-1-2-2-1 2-1 1-2Z" fill="currentColor"/></svg></span></div><span class="nl">Cleaner</span></div>
+      </div>
+    </div>
+    <div class="cap">10 · Settings / Themes<span>Dark selected by default (with light + system). Dynamic color honoured. Chunky icon-led rows, not bare M3 list.</span></div>
+  </div>
+
+  <!-- 11. EMPTY -->
+  <div class="frame">
+    <div class="phone">
+      <div class="notch"></div>
+      <div class="scroll">
+        <div class="content" style="height:100%">
+          <div class="status"><span>9:41</span><span class="r"><span class="icon"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M2 20h.01M6 20v-4M10 20v-8M14 20V8M18 20V4" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg></span><span class="bat"></span></span></div>
+          <div class="appbar">
+            <span class="iconbtn"><span class="icon"><svg viewBox="0 0 24 24" fill="none"><path d="m15 6-6 6 6 6" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span></span>
+            <div class="crumbs"><span>Internal</span><span class="sep">/</span><b>New folder</b></div>
+          </div>
+          <div class="state" style="height:78%">
+            <div class="art" style="background:var(--blue-soft)"><span class="icon" style="color:var(--cyan)"><svg viewBox="0 0 24 24" fill="none"><path d="M4 8a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v6a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V8Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M12 11v5M9.5 13.5h5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></span></div>
+            <h2>This folder is empty</h2>
+            <p>Add files here, or move photos and documents in from anywhere on your device.</p>
+            <div class="cta"><div class="btn-primary" style="margin-top:0">Add files</div></div>
+          </div>
+        </div>
+      </div>
+      <div class="bnav">
+        <div class="nav on"><div class="navpill"><span class="icon"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 11 12 3l9 8v9a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1v-9Z"/></svg></span></div><span class="nl">Home</span></div>
+        <div class="nav"><div class="navpill"><span class="icon"><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2"/><path d="M12 7v5l3 2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span></div><span class="nl">Recent</span></div>
+        <div class="nav"><div class="navpill"><span class="icon"><svg viewBox="0 0 24 24" fill="none"><path d="M5 20 14 7l3 3L8 23l-3-3Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M15 4l1 2 2 1-2 1-1 2-1-2-2-1 2-1 1-2Z" fill="currentColor"/></svg></span></div><span class="nl">Cleaner</span></div>
+      </div>
+    </div>
+    <div class="cap">11 · Empty state<span>Warm, never a blank screen: friendly line + one clear primary action. Blue art, no alarm.</span></div>
+  </div>
+
+  <!-- 12. ERROR -->
+  <div class="frame">
+    <div class="phone">
+      <div class="notch"></div>
+      <div class="scroll">
+        <div class="content" style="height:100%">
+          <div class="status"><span>9:41</span><span class="r"><span class="icon"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M2 20h.01M6 20v-4M10 20v-8M14 20V8M18 20V4" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg></span><span class="bat"></span></span></div>
+          <div class="appbar">
+            <span class="iconbtn"><span class="icon"><svg viewBox="0 0 24 24" fill="none"><path d="m15 6-6 6 6 6" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></svg></span></span>
+            <div class="crumbs"><span>Internal</span><span class="sep">/</span><b>Android/data</b></div>
+          </div>
+          <div class="state" style="height:78%">
+            <div class="art" style="background:var(--error-soft)"><span class="icon" style="color:var(--error)"><svg viewBox="0 0 24 24" fill="none"><path d="M4 8a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v6a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V8Z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M12 10v3M12 16h.01" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg></span></div>
+            <h2>Couldn't open this folder</h2>
+            <p>This location is protected by Android and can't be accessed. Nothing was changed.</p>
+            <div class="cta"><div class="btn-outline">Try again</div><div class="btn-text" style="padding:8px">Go back</div></div>
+          </div>
+        </div>
+      </div>
+      <div class="bnav">
+        <div class="nav on"><div class="navpill"><span class="icon"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 11 12 3l9 8v9a1 1 0 0 1-1 1h-5v-6h-6v6H4a1 1 0 0 1-1-1v-9Z"/></svg></span></div><span class="nl">Home</span></div>
+        <div class="nav"><div class="navpill"><span class="icon"><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="2"/><path d="M12 7v5l3 2" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span></div><span class="nl">Recent</span></div>
+        <div class="nav"><div class="navpill"><span class="icon"><svg viewBox="0 0 24 24" fill="none"><path d="M5 20 14 7l3 3L8 23l-3-3Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M15 4l1 2 2 1-2 1-1 2-1-2-2-1 2-1 1-2Z" fill="currentColor"/></svg></span></div><span class="nl">Cleaner</span></div>
+      </div>
+    </div>
+    <div class="cap">12 · Error state<span>Calm, not alarming: cause line + reassurance (“nothing was changed”), Try again / Go back. Error color used sparingly.</span></div>
+  </div>
+
+  <!-- 13. DELETE CONFIRM + UNDO -->
+  <div class="frame">
+    <div class="phone">
+      <div class="notch"></div>
+      <div class="scroll nonav">
+        <div class="content">
+          <div class="status"><span>9:41</span><span class="r"><span class="icon"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M2 20h.01M6 20v-4M10 20v-8M14 20V8M18 20V4" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg></span><span class="bat"></span></span></div>
+          <div class="selbar">
+            <span class="iconbtn ghost"><span class="icon"><svg viewBox="0 0 24 24" fill="none"><path d="M6 6l12 12M18 6 6 18" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg></span></span>
+            <span class="sc">3 selected</span>
+          </div>
+          <div class="list" style="opacity:.45;filter:blur(.4px)">
+            <div class="row sel"><div class="selcheck"><span class="icon"><svg viewBox="0 0 24 24" fill="none"><path d="m5 13 4 4L19 7" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span></div><div class="tile thumb ph-beach" style="border-radius:15px"></div><div class="gr"><div class="nm">IMG_4821.jpg</div><div class="mt">4.2 MB · Today</div></div></div>
+            <div class="row sel"><div class="selcheck"><span class="icon"><svg viewBox="0 0 24 24" fill="none"><path d="m5 13 4 4L19 7" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span></div><div class="tile thumb ph-mountain" style="border-radius:15px"></div><div class="gr"><div class="nm">IMG_4790.jpg</div><div class="mt">3.8 MB · Yesterday</div></div></div>
+          </div>
+        </div>
+        <div class="scrim"></div>
+        <div class="sheet">
+          <div class="handle"></div>
+          <div style="display:flex;align-items:center;gap:14px;margin-top:4px">
+            <div class="prog-ic" style="background:var(--error-soft)"><span class="icon" style="color:var(--error)"><svg viewBox="0 0 24 24" fill="none"><path d="M6 7h12l-1 13H7L6 7Z" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M9 7V5h6v2M10 11v5M14 11v5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span></div>
+            <div><h3>Delete 3 items?</h3><div class="ps" style="color:var(--muted);font-size:13px;font-weight:600;margin-top:3px">They move to Trash — restore for 30 days.</div></div>
+          </div>
+          <div class="btn-tonal" style="margin-top:20px;background:var(--error-soft);color:var(--error);border-color:rgba(242,109,114,.3)">Move to Trash</div>
+          <div class="sbtn" style="border:none;margin-top:6px">Cancel</div>
+        </div>
+        <div class="toast" style="bottom:20px">
+          <span class="tdot"><span class="icon"><svg viewBox="0 0 24 24" fill="none"><path d="m5 13 4 4L19 7" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span></span>
+          <span class="tm">3 items moved to Trash</span>
+          <span class="tu">Undo</span>
+        </div>
+      </div>
+    </div>
+    <div class="cap">13 · Delete confirm + undo<span>Honest &amp; reversible: reversibility surfaced before the tap; a Snackbar Undo follows. Error tint only here.</span></div>
+  </div>
+
+</div>
+
+<div class="legend-note">
+  <h4>Taste mapping — why each choice reads as InShot-grade, not stock Material</h4>
+  The <b>dark-first charcoal canvas</b> with a single blue <span class="src">#2563EB</span> accent and edge-to-edge media previews is the <span class="src">InShot</span> instinct — dark, bold, media-forward — applied without garishness (one accent + a fixed category wheel = <span class="src">Simple Design Ltd.</span>’s “one system applied ruthlessly,” ~2B installs). <b>Large real-looking thumbnails</b> with rounded 16px corners, size/duration badges and play glyphs answer the “content is the hero” principle and directly fix the “low-fi grey blocks = poor UI” note; folders/docs fall back to <b>tinted category tiles</b> (the accent wheel as encoding, like syntax highlighting). The <b>chunky bottom action bar</b> of big single-purpose tiles is the <span class="src">InShot</span> “object is the interface” multi-select pattern kept firmly in the thumb zone (<span class="src">Mobile_V5</span> thumb-first ergonomics); Delete alone carries error tint so destructive intent is never ambiguous. <b>Soft depth and shadow</b> (not flat outlines), a confident gradient <b>storage-ring hero</b>, filled cohesive icons and a lean <b>Home · Recent · Cleaner</b> bar deliver premium polish while staying <span class="src">native &amp; trustworthy</span> (dynamic color honoured, true dark first-class). Warmth and honesty — trust-first permission gate, friendly empty state, calm error (“nothing was changed”), and reversible delete with an Undo snackbar — are the <span class="src">BetterApp</span> / warmth-is-a-feature and fast-&amp;-honest principles. Every value maps to <code>core-ui/theme</code> tokens (design-system §6 dark family, §6.5 Home, §7 Browse, §8 multi-select) — nothing hard-coded, no second brand color, no 5th body size.
+</div>
+
+<div class="mini">Filora · InShot-grade recovery pass (APP-141) · dark-first · blue #2563EB · Home·Recent·Cleaner · built on the ratified blue foundation (APP-137 design-system §6.5/§7/§8). For Chief fidelity review before board confirmation on APP-136.</div>
+
+</body>
+</html>
