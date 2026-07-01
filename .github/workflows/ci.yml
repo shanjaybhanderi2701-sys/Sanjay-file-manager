@@ -215,8 +215,12 @@ jobs:
           force-avd-creation: false
           emulator-options: -no-snapshot-save -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim
           disable-animations: true
+          # `connectedStandardDebugAndroidTest` covers :app (the flavored module);
+          # `connectedDebugAndroidTest` covers the library/feature modules (their
+          # androidTest suites — T165 screen tests, DAO/migration tests). :app has no
+          # flavourless variant so it is not double-run.
           script: |
-            ./gradlew --no-daemon --stacktrace connectedStandardDebugAndroidTest
+            ./gradlew --no-daemon --stacktrace connectedStandardDebugAndroidTest connectedDebugAndroidTest
 
       - name: Upload instrumented test results (${{ matrix.label }})
         if: always()
