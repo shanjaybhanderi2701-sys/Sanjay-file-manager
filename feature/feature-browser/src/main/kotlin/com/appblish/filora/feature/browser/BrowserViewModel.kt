@@ -6,9 +6,12 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.appblish.filora.core.common.result.OperationError
 import com.appblish.filora.core.common.result.Result
+import com.appblish.filora.core.domain.model.ConflictStrategy
 import com.appblish.filora.core.domain.model.FileItem
+import com.appblish.filora.core.domain.model.FileOperationKind
 import com.appblish.filora.core.domain.model.SortOrder
 import com.appblish.filora.core.domain.model.ViewLayout
+import com.appblish.filora.core.domain.repository.FileOperationsScheduler
 import com.appblish.filora.core.domain.repository.SettingsRepository
 import com.appblish.filora.core.domain.usecase.CreateFolderUseCase
 import com.appblish.filora.core.domain.usecase.DeleteUseCase
@@ -16,6 +19,14 @@ import com.appblish.filora.core.domain.usecase.ListDirectoryUseCase
 import com.appblish.filora.core.domain.usecase.ObserveFavoritesUseCase
 import com.appblish.filora.core.domain.usecase.RenameUseCase
 import com.appblish.filora.core.domain.usecase.ToggleFavoriteUseCase
+import com.appblish.filora.feature.browser.operations.ActiveOperation
+import com.appblish.filora.feature.browser.operations.BatchOperationKind
+import com.appblish.filora.feature.browser.operations.FolderPickerState
+import com.appblish.filora.feature.browser.operations.OperationFlowState
+import com.appblish.filora.feature.browser.operations.OperationUpdate
+import com.appblish.filora.feature.browser.operations.PendingBatchOperation
+import com.appblish.filora.feature.browser.operations.archiveDestinationPath
+import com.appblish.filora.feature.browser.operations.toUpdate
 import com.appblish.filora.feature.browser.selection.MultiSelectReducer
 import com.appblish.filora.feature.browser.selection.SelectionState
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -23,6 +34,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
@@ -61,6 +73,7 @@ class BrowserViewModel
         private val createFolderUseCase: CreateFolderUseCase,
         private val renameUseCase: RenameUseCase,
         private val deleteUseCase: DeleteUseCase,
+        private val fileOperationsScheduler: FileOperationsScheduler,
     ) : ViewModel() {
         private val _uiState = MutableStateFlow(BrowserUiState())
         val uiState: StateFlow<BrowserUiState> = _uiState.asStateFlow()
@@ -70,6 +83,8 @@ class BrowserViewModel
         private var hasLoaded = false
         private var listJob: Job? = null
         private var preferencesStarted = false
+        private var pickerJob: Job? = null
+        private var operationJob: Job? = null
 
         init {
             observeFavorites()
@@ -86,12 +101,14 @@ class BrowserViewModel
             this.location = resolved
             hasLoaded = false
             rawEntries = emptyList()
+            pickerJob?.cancel()
             _uiState.update {
                 it.copy(
                     location = resolved,
                     phase = BrowserUiState.Phase.Loading,
                     selection = SelectionState(),
                     dialog = null,
+                    operationFlow = null,
                 )
             }
             startPreferences()
@@ -245,6 +262,214 @@ class BrowserViewModel
             }
         }
 
+        // ---- Copy / Move / Zip (T069/T070 destination picker, T079 progress) ----
+
+        /**
+         * Starts a copy/move/zip from the batch bar (FR-3.2/3.3, FR-7.1). Snapshots the
+         * current selection so it can be cleared while the destination is chosen. Copy/move
+         * over a SAF tree defer to the system `ACTION_OPEN_DOCUMENT_TREE` picker; everything
+         * else (all `file://` copy/move, and every ZIP — whose worker writes a local file)
+         * uses the in-app folder chooser. Ignored while an operation is already in flight.
+         */
+        fun beginBatchOperation(kind: BatchOperationKind) {
+            val currentLocation = location ?: return
+            val state = _uiState.value
+            if (state.activeOperation != null) return
+            val sources = state.selectedItems()
+            if (sources.isEmpty()) return
+            val request = PendingBatchOperation(kind, sources)
+
+            if (kind != BatchOperationKind.ZIP && isSaf(currentLocation)) {
+                _uiState.update { it.copy(operationFlow = OperationFlowState.PickingSafDestination(request)) }
+            } else {
+                // Root the chooser at primary storage so any local folder is reachable; start at
+                // the current directory when it is itself a local path. (DEFAULT_ROOT keeps this
+                // free of android.os.Environment so the flow stays unit-testable.)
+                val root = DEFAULT_ROOT
+                val start = if (!isSaf(currentLocation)) currentLocation else root
+                _uiState.update {
+                    it.copy(
+                        operationFlow =
+                            OperationFlowState.PickingLocalDestination(
+                                request,
+                                FolderPickerState(rootPath = root, currentPath = start),
+                            ),
+                    )
+                }
+                loadPickerFolders(start)
+            }
+        }
+
+        /** Navigates the folder chooser into [directory]. */
+        fun pickerEnter(directory: FileItem) {
+            val flow = _uiState.value.operationFlow as? OperationFlowState.PickingLocalDestination ?: return
+            if (!directory.isDirectory) return
+            navigatePicker(flow, directory.path)
+        }
+
+        /** Walks the folder chooser up one level, never above its root. */
+        fun pickerUp() {
+            val flow = _uiState.value.operationFlow as? OperationFlowState.PickingLocalDestination ?: return
+            if (!flow.picker.canGoUp) return
+            navigatePicker(flow, flow.picker.parentPath)
+        }
+
+        private fun navigatePicker(
+            flow: OperationFlowState.PickingLocalDestination,
+            path: String,
+        ) {
+            val picker = flow.picker.copy(currentPath = path, isLoading = true, errorMessageRes = null)
+            _uiState.update { it.copy(operationFlow = flow.copy(picker = picker)) }
+            loadPickerFolders(path)
+        }
+
+        /** Confirms the folder chooser's current directory as the destination. */
+        fun pickerConfirm() {
+            val flow = _uiState.value.operationFlow as? OperationFlowState.PickingLocalDestination ?: return
+            proceedWithDestination(flow.request, flow.picker.currentPath)
+        }
+
+        /** Receives the SAF tree the system picker returned as the copy/move destination. */
+        fun onSafDestinationPicked(destinationTreeUri: String) {
+            val flow = _uiState.value.operationFlow as? OperationFlowState.PickingSafDestination ?: return
+            proceedWithDestination(flow.request, destinationTreeUri)
+        }
+
+        /** Chooses the conflict strategy for a copy/move and enqueues it (FR-3.3). */
+        fun chooseConflict(strategy: ConflictStrategy) {
+            val flow = _uiState.value.operationFlow as? OperationFlowState.ChoosingConflict ?: return
+            enqueueCopyMove(flow.request, flow.destinationDir, strategy)
+        }
+
+        /** Dismisses the destination picker / conflict prompt without enqueuing anything. */
+        fun cancelOperationFlow() {
+            pickerJob?.cancel()
+            _uiState.update { it.copy(operationFlow = null) }
+        }
+
+        /** Cancels the in-flight operation (T074); its progress stream reports the cancellation. */
+        fun cancelActiveOperation() {
+            val id = _uiState.value.activeOperation?.operationId ?: return
+            fileOperationsScheduler.cancel(id)
+        }
+
+        private fun proceedWithDestination(
+            request: PendingBatchOperation,
+            destinationDir: String,
+        ) {
+            when (request.kind) {
+                BatchOperationKind.ZIP -> enqueueZip(request, destinationDir)
+                BatchOperationKind.COPY, BatchOperationKind.MOVE ->
+                    _uiState.update {
+                        it.copy(operationFlow = OperationFlowState.ChoosingConflict(request, destinationDir))
+                    }
+            }
+        }
+
+        private fun loadPickerFolders(path: String) {
+            pickerJob?.cancel()
+            pickerJob =
+                viewModelScope.launch {
+                    when (val result = listDirectory(path).first()) {
+                        is Result.Success ->
+                            updatePicker(path) {
+                                it.copy(
+                                    directories = result.data.filter(FileItem::isDirectory),
+                                    isLoading = false,
+                                    errorMessageRes = null,
+                                )
+                            }
+
+                        is Result.Error ->
+                            updatePicker(path) {
+                                it.copy(
+                                    directories = emptyList(),
+                                    isLoading = false,
+                                    errorMessageRes = result.error.toMessageRes(),
+                                )
+                            }
+                    }
+                }
+        }
+
+        private fun updatePicker(
+            path: String,
+            transform: (FolderPickerState) -> FolderPickerState,
+        ) {
+            _uiState.update { state ->
+                val flow = state.operationFlow as? OperationFlowState.PickingLocalDestination ?: return@update state
+                // Ignore a stale listing that resolved after the user navigated elsewhere.
+                if (flow.picker.currentPath != path) return@update state
+                state.copy(operationFlow = flow.copy(picker = transform(flow.picker)))
+            }
+        }
+
+        private fun enqueueCopyMove(
+            request: PendingBatchOperation,
+            destinationDir: String,
+            strategy: ConflictStrategy,
+        ) {
+            val kind =
+                if (request.kind == BatchOperationKind.COPY) FileOperationKind.Copy else FileOperationKind.Move
+            val operationId =
+                fileOperationsScheduler.enqueue(
+                    kind = kind,
+                    sources = request.sourcePaths,
+                    destinationDir = destinationDir,
+                    conflictStrategy = strategy,
+                )
+            startOperation(operationId, request.kind)
+            observe {
+                fileOperationsScheduler.progress(operationId).collect { progress ->
+                    onOperationUpdate(progress.toUpdate(operationId, request.kind))
+                }
+            }
+        }
+
+        private fun enqueueZip(
+            request: PendingBatchOperation,
+            destinationDir: String,
+        ) {
+            val archivePath = archiveDestinationPath(destinationDir, request.sources)
+            val operationId = fileOperationsScheduler.enqueueCompress(request.sourcePaths, archivePath)
+            startOperation(operationId, BatchOperationKind.ZIP)
+            observe {
+                fileOperationsScheduler.compressProgress(operationId).collect { progress ->
+                    onOperationUpdate(progress.toUpdate(operationId))
+                }
+            }
+        }
+
+        private fun startOperation(
+            operationId: String,
+            kind: BatchOperationKind,
+        ) {
+            _uiState.update {
+                it.copy(
+                    operationFlow = null,
+                    selection = SelectionState(),
+                    activeOperation = ActiveOperation(operationId, kind, fraction = null, currentName = null),
+                )
+            }
+        }
+
+        private fun observe(block: suspend () -> Unit) {
+            operationJob?.cancel()
+            operationJob = viewModelScope.launch { block() }
+        }
+
+        private fun onOperationUpdate(update: OperationUpdate) {
+            when (update) {
+                is OperationUpdate.Running -> _uiState.update { it.copy(activeOperation = update.active) }
+                is OperationUpdate.Terminal -> {
+                    _uiState.update { it.copy(activeOperation = null, messageRes = update.messageRes) }
+                    if (update.succeeded) reload()
+                }
+            }
+        }
+
+        private fun isSaf(location: String): Boolean = location.startsWith(CONTENT_SCHEME)
+
         private fun startPreferences() {
             if (preferencesStarted) return
             preferencesStarted = true
@@ -312,6 +537,7 @@ class BrowserViewModel
 
         private companion object {
             const val DEFAULT_ROOT = "/storage/emulated/0"
+            const val CONTENT_SCHEME = "content://"
         }
     }
 

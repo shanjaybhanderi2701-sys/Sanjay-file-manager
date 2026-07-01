@@ -1,3 +1,5 @@
+@file:Suppress("MatchingDeclarationName") // File name reflects the UI role; sole declaration is FileNameErrorMessage.
+
 package com.appblish.filora.feature.browser.dialog
 
 import androidx.annotation.StringRes

@@ -9,6 +9,7 @@ import com.appblish.filora.core.domain.model.ArchiveProgress
 import com.appblish.filora.core.domain.model.ConflictStrategy
 import com.appblish.filora.core.domain.model.FileOperationKind
 import com.appblish.filora.core.domain.model.OperationProgress
+import com.appblish.filora.core.domain.repository.FileOperationsScheduler
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
@@ -30,19 +31,19 @@ class OperationScheduler
         private val workManager: WorkManager,
         private val store: WorkRequestStore,
         private val idGenerator: OperationIdGenerator,
-    ) {
+    ) : FileOperationsScheduler {
         /**
          * Enqueues [kind] over [sources] into [destinationDir] (ignored for delete)
          * and returns the operation id to observe with [progress] / cancel with
          * [cancel]. Small lists travel inline in the work input; larger ones are
          * stashed in [store] and referenced by id (spec §2).
          */
-        fun enqueue(
+        override fun enqueue(
             kind: FileOperationKind,
             sources: List<String>,
-            destinationDir: String? = null,
-            toTrash: Boolean = true,
-            conflictStrategy: ConflictStrategy = ConflictStrategy.KeepBoth,
+            destinationDir: String?,
+            toTrash: Boolean,
+            conflictStrategy: ConflictStrategy,
         ): String {
             val operationId = idGenerator.newId()
             if (sources.size > OperationWorkData.INLINE_SOURCE_LIMIT) {
@@ -93,7 +94,7 @@ class OperationScheduler
          * self-contained, so tree-walk, entry naming and partial-output cleanup all
          * live in its [com.appblish.filora.core.data.archive.ZipCompressor].
          */
-        fun enqueueCompress(
+        override fun enqueueCompress(
             sources: List<String>,
             destinationArchivePath: String,
         ): String {
@@ -110,21 +111,21 @@ class OperationScheduler
         }
 
         /** Live compression progress for [operationId]; completes once the work terminates. */
-        fun compressProgress(operationId: String): Flow<ArchiveProgress> =
+        override fun compressProgress(operationId: String): Flow<ArchiveProgress> =
             workManager.getWorkInfosForUniqueWorkFlow(operationId).map { infos ->
                 val info = infos.firstOrNull() ?: return@map ArchiveProgress.Pending
                 toArchiveProgress(info)
             }
 
         /** Live progress for [operationId]; completes naturally once the work terminates. */
-        fun progress(operationId: String): Flow<OperationProgress> =
+        override fun progress(operationId: String): Flow<OperationProgress> =
             workManager.getWorkInfosForUniqueWorkFlow(operationId).map { infos ->
                 val info = infos.firstOrNull() ?: return@map OperationProgress.Pending(FileOperationKind.Copy)
                 toProgress(info)
             }
 
         /** Cancels the operation; the worker observes the stop and WorkManager records it cancelled. */
-        fun cancel(operationId: String) {
+        override fun cancel(operationId: String) {
             workManager.cancelUniqueWork(operationId)
         }
 

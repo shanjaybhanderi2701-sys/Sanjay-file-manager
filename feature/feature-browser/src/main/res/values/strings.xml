@@ -54,6 +54,30 @@
     <!-- New folder + operation results (FR-3.1, FR-3.5) -->
     <string name="browser_action_new_folder">New folder</string>
     <string name="browser_deleted">Deleted.</string>
+    <string name="browser_copied">Copied.</string>
+    <string name="browser_moved">Moved.</string>
+    <string name="browser_zipped">Archive created.</string>
+    <string name="browser_op_cancelled">Cancelled.</string>
+
+    <!-- Destination picker for copy/move/zip (FR-3.2, T069/T070) -->
+    <string name="browser_dest_picker_title">Choose destination</string>
+    <string name="browser_dest_picker_up">Up one level</string>
+    <string name="browser_dest_picker_empty">No sub-folders here.</string>
+    <string name="browser_dest_copy_here">Copy here</string>
+    <string name="browser_dest_move_here">Move here</string>
+    <string name="browser_dest_zip_here">Zip here</string>
+
+    <!-- Copy/move conflict strategy (FR-3.3) -->
+    <string name="browser_conflict_title">If an item already exists</string>
+    <string name="browser_conflict_keep_both">Keep both</string>
+    <string name="browser_conflict_replace">Replace</string>
+    <string name="browser_conflict_skip">Skip</string>
+
+    <!-- Live operation progress sheet (FR-3.5, T079) -->
+    <string name="browser_op_title_copy">Copying…</string>
+    <string name="browser_op_title_move">Moving…</string>
+    <string name="browser_op_title_zip">Compressing…</string>
+    <string name="browser_op_cancel">Cancel</string>
 
     <!-- Name input dialog (create folder / rename) -->
     <string name="browser_dialog_cancel">Cancel</string>

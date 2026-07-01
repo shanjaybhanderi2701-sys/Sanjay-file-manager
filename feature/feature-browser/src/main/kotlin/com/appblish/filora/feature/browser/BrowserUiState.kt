@@ -4,6 +4,8 @@ import androidx.annotation.StringRes
 import com.appblish.filora.core.domain.model.FileItem
 import com.appblish.filora.core.domain.model.SortOrder
 import com.appblish.filora.core.domain.model.ViewLayout
+import com.appblish.filora.feature.browser.operations.ActiveOperation
+import com.appblish.filora.feature.browser.operations.OperationFlowState
 import com.appblish.filora.feature.browser.selection.SelectionState
 
 /**
@@ -18,6 +20,10 @@ import com.appblish.filora.feature.browser.selection.SelectionState
  * [dialog] is the currently open create/rename/delete dialog (T066–T068); and
  * [messageRes] is a one-shot snackbar message (operation result or failure, T079)
  * the screen shows and then clears via [BrowserViewModel.clearMessage].
+ *
+ * [operationFlow] drives the copy/move/zip destination picker + conflict prompt
+ * (T069/T070) and [activeOperation] the live worker-progress sheet (T079). Both are
+ * `null` when no long operation is being set up or is in flight.
  */
 data class BrowserUiState(
     val location: String = "",
@@ -32,6 +38,8 @@ data class BrowserUiState(
     val selection: SelectionState = SelectionState(),
     val dialog: BrowserDialog? = null,
     @StringRes val messageRes: Int? = null,
+    val operationFlow: OperationFlowState? = null,
+    val activeOperation: ActiveOperation? = null,
 ) {
     enum class Phase { Loading, Content, Empty, Error }
 

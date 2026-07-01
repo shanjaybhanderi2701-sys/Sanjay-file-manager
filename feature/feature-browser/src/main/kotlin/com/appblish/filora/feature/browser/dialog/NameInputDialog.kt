@@ -29,6 +29,7 @@ import com.appblish.filora.feature.browser.R
  * On confirm the trimmed, validated name is handed to [onConfirm]; the caller is
  * responsible for invoking the matching use case.
  */
+@Suppress("SpreadOperator") // pluralStringResource requires vararg format args from the validator.
 @Composable
 internal fun NameInputDialog(
     title: String,

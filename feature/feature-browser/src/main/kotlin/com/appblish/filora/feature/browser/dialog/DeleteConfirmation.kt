@@ -42,7 +42,9 @@ object DeleteConfirmation {
         toTrash: Boolean,
     ): DeletePrompt {
         val single = count <= 1
-        @StringRes @PluralsRes val messageRes =
+
+        @StringRes @PluralsRes
+        val messageRes =
             when {
                 toTrash && single && containsDirectory -> R.string.browser_delete_trash_folder
                 toTrash && single -> R.string.browser_delete_trash_file
