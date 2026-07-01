@@ -1,6 +1,7 @@
 package com.appblish.filora.core.data.operations
 
 import android.content.Context
+import androidx.annotation.VisibleForTesting
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import com.appblish.filora.core.common.result.OperationError
@@ -41,6 +42,18 @@ internal class ArchiveCompressWorker(
 ) : CoroutineWorker(appContext, params) {
     private val notifier = ArchiveCompressNotifier(appContext)
 
+    /**
+     * Test seam for cooperative cancellation. Production leaves this `null` and the
+     * worker observes WorkManager's own [isStopped]; a JVM/Robolectric test supplies a
+     * signal that flips mid-archive to drive the cancel-cleans-partial path
+     * deterministically (WorkManager has no supported way to stop a
+     * `TestListenableWorkerBuilder` worker).
+     */
+    @VisibleForTesting
+    internal var stoppedSignalOverride: (() -> Boolean)? = null
+
+    private fun stopped(): Boolean = stoppedSignalOverride?.invoke() ?: isStopped
+
     override suspend fun getForegroundInfo() = notifier.foregroundInfo()
 
     override suspend fun doWork(): WorkerResult {
@@ -59,7 +72,7 @@ internal class ArchiveCompressWorker(
                     onProgress = { index, total, name ->
                         updates.trySend(ArchiveProgress.Running(index, total, name))
                     },
-                    isActive = { !isStopped },
+                    isActive = { !stopped() },
                 )
             }
             updates.close()

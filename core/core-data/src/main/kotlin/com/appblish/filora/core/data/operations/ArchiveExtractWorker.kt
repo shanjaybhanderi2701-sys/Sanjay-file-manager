@@ -1,6 +1,7 @@
 package com.appblish.filora.core.data.operations
 
 import android.content.Context
+import androidx.annotation.VisibleForTesting
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import com.appblish.filora.core.common.result.OperationError
@@ -32,6 +33,15 @@ internal class ArchiveExtractWorker(
 ) : CoroutineWorker(appContext, params) {
     private val notifier = ArchiveExtractNotifier(appContext)
 
+    /**
+     * Test seam for cooperative cancellation — see [ArchiveCompressWorker.stoppedSignalOverride].
+     * `null` in production, where the extractor polls WorkManager's [isStopped].
+     */
+    @VisibleForTesting
+    internal var stoppedSignalOverride: (() -> Boolean)? = null
+
+    private fun stopped(): Boolean = stoppedSignalOverride?.invoke() ?: isStopped
+
     override suspend fun getForegroundInfo() = notifier.foregroundInfo()
 
     override suspend fun doWork(): WorkerResult {
@@ -45,7 +55,7 @@ internal class ArchiveExtractWorker(
                 archive = File(args.archivePath),
                 destinationDir = File(args.destinationDir),
                 strategy = args.strategy,
-                isActive = { !isStopped },
+                isActive = { !stopped() },
             )
             when (outcome) {
                 is OpResult.Success -> WorkerResult.success(ArchiveExtractWorkData.encodeSuccess(outcome.data))
