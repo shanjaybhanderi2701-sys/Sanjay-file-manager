@@ -64,7 +64,10 @@ class TrashDaoTest {
         }
 
     @Test
-    fun findExpired_returnsOnlyRowsStrictlyBeforeCutoff() =
+    // Explicit `: Unit` — the trailing `containsExactly(...)` returns Truth's `Ordered`,
+    // which as an expression body would make this @Test method non-void and JUnit4 would
+    // reject the whole class with InvalidTestClassError (APP-150).
+    fun findExpired_returnsOnlyRowsStrictlyBeforeCutoff(): Unit =
         runBlocking {
             dao.upsert(entry(id = "old", deletedAt = 100))
             dao.upsert(entry(id = "edge", deletedAt = 200))
