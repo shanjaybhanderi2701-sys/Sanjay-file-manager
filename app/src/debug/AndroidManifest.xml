@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <!--
+      Empty host activity for compose / navigation instrumented tests (T165/T166).
+
+      It MUST live in the debug source set, not `src/androidTest`: the androidTest
+      manifest is merged into the instrumentation APK (applicationId
+      `com.appblish.filora.test`), so an activity declared there resolves to the
+      `.test` process while `createAndroidComposeRule<HiltComponentActivity>()`
+      launches it with the app-under-test's target context — Android rejects the
+      cross-process intent ("resolved to different process …"). Declaring it in the
+      debug variant packages it into the app-under-test itself, so the launch and
+      Hilt injection both happen in `com.appblish.filora`. (APP-151)
+    -->
+    <application>
+        <activity
+            android:name="com.appblish.filora.HiltComponentActivity"
+            android:exported="false" />
+    </application>
+</manifest>
