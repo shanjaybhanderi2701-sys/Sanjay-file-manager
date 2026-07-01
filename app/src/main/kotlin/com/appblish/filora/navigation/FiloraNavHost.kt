@@ -60,7 +60,6 @@ fun FiloraNavHost(
             BrowserScreen(
                 location = backStackEntry.toRoute<Route.Browser>().location,
                 onOpenDirectory = { path -> navController.navigate(Route.Browser(location = path)) },
-                onNavigateToAncestor = { path -> navController.navigateToAncestor(path) },
             )
         }
         composable<Route.Search> { backStackEntry ->
@@ -111,20 +110,6 @@ fun FiloraNavHost(
 private fun NavHostController.navigateToHomeFromGate() {
     navigate(Route.Home) {
         popUpTo(Route.Permission) { inclusive = true }
-        launchSingleTop = true
-    }
-}
-
-/**
- * Breadcrumb ancestor tap (T048/T049): walk *up* to [location] rather than pushing a new
- * level. If that ancestor is already on the back stack (the normal descend-then-tap case)
- * its entries-above are popped and it is reused; if it isn't (e.g. a deep link landed us
- * deep in the tree) we simply navigate to it. Either way the trail never accumulates
- * duplicate folder entries.
- */
-private fun NavHostController.navigateToAncestor(location: String) {
-    navigate(Route.Browser(location = location)) {
-        popUpTo(Route.Browser(location = location)) { inclusive = false }
         launchSingleTop = true
     }
 }
