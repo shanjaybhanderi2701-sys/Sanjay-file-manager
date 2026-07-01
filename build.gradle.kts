@@ -1,3 +1,5 @@
+import kotlinx.kover.gradle.plugin.dsl.KoverProjectExtension
+
 // Root build file. Plugins are declared `apply false` here and applied per-module
 // (directly or via Filora convention plugins in `build-logic`).
 plugins {
@@ -16,12 +18,54 @@ plugins {
     alias(libs.plugins.hilt) apply false
     alias(libs.plugins.ktlint) apply false
     alias(libs.plugins.detekt) apply false
+    // T170 — applied to the root project so it can aggregate per-module coverage.
+    alias(libs.plugins.kover)
 }
+
+// T170 (M16) — Kover coverage aggregation.
+// Measured modules apply Kover and are aggregated into a single root report. The gate
+// THRESHOLD VALUES are a Product Manager decision (see APP-36 interaction c51ac274);
+// until PM confirms, the placeholder bounds below are wired but kept NON-ENFORCING in
+// CI (the coverage job runs `koverVerify` with continue-on-error). Proposed defaults
+// from the APP-122 spec: 70% line for core-domain/core-data, 50% line overall.
+// :app and :baselineprofile are intentionally excluded (product flavors / test-only
+// module complicate variant selection and carry little measurable logic).
+val koverMeasuredModules =
+    listOf(
+        ":core:core-common",
+        ":core:core-domain",
+        ":core:core-data",
+        ":core:core-database",
+        ":core:core-ui",
+        ":feature:feature-home",
+        ":feature:feature-browser",
+        ":feature:feature-search",
+        ":feature:feature-media",
+        ":feature:feature-storage",
+        ":feature:feature-settings",
+    )
+val koverStrictModules = listOf(":core:core-domain", ":core:core-data")
 
 // Apply ktlint + detekt to every module from one place.
 subprojects {
     apply(plugin = rootProject.libs.plugins.ktlint.get().pluginId)
     apply(plugin = rootProject.libs.plugins.detekt.get().pluginId)
+
+    if (path in koverMeasuredModules) {
+        apply(plugin = rootProject.libs.plugins.kover.get().pluginId)
+        if (path in koverStrictModules) {
+            extensions.configure<KoverProjectExtension> {
+                reports {
+                    verify {
+                        // PLACEHOLDER — 70% line for domain/data. Flip to enforced once PM confirms.
+                        rule("Line coverage (placeholder — pending PM APP-36 c51ac274)") {
+                            minBound(70)
+                        }
+                    }
+                }
+            }
+        }
+    }
 
     extensions.configure<org.jlleitschuh.gradle.ktlint.KtlintExtension> {
         version.set("1.4.1")
@@ -68,5 +112,25 @@ tasks.register("checkModuleDependencies") {
             )
         }
         logger.lifecycle("Module dependency rules OK (${rootProject.subprojects.size} modules checked).")
+    }
+}
+
+// T170 — pull every measured module into the aggregated root Kover report and wire the
+// overall (aggregated) placeholder gate. `koverXmlReport` / `koverHtmlReport` produce the
+// CI artifact; `koverVerify` enforces the rules (non-blocking in CI pending PM sign-off).
+dependencies {
+    koverMeasuredModules.forEach { add("kover", project(it)) }
+}
+
+kover {
+    reports {
+        total {
+            verify {
+                // PLACEHOLDER — 50% overall line coverage. Enforced once PM confirms values.
+                rule("Overall line coverage (placeholder — pending PM APP-36 c51ac274)") {
+                    minBound(50)
+                }
+            }
+        }
     }
 }
