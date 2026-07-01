@@ -99,6 +99,13 @@ jobs:
     name: Baseline profile · Startup benchmark (NFR-1.1)
     runs-on: ubuntu-latest
     timeout-minutes: 60
+    # Advisory gate: the GitHub-hosted-runner emulator boot is chronically flaky
+    # ("Unable to connect to adb daemon" / "device offline") even with KVM enabled,
+    # so this perf-benchmark job must NOT block landing. The correctness gates
+    # (Build·Lint·Test, Release·R8) stay hard-blocking. Re-enable as a required gate
+    # once the emulator boot is stabilised (self-hosted runner / AVD cache) — tracked
+    # as a follow-up. The job still runs and uploads artifacts when the emulator boots.
+    continue-on-error: true
     # Generates the baseline profile and measures cold start on a managed emulator.
     # Runs on push to main (and manual dispatch) — too heavy for every PR.
     if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
