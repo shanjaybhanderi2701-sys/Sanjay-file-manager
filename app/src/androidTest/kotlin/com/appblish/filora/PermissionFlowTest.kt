@@ -3,6 +3,7 @@ package com.appblish.filora
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithText
+import androidx.compose.ui.test.performScrollTo
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import dagger.hilt.android.testing.HiltAndroidRule
 import dagger.hilt.android.testing.HiltAndroidTest
@@ -36,9 +37,13 @@ class PermissionFlowTest {
         composeRule.waitForIdle()
 
         // The rationale, not Home: the gate explains why and offers to grant.
-        composeRule.onNodeWithText("Access your files").assertIsDisplayed()
-        composeRule.onNodeWithText("Grant access").assertIsDisplayed()
+        // The gate's Column is `verticalScroll`-able, so on shorter viewports (e.g. the
+        // API30 phone and tablet targets) the lower actions render below the fold.
+        // Scroll each node into view before asserting visibility — `assertIsDisplayed`
+        // does not auto-scroll, so a present-but-clipped node would otherwise fail.
+        composeRule.onNodeWithText("Access your files").performScrollTo().assertIsDisplayed()
+        composeRule.onNodeWithText("Grant access").performScrollTo().assertIsDisplayed()
         // The permission-free SAF path is always reachable — never a dead end.
-        composeRule.onNodeWithText("Continue with limited access").assertIsDisplayed()
+        composeRule.onNodeWithText("Continue with limited access").performScrollTo().assertIsDisplayed()
     }
 }
