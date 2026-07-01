@@ -153,6 +153,23 @@ The screen a file manager lives or dies on. Content is the hero; chrome is quiet
 
 **Grid view:** same tokens, 2-col tiles with tinted thumbnail placeholder + name/meta — media-forward density; toggle is one tap, state persists (Settings).
 
+### 7.1 Bottom navigation (tab bar) · serves §2.6 thumb-first + §2.7 restraint
+
+Five destinations — the Material 3 ceiling for a bottom bar (3–5). We **curate, not cram**: past five, targets shrink out of the thumb zone and the guide's restraint principle breaks, so the answer to "more options" is *the best five*, not more than five.
+
+| # | Tab | Icon | Why it earns a tab (maps to a shipped feature) |
+|---|---|---|---|
+| 1 | **Home** | house | Dashboard: storage ring, categories, favorites/recents strips. |
+| 2 | **Browse** | folder | The file tree — the core utility (Hero Flow A). |
+| 3 | **Media** | image | Category hub (Photos/Video/Audio/Docs, M4) — the single highest-value file-manager destination after Browse; users think in *content*, not paths. |
+| 4 | **Storage** | gauge | Storage insights + "free up space" (M6/M11) — utility framed as value (§2.6). |
+| 5 | **Recent** | clock | Recently opened/modified (M9) — fast re-access is the #1 repeat task; benefit-led. |
+
+- **Settings is not a tab.** Config is not a content destination — it lives in the **app-bar overflow / gear** (standard M3, Mobile_V5 native instinct). Removing it from the bar frees the slot for a content destination and keeps the bar all-tasks.
+- **Also considered, deliberately left off:** *Favorites* (already a Home strip + star action — a tab would duplicate), *Transfer/Send* (device-to-device is out of v1 scope — no tab for an unbuilt feature), *Search* (a persistent search bar on Home/Browse, not a destination).
+- **≥600dp:** the same five swap to a **navigation rail** (never both). Order and icons identical.
+- Each item ≥48dp, active = `iris-container` pill behind the icon + iris label (see mockup).
+
 ### Required states (never ship only the happy path)
 | State | Design |
 |---|---|
