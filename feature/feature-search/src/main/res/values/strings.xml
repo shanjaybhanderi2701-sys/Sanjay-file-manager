@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="search_hint">Search files</string>
+    <string name="search_remove_filter">Remove %1$s filter</string>
+    <string name="search_empty_title">No matches</string>
+    <string name="search_empty_body">Try a different name or clear some filters.</string>
+
+    <string name="search_size_small">Under 1 MB</string>
+    <string name="search_size_medium">1–100 MB</string>
+    <string name="search_size_large">Over 100 MB</string>
+
+    <string name="search_date_today">Today</string>
+    <string name="search_date_week">Last 7 days</string>
+    <string name="search_date_month">Last 30 days</string>
+    <string name="search_date_year">Last year</string>
+
+    <string name="search_type_images">Images</string>
+    <string name="search_type_video">Video</string>
+    <string name="search_type_audio">Audio</string>
+    <string name="search_type_docs">Docs</string>
+    <string name="search_type_archives">Archives</string>
+    <string name="search_type_apks">APKs</string>
+</resources>
