@@ -23,10 +23,17 @@ import javax.inject.Singleton
  * once for the process and bound to a [SettingsRepository] so consumers depend on
  * the contract, not the on-disk file. Disk IO runs on the injected
  * [IoDispatcher] (provided in `:app`), keeping the read/write off the main thread.
+ *
+ * Both the [DataStore] provider and the repository binding are `@Singleton` in the
+ * [SingletonComponent], so in production exactly one DataStore is ever active on the
+ * `filora_settings` file. This module is intentionally public (not `internal`) so a
+ * Hilt instrumentation test can `@TestInstallIn(replaces = [SettingsDataModule::class])`
+ * to swap in a per-test file — `HiltAndroidRule` rebuilds the singleton graph per test,
+ * which would otherwise open a second DataStore on the same file (see APP-149).
  */
 @Module
 @InstallIn(SingletonComponent::class)
-internal interface SettingsDataModule {
+interface SettingsDataModule {
     @Binds
     @Singleton
     fun bindSettingsRepository(impl: SettingsRepositoryImpl): SettingsRepository
