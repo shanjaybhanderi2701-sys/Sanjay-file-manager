@@ -68,7 +68,10 @@ class FavoriteDaoTest {
         }
 
     @Test
-    fun deleteByPath_removesOnlyThatFavorite() =
+    // Explicit `: Unit` — the trailing `containsExactly(...)` returns Truth's `Ordered`,
+    // which as an expression body would make this @Test method non-void and JUnit4 would
+    // reject the whole class with InvalidTestClassError (APP-150).
+    fun deleteByPath_removesOnlyThatFavorite(): Unit =
         runBlocking {
             dao.upsert(favorite(path = "/sdcard/a.txt", name = "a.txt", addedAt = 100))
             dao.upsert(favorite(path = "/sdcard/b.txt", name = "b.txt", addedAt = 200))
