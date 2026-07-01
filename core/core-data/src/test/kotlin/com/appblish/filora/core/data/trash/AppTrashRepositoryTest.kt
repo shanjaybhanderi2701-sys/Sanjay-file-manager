@@ -38,8 +38,7 @@ class AppTrashRepositoryTest {
         override fun observeAll(): Flow<List<TrashEntity>> =
             rows.map { it.values.sortedByDescending(TrashEntity::deletedAtEpochMillis) }
 
-        override fun observeTotalSize(): Flow<Long> =
-            rows.map { map -> map.values.sumOf { it.sizeBytes } }
+        override fun observeTotalSize(): Flow<Long> = rows.map { map -> map.values.sumOf { it.sizeBytes } }
 
         override suspend fun findById(id: String): TrashEntity? = rows.value[id]
 
@@ -79,8 +78,7 @@ class AppTrashRepositoryTest {
     private fun userFile(
         name: String,
         content: String = "hello",
-    ): File =
-        File(userDir, name).apply { writeText(content) }
+    ): File = File(userDir, name).apply { writeText(content) }
 
     @Test
     fun `canTrash accepts local paths and rejects content uris`() {
