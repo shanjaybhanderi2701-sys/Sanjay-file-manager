@@ -29,6 +29,27 @@
 
     <string name="browser_action_new_folder">مجلد جديد</string>
     <string name="browser_deleted">تم الحذف.</string>
+    <string name="browser_copied">تم النسخ.</string>
+    <string name="browser_moved">تم النقل.</string>
+    <string name="browser_zipped">تم إنشاء الأرشيف.</string>
+    <string name="browser_op_cancelled">تم الإلغاء.</string>
+
+    <string name="browser_dest_picker_title">اختر الوجهة</string>
+    <string name="browser_dest_picker_up">مستوى للأعلى</string>
+    <string name="browser_dest_picker_empty">لا توجد مجلدات فرعية هنا.</string>
+    <string name="browser_dest_copy_here">نسخ هنا</string>
+    <string name="browser_dest_move_here">نقل هنا</string>
+    <string name="browser_dest_zip_here">ضغط هنا</string>
+
+    <string name="browser_conflict_title">إذا كان العنصر موجودًا بالفعل</string>
+    <string name="browser_conflict_keep_both">الاحتفاظ بكليهما</string>
+    <string name="browser_conflict_replace">استبدال</string>
+    <string name="browser_conflict_skip">تخطٍّ</string>
+
+    <string name="browser_op_title_copy">جارٍ النسخ…</string>
+    <string name="browser_op_title_move">جارٍ النقل…</string>
+    <string name="browser_op_title_zip">جارٍ الضغط…</string>
+    <string name="browser_op_cancel">إلغاء</string>
 
     <string name="browser_dialog_cancel">إلغاء</string>
     <string name="browser_dialog_new_folder_title">مجلد جديد</string>

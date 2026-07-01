@@ -1,8 +1,11 @@
 package com.appblish.filora.feature.browser
 
 import android.content.Context
+import android.content.Intent
 import android.text.format.DateUtils
 import android.text.format.Formatter
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.border
 import androidx.compose.foundation.combinedClickable
@@ -66,6 +69,11 @@ import com.appblish.filora.feature.browser.dialog.CreateFolderDialog
 import com.appblish.filora.feature.browser.dialog.DeleteConfirmDialog
 import com.appblish.filora.feature.browser.dialog.DeleteConfirmation
 import com.appblish.filora.feature.browser.dialog.RenameDialog
+import com.appblish.filora.feature.browser.operations.BatchOperationKind
+import com.appblish.filora.feature.browser.operations.ConflictStrategyDialog
+import com.appblish.filora.feature.browser.operations.DestinationPickerDialog
+import com.appblish.filora.feature.browser.operations.OperationFlowState
+import com.appblish.filora.feature.browser.operations.OperationProgressSheet
 import com.appblish.filora.feature.browser.selection.BatchAction
 import com.appblish.filora.feature.browser.selection.BatchActionBar
 import com.appblish.filora.feature.browser.selection.SelectionState
@@ -107,6 +115,23 @@ fun BrowserScreen(
             snackbarHostState.showSnackbar(message)
             viewModel.clearMessage()
         }
+    }
+
+    // Copy/move over a SAF tree defers to the system folder picker; take a persistable
+    // read/write grant on the chosen tree so the worker can write into it (FR-3.2).
+    val safDestinationPicker =
+        rememberLauncherForActivityResult(ActivityResultContracts.OpenDocumentTree()) { treeUri ->
+            if (treeUri != null) {
+                val flags = Intent.FLAG_GRANT_READ_URI_PERMISSION or Intent.FLAG_GRANT_WRITE_URI_PERMISSION
+                context.contentResolver.takePersistableUriPermission(treeUri, flags)
+                viewModel.onSafDestinationPicked(treeUri.toString())
+            } else {
+                viewModel.cancelOperationFlow()
+            }
+        }
+    val safRequest = (uiState.operationFlow as? OperationFlowState.PickingSafDestination)?.request
+    LaunchedEffect(safRequest) {
+        if (safRequest != null) safDestinationPicker.launch(null)
     }
 
     Scaffold(
@@ -170,6 +195,47 @@ fun BrowserScreen(
         uiState = uiState,
         viewModel = viewModel,
     )
+
+    BrowserOperationOverlays(uiState = uiState, viewModel = viewModel)
+}
+
+/**
+ * The copy/move/zip overlays: the in-app destination folder chooser and conflict-strategy
+ * prompt (T069/T070, FR-3.2/3.3) and the live worker-progress sheet with cancel (T079).
+ * The SAF destination stage owns no UI here — the system picker is launched from a
+ * [LaunchedEffect] in [BrowserScreen].
+ */
+@Composable
+private fun BrowserOperationOverlays(
+    uiState: BrowserUiState,
+    viewModel: BrowserViewModel,
+) {
+    when (val flow = uiState.operationFlow) {
+        is OperationFlowState.PickingLocalDestination ->
+            DestinationPickerDialog(
+                picker = flow.picker,
+                kind = flow.request.kind,
+                onEnter = viewModel::pickerEnter,
+                onUp = viewModel::pickerUp,
+                onConfirm = viewModel::pickerConfirm,
+                onDismiss = viewModel::cancelOperationFlow,
+            )
+
+        is OperationFlowState.ChoosingConflict ->
+            ConflictStrategyDialog(
+                onChoose = viewModel::chooseConflict,
+                onDismiss = viewModel::cancelOperationFlow,
+            )
+
+        is OperationFlowState.PickingSafDestination, null -> Unit
+    }
+
+    uiState.activeOperation?.let { operation ->
+        OperationProgressSheet(
+            operation = operation,
+            onCancel = viewModel::cancelActiveOperation,
+        )
+    }
 }
 
 /** Routes a batch action to the ViewModel or the system share sheet (T076/T078). */
@@ -188,8 +254,10 @@ private fun onBatchAction(
                 val shared = FileShareLauncher.shareFiles(context, uiState.selectedItems())
                 if (!shared) viewModel.showMessage(R.string.browser_share_no_app)
             }
-        // Move/copy/zip need a destination picker + worker progress surface (APP-26 follow-up).
-        BatchAction.MOVE, BatchAction.COPY, BatchAction.ZIP -> viewModel.showMessage(R.string.browser_coming_soon)
+        // Copy/move/zip open a destination picker, then enqueue with a live progress sheet (T069/T070/T079).
+        BatchAction.MOVE -> viewModel.beginBatchOperation(BatchOperationKind.MOVE)
+        BatchAction.COPY -> viewModel.beginBatchOperation(BatchOperationKind.COPY)
+        BatchAction.ZIP -> viewModel.beginBatchOperation(BatchOperationKind.ZIP)
     }
 }
 

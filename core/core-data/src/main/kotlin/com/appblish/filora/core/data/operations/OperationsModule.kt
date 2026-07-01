@@ -2,7 +2,9 @@ package com.appblish.filora.core.data.operations
 
 import android.content.Context
 import androidx.work.WorkManager
+import com.appblish.filora.core.domain.repository.FileOperationsScheduler
 import com.appblish.filora.core.domain.repository.FileRepository
+import dagger.Binds
 import dagger.BindsOptionalOf
 import dagger.Module
 import dagger.Provides
@@ -45,4 +47,12 @@ object OperationsModule {
 internal interface FileOperationsBindings {
     @BindsOptionalOf
     fun optionalFileRepository(): FileRepository
+
+    /**
+     * Exposes the WorkManager-backed [OperationScheduler] under the [FileOperationsScheduler]
+     * domain seam so feature modules (which see `core-domain` only) can enqueue and observe
+     * copy/move/zip operations without depending on `core-data`.
+     */
+    @Binds
+    fun bindFileOperationsScheduler(impl: OperationScheduler): FileOperationsScheduler
 }
