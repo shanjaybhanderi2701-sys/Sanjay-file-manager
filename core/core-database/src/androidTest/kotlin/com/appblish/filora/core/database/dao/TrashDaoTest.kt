@@ -63,10 +63,10 @@ class TrashDaoTest {
             assertThat(dao.observeTotalSize().first()).isEqualTo(35L)
         }
 
-    @Test
     // Explicit `: Unit` — the trailing `containsExactly(...)` returns Truth's `Ordered`,
     // which as an expression body would make this @Test method non-void and JUnit4 would
     // reject the whole class with InvalidTestClassError (APP-150).
+    @Test
     fun findExpired_returnsOnlyRowsStrictlyBeforeCutoff(): Unit =
         runBlocking {
             dao.upsert(entry(id = "old", deletedAt = 100))
