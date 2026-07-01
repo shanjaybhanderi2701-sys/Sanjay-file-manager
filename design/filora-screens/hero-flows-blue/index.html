@@ -1,0 +1,661 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Filora — Hero Flows · BLUE variant (for review)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  /* ============================================================
+     FILORA — HERO FLOWS (Browse + Multi-select)
+     Applies the Play Store Taste Guide (APP-136) to the shipped
+     "Filora Iris" design system (APP-134). Tokens below map 1:1
+     to core-ui/theme values — no second brand color invented.
+     ============================================================ */
+  :root{
+    /* --- Brand: Filora Iris --- */
+    --iris:#2563EB; --iris-600:#1D4FD7; --violet:#4C7DF5; --orchid:#38BDF8;
+    --iris-container:#DCE7FF; --on-iris-container:#0A245F;
+
+    /* --- Ink & neutrals (indigo-tinted, not pure grey) --- */
+    --ink:#15142B; --ink-2:#403E5C; --muted:#75738F;
+    --bg:#F5F4FB; --surface:#FFFFFF; --surf-tint:#FBFAFF; --line:#ECEAF7; --line-2:#E2DFF2;
+
+    /* --- Per-category accent wheel --- */
+    --c-image:#F43F6E;    --c-image-c:#FFE1E9;
+    --c-video:#7C5CF7;    --c-video-c:#EAE2FF;
+    --c-audio:#F5921B;    --c-audio-c:#FFEBCF;
+    --c-doc:#2E7CF6;      --c-doc-c:#DBE9FF;
+    --c-download:#12A46B; --c-download-c:#CFF3E1;
+    --c-app:#5B5BD6;      --c-app-c:#E4E4FB;
+    --c-archive:#B44BC9;  --c-archive-c:#F6DEFB;
+    --c-folder:#6E6C8A;   --c-folder-c:#ECEBF3;
+    --c-fav:#F5A524;      --c-fav-c:#FFF0D2;
+    --success:#12A46B; --error:#E5484D; --error-c:#FFE3E1; --on-error-c:#5C0A0C;
+
+    /* --- Elevation --- */
+    --sh-1:0 1px 2px rgba(21,20,43,.05), 0 1px 3px rgba(21,20,43,.05);
+    --sh-2:0 6px 16px rgba(21,20,43,.07), 0 2px 5px rgba(21,20,43,.05);
+    --sh-3:0 16px 34px rgba(21,20,43,.12), 0 5px 12px rgba(21,20,43,.06);
+    --sh-brand:0 12px 26px rgba(37,99,235,.30), 0 3px 8px rgba(37,99,235,.20);
+
+    /* --- Shape --- */
+    --r-sm:10px; --r-md:12px; --r-lg:14px; --r-xl:18px; --r-2xl:22px; --r-pill:999px;
+
+    /* --- Spacing --- */
+    --xs:4px; --sm:8px; --md:12px; --lg:16px; --xl:24px; --xxl:32px;
+
+    --font:'Manrope',-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+  }
+
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{font-family:var(--font);background:radial-gradient(1200px 600px at 15% -5%,#1c1b3a,#0c0b1c 60%);
+    color:#cdcbe6;padding:40px 20px 90px;-webkit-font-smoothing:antialiased}
+
+  /* ---------- Page chrome ---------- */
+  header.page{max-width:1320px;margin:0 auto 30px}
+  .brandline{display:flex;align-items:center;gap:12px}
+  .logo{width:40px;height:40px;border-radius:12px;
+    background:linear-gradient(135deg,var(--iris),var(--violet) 55%,var(--orchid));
+    box-shadow:var(--sh-brand);display:flex;align-items:center;justify-content:center}
+  header.page h1{font-size:28px;color:#f4f3ff;font-weight:800;letter-spacing:-.6px}
+  header.page .sub{color:#9d9bc4;margin-top:10px;font-size:14.5px;line-height:1.6;max-width:900px}
+  .pill{display:inline-block;background:rgba(37,99,235,.16);color:#bcd3ff;border:1px solid rgba(56,189,248,.35);
+    padding:4px 12px;border-radius:var(--r-pill);font-size:12px;font-weight:600;margin-top:16px;margin-right:6px}
+  .sectlabel{max-width:1320px;margin:44px auto 6px;color:#8886b3;font-size:12px;font-weight:700;
+    letter-spacing:1.4px;text-transform:uppercase}
+  .sectlabel + .sectnote{max-width:1320px;margin:0 auto 18px;color:#75739c;font-size:13px}
+
+  .gallery{max-width:1320px;margin:0 auto;display:flex;flex-wrap:wrap;gap:40px;align-items:flex-start}
+  .frame{display:flex;flex-direction:column;gap:12px}
+  .frame > .cap{color:#b7b5da;font-size:13.5px;font-weight:700;text-align:center}
+  .frame > .cap span{display:block;color:#7d7ba6;font-weight:500;font-size:11.5px;margin-top:3px;max-width:320px}
+
+  /* ---------- Device shell ---------- */
+  .phone{width:340px;height:738px;background:var(--bg);border-radius:38px;
+    border:10px solid #050510;overflow:hidden;position:relative;color:var(--ink);
+    box-shadow:0 30px 70px rgba(0,0,0,.6), inset 0 0 0 2px #1c1b32}
+  .scroll{position:absolute;inset:0 0 68px 0;overflow:hidden}
+  .content{padding-bottom:20px}
+
+  /* status bar strip */
+  .status{height:26px;display:flex;align-items:center;justify-content:space-between;padding:0 18px;
+    font-size:11px;font-weight:700;color:var(--ink-2)}
+  .status .sdots{display:flex;gap:4px;align-items:center}
+  .status .sdots i{display:block;width:4px;height:4px;border-radius:50%;background:var(--ink-2)}
+  .status .bat{width:20px;height:11px;border:1.4px solid var(--ink-2);border-radius:3px;position:relative;margin-left:2px}
+  .status .bat::after{content:"";position:absolute;top:2px;bottom:2px;left:2px;width:11px;border-radius:1px;background:var(--ink-2)}
+  .status .bat::before{content:"";position:absolute;top:3px;right:-3px;width:2px;height:5px;border-radius:1px;background:var(--ink-2)}
+
+  /* ---------- Icons ---------- */
+  .icon{width:24px;height:24px;display:inline-block;vertical-align:middle;flex-shrink:0}
+  .icon svg{width:100%;height:100%;display:block}
+
+  /* ---------- App bar ---------- */
+  .appbar{padding:8px 12px 6px;display:flex;align-items:center;gap:8px}
+  .appbar .grp{display:flex;gap:2px;align-items:center;margin-left:auto}
+  .iconbtn{width:44px;height:44px;border-radius:var(--r-pill);display:flex;align-items:center;justify-content:center;
+    color:var(--ink-2);background:transparent}
+  .iconbtn:hover{background:var(--iris-container)}
+  .iconbtn .icon{width:22px;height:22px}
+
+  /* breadcrumb */
+  .crumbs{display:flex;align-items:center;gap:5px;font-size:13px;color:var(--muted);
+    font-weight:600;overflow:hidden;white-space:nowrap;flex:1;min-width:0}
+  .crumbs b{color:var(--ink);font-weight:700;overflow:hidden;text-overflow:ellipsis}
+  .crumbs .sep{opacity:.5}
+  .crumbs .head{color:var(--muted);flex-shrink:0}
+
+  /* search */
+  .searchbar{margin:4px var(--lg) 8px;display:flex;align-items:center;gap:10px;background:var(--surface);
+    border:1px solid var(--line);border-radius:var(--r-pill);padding:13px 16px;box-shadow:var(--sh-2)}
+  .searchbar .icon{width:20px;height:20px;color:var(--muted)}
+  .searchbar .ph{flex:1;font-size:14.5px;font-weight:500;color:var(--muted)}
+
+  .muted{color:var(--muted)}
+
+  /* ---------- File row (~56dp+) ---------- */
+  .list{padding:0 8px}
+  .row{display:flex;align-items:center;gap:var(--md);padding:8px 12px;min-height:60px;border-radius:var(--r-md)}
+  .row .nm{font-size:15px;font-weight:600;line-height:20px;color:var(--ink)}
+  .row .mt{font-size:12px;line-height:15px;color:var(--muted);margin-top:2px;font-weight:500}
+  .row .gr{flex:1;min-width:0}
+  .row .nm,.row .mt{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .row .tail{color:var(--muted);display:flex;align-items:center;justify-content:center;width:36px;height:36px}
+  .row .tail .icon{width:20px;height:20px}
+
+  /* leading icon tile */
+  .tile{width:44px;height:44px;border-radius:12px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+  .tile .icon{width:22px;height:22px}
+
+  /* FAB */
+  .fab{position:absolute;right:18px;bottom:84px;width:58px;height:58px;border-radius:20px;
+    background:linear-gradient(135deg,var(--iris),var(--violet));box-shadow:var(--sh-brand);
+    display:flex;align-items:center;justify-content:center;color:#fff;z-index:5}
+  .fab .icon{width:26px;height:26px;color:#fff}
+
+  /* ---------- Bottom nav ---------- */
+  .bnav{position:absolute;left:0;right:0;bottom:0;height:68px;background:rgba(255,255,255,.92);
+    backdrop-filter:blur(14px);display:flex;justify-content:space-around;align-items:center;
+    border-top:1px solid var(--line);padding-bottom:6px}
+  .bnav .n{display:flex;flex-direction:column;align-items:center;gap:3px;font-size:10.5px;color:var(--muted);font-weight:600}
+  .bnav .n .b{width:56px;height:30px;border-radius:var(--r-pill);display:flex;align-items:center;justify-content:center}
+  .bnav .n .b .icon{width:22px;height:22px}
+  .bnav .n.act{color:var(--iris)}
+  .bnav .n.act .b{background:var(--iris-container)}
+
+  /* ---------- Grid view ---------- */
+  .fgrid{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:4px var(--lg)}
+  .gcell{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-lg);
+    overflow:hidden;box-shadow:var(--sh-1)}
+  .gcell .gthumb{height:104px;display:flex;align-items:center;justify-content:center;position:relative}
+  .gcell .gthumb .icon{width:38px;height:38px}
+  .gcell .gpd{position:absolute;bottom:6px;right:7px;color:#fff;font-size:9.5px;font-weight:700;
+    background:rgba(21,20,43,.55);padding:1px 6px;border-radius:var(--r-pill)}
+  .gcell .gmeta{padding:9px 11px 11px;display:flex;align-items:center;gap:8px}
+  .gcell .gmeta .gt{width:22px;height:22px;border-radius:7px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+  .gcell .gmeta .gt .icon{width:13px;height:13px}
+  .gcell .gn{font-size:12.5px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--ink)}
+  .gcell .gm{font-size:10.5px;color:var(--muted);font-weight:600;margin-top:1px}
+
+  /* ---------- Skeleton ---------- */
+  .sk{background:linear-gradient(100deg,var(--line) 30%,#F6F5FC 50%,var(--line) 70%);
+    background-size:200% 100%;animation:sh 1.3s infinite;border-radius:8px}
+  @keyframes sh{to{background-position:-200% 0}}
+  .skrow{display:flex;align-items:center;gap:var(--md);padding:12px;min-height:60px}
+  .skrow .ski{width:44px;height:44px;border-radius:12px;flex-shrink:0}
+  .skrow .skg{flex:1}
+  .skrow .sk1{height:13px;width:62%;margin-bottom:8px}
+  .skrow .sk2{height:10px;width:40%}
+
+  /* ---------- State screens (empty / error / permission) ---------- */
+  .state{display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;
+    padding:36px 30px;height:100%;gap:6px}
+  .state .bloom{width:130px;height:130px;display:flex;align-items:center;justify-content:center;margin-bottom:12px;position:relative}
+  .state h4{font-size:19px;font-weight:800;letter-spacing:-.3px;color:var(--ink)}
+  .state p{font-size:13px;color:var(--muted);font-weight:500;line-height:1.55;max-width:246px;margin-top:2px}
+  .btn-brand{margin-top:18px;background:linear-gradient(135deg,var(--iris),var(--violet));color:#fff;font-weight:700;
+    font-size:14px;padding:14px 26px;border-radius:var(--r-pill);box-shadow:var(--sh-brand);display:inline-flex;
+    align-items:center;gap:9px}
+  .btn-brand .icon{width:18px;height:18px;color:#fff}
+  .btn-out{margin-top:16px;background:var(--surface);color:var(--iris);font-weight:700;font-size:14px;
+    padding:13px 26px;border-radius:var(--r-pill);border:1.5px solid var(--line-2);display:inline-flex;align-items:center;gap:8px}
+  .btn-text{margin-top:12px;color:var(--muted);font-weight:700;font-size:13px}
+  .btn-link{margin-top:16px;color:var(--iris);font-weight:700;font-size:13px}
+
+  /* permission trust bullets */
+  .trust{display:flex;flex-direction:column;gap:12px;margin-top:20px;width:100%;max-width:250px}
+  .tb{display:flex;align-items:flex-start;gap:11px;text-align:left}
+  .tb .tbi{width:26px;height:26px;border-radius:9px;background:var(--c-download-c);color:var(--c-download);
+    display:flex;align-items:center;justify-content:center;flex-shrink:0}
+  .tb .tbi .icon{width:16px;height:16px}
+  .tb span{font-size:12.5px;font-weight:600;color:var(--ink-2);line-height:1.4;padding-top:4px}
+  .appglyph{width:80px;height:80px;border-radius:24px;background:linear-gradient(135deg,var(--iris),var(--violet) 55%,var(--orchid));
+    box-shadow:var(--sh-brand);display:flex;align-items:center;justify-content:center;margin-bottom:18px}
+  .appglyph .icon{width:44px;height:44px;color:#fff}
+
+  /* ---------- Selection mode ---------- */
+  .appbar.sel{background:var(--iris-container);padding:8px 8px 8px 6px;align-items:center}
+  .appbar.sel .seltitle{font-size:17px;font-weight:800;color:var(--on-iris-container);margin-left:2px}
+  .appbar.sel .iconbtn{color:var(--on-iris-container)}
+  .appbar.sel .iconbtn:hover{background:rgba(91,91,214,.16)}
+  .row.selrow{background:var(--iris-container)}
+  .check{width:26px;height:26px;border-radius:var(--r-pill);background:var(--iris);display:flex;align-items:center;
+    justify-content:center;color:#fff;flex-shrink:0;box-shadow:var(--sh-1)}
+  .check .icon{width:16px;height:16px;color:#fff}
+  .checkbox{width:26px;height:26px;border-radius:var(--r-pill);border:2px solid var(--line-2);flex-shrink:0;background:var(--surface)}
+
+  /* ---------- InShot-style bottom action bar ---------- */
+  .actionbar{position:absolute;left:0;right:0;bottom:68px;background:var(--surface);
+    border-top:1px solid var(--line);box-shadow:0 -8px 24px rgba(21,20,43,.10);
+    display:flex;justify-content:space-around;align-items:flex-start;padding:12px 6px 14px;z-index:6}
+  .act{display:flex;flex-direction:column;align-items:center;gap:6px;width:52px}
+  .act .ai{width:52px;height:52px;border-radius:var(--r-lg);display:flex;align-items:center;justify-content:center;
+    background:var(--iris-container);color:var(--iris)}
+  .act .ai .icon{width:24px;height:24px}
+  .act.del .ai{background:var(--error-c);color:var(--error)}
+  .act span{font-size:11px;font-weight:700;color:var(--ink-2)}
+  .act.del span{color:var(--error)}
+
+  /* ---------- Bottom sheet (delete confirm) ---------- */
+  .scrim{position:absolute;inset:0;background:rgba(12,11,28,.42);z-index:7}
+  .sheet{position:absolute;left:0;right:0;bottom:0;background:var(--surface);
+    border-radius:24px 24px 0 0;box-shadow:0 -16px 40px rgba(12,11,28,.35);z-index:8;padding:12px 22px 26px}
+  .sheet .handle{width:36px;height:4px;border-radius:99px;background:var(--line-2);margin:2px auto 18px}
+  .sheet .shicon{width:52px;height:52px;border-radius:16px;background:var(--error-c);color:var(--error);
+    display:flex;align-items:center;justify-content:center;margin:0 auto 14px}
+  .sheet .shicon .icon{width:26px;height:26px}
+  .sheet h4{font-size:19px;font-weight:800;text-align:center;color:var(--ink);letter-spacing:-.3px}
+  .sheet p{font-size:13px;color:var(--muted);text-align:center;font-weight:500;line-height:1.5;margin-top:8px}
+  .sheet .undo{display:inline-flex;align-items:center;gap:7px;margin:14px auto 0;background:var(--iris-container);
+    color:var(--on-iris-container);font-size:11.5px;font-weight:700;padding:6px 12px;border-radius:var(--r-pill)}
+  .sheet .undo .icon{width:14px;height:14px}
+  .sheet .btn-tonal{margin-top:20px;background:var(--error-c);color:var(--on-error-c);font-weight:800;font-size:15px;
+    width:100%;padding:15px;border-radius:var(--r-pill);text-align:center;display:flex;align-items:center;
+    justify-content:center;gap:9px}
+  .sheet .btn-tonal .icon{width:18px;height:18px;color:var(--on-error-c)}
+  .sheet .btn-cancel{margin-top:8px;color:var(--ink-2);font-weight:700;font-size:14px;width:100%;padding:14px;text-align:center}
+  .sheetbox{display:flex;flex-direction:column}
+
+  footer{max-width:1320px;margin:60px auto 0;color:#6c6a95;font-size:12.5px;line-height:1.7;border-top:1px solid #23223f;padding-top:20px}
+  footer code{background:#1a1934;color:#c7c5ff;padding:2px 6px;border-radius:6px;font-size:11.5px}
+</style>
+</head>
+<body>
+<header class="page">
+  <div class="brandline">
+    <div class="logo">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+        <path d="M4 8.5C4 6.6 5.6 5 7.5 5H10l2 2.4h4.5C18.4 7.4 20 9 20 10.9V16c0 1.9-1.6 3.5-3.5 3.5h-9C5.6 19.5 4 17.9 4 16V8.5Z" fill="#fff" opacity=".92"/>
+        <circle cx="12" cy="13" r="3.1" fill="#38BDF8"/>
+      </svg>
+    </div>
+    <h1>Filora — Hero Flows · BLUE variant (for review)</h1>
+  </div>
+  <p class="sub">The two flows people actually spend time in — <b>browsing files</b> and <b>batch-acting on a selection</b> —
+  rendered in a <b>BLUE primary</b> variant for board review (vs the ratified Iris/purple) with a <b>3-item InShot-style tab bar</b> and filled tab icons. Applies the Play Store <b>Taste Guide (APP-136)</b>:
+  content-first chrome, warmth in the empty states, honest &amp; reversible destructive actions, and an <b>InShot-style bottom
+  action bar</b> where the object is the interface. One accent (blue) plus the per-category accent wheel — no second brand color.</p>
+  <span class="pill">Flow A · Browse</span>
+  <span class="pill">Flow B · Selection &amp; batch actions</span>
+  <span class="pill">Blue primary · review</span>
+  <span class="pill">Taste Guide · APP-136</span>
+</header>
+
+<!-- ======================================================= FLOW A ======================================================= -->
+<div class="sectlabel">Flow A — Browse</div>
+<div class="sectnote">Content-first file list. The toolbar stays quiet until you need it; loading, empty and error states keep the layout stable and calm.</div>
+
+<div class="gallery">
+
+  <!-- 1 · BROWSE POPULATED (LIST) -->
+  <div class="frame">
+    <div class="phone">
+      <div class="scroll">
+        <div class="content">
+          <div class="status"><span>9:41</span><div class="sdots"><i></i><i></i><i></i><span class="bat"></span></div></div>
+          <div class="appbar">
+            <div class="iconbtn"><span class="icon"><svg viewBox="0 0 24 24" fill="none"><path d="M15 5l-7 7 7 7" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/></svg></span></div>
+            <div class="crumbs"><span class="head">Internal storage</span><span class="sep">›</span><b>Download</b></div>
+            <div class="grp">
+              <div class="iconbtn"><span class="icon">
+                <svg viewBox="0 0 24 24" fill="none"><rect x="4" y="4" width="7" height="7" rx="1.6" stroke="currentColor" stroke-width="1.75"/><rect x="13" y="4" width="7" height="7" rx="1.6" stroke="currentColor" stroke-width="1.75"/><rect x="4" y="13" width="7" height="7" rx="1.6" stroke="currentColor" stroke-width="1.75"/><rect x="13" y="13" width="7" height="7" rx="1.6" stroke="currentColor" stroke-width="1.75"/></svg>
+              </span></div>
+              <div class="iconbtn"><span class="icon">
+                <svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="5" r="1.6" fill="currentColor"/><circle cx="12" cy="12" r="1.6" fill="currentColor"/><circle cx="12" cy="19" r="1.6" fill="currentColor"/></svg>
+              </span></div>
+            </div>
+          </div>
+          <div class="searchbar">
+            <span class="icon"><svg viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="6.5" stroke="currentColor" stroke-width="1.75"/><path d="M20 20l-3.5-3.5" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"/></svg></span>
+            <span class="ph">Search this folder</span>
+          </div>
+          <div class="list">
+            <div class="row">
+              <div class="tile" style="background:var(--c-folder-c);color:var(--c-folder)"><span class="icon"><svg viewBox="0 0 24 24" fill="none"><path d="M3 7.5C3 6.1 4.1 5 5.5 5H9l1.6 1.8H18.5C19.9 6.8 21 7.9 21 9.3V16.5c0 1.4-1.1 2.5-2.5 2.5h-13C4.1 19 3 17.9 3 16.5V7.5Z" fill="currentColor"/></svg></span></div>
+              <div class="gr"><div class="nm">Invoices 2026</div><div class="mt">12 items</div></div>
+              <div class="tail"><span class="icon"><svg viewBox="0 0 24 24" fill="none"><path d="M9 5l7 7-7 7" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/></svg></span></div>
+            </div>
+            <div class="row">
+              <div class="tile" style="background:var(--c-folder-c);color:var(--c-folder)"><span class="icon"><svg viewBox="0 0 24 24" fill="none"><path d="M3 7.5C3 6.1 4.1 5 5.5 5H9l1.6 1.8H18.5C19.9 6.8 21 7.9 21 9.3V16.5c0 1.4-1.1 2.5-2.5 2.5h-13C4.1 19 3 17.9 3 16.5V7.5Z" fill="currentColor"/></svg></span></div>
+              <div class="gr"><div class="nm">Trip photos</div><div class="mt">148 items</div></div>
+              <div class="tail"><span class="icon"><svg viewBox="0 0 24 24" fill="none"><path d="M9 5l7 7-7 7" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/></svg></span></div>
+            </div>
+            <div class="row">
+              <div class="tile" style="background:var(--c-doc-c);color:var(--c-doc)"><span class="icon"><svg viewBox="0 0 24 24" fill="none"><path d="M6 3.5h8L18.5 8v11.5c0 .8-.7 1.5-1.5 1.5H6c-.8 0-1.5-.7-1.5-1.5v-14C4.5 4.2 5.2 3.5 6 3.5Z" stroke="currentColor" stroke-width="1.75" stroke-linejoin="round"/><path d="M13.5 3.7V8.2h4.5" stroke="currentColor" stroke-width="1.75" stroke-linejoin="round"/><path d="M8 14.5h5M8 17h3.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></span></div>
+              <div class="gr"><div class="nm">Statement_Q2.pdf</div><div class="mt">1.4 MB · Jun 28, 2026</div></div>
+              <div class="tail"><span class="icon"><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="5" r="1.5" fill="currentColor"/><circle cx="12" cy="12" r="1.5" fill="currentColor"/><circle cx="12" cy="19" r="1.5" fill="currentColor"/></svg></span></div>
+            </div>
+            <div class="row">
+              <div class="tile" style="background:var(--c-image-c);color:var(--c-image)"><span class="icon"><svg viewBox="0 0 24 24" fill="none"><rect x="3.5" y="4.5" width="17" height="15" rx="2.4" stroke="currentColor" stroke-width="1.75"/><circle cx="8.5" cy="9.5" r="1.6" fill="currentColor"/><path d="M4 17l4.5-4.5 3.5 3 3-2.5 5 4.5" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/></svg></span></div>
+              <div class="gr"><div class="nm">IMG_2048.jpg</div><div class="mt">3.8 MB · Jun 25, 2026</div></div>
+              <div class="tail"><span class="icon"><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="5" r="1.5" fill="currentColor"/><circle cx="12" cy="12" r="1.5" fill="currentColor"/><circle cx="12" cy="19" r="1.5" fill="currentColor"/></svg></span></div>
+            </div>
+            <div class="row">
+              <div class="tile" style="background:var(--c-video-c);color:var(--c-video)"><span class="icon"><svg viewBox="0 0 24 24" fill="none"><rect x="3" y="6" width="12.5" height="12" rx="2.4" stroke="currentColor" stroke-width="1.75"/><path d="M15.5 10l5.5-3v10l-5.5-3v-4Z" stroke="currentColor" stroke-width="1.75" stroke-linejoin="round"/></svg></span></div>
+              <div class="gr"><div class="nm">Clip_final.mp4</div><div class="mt">42.1 MB · Jun 24, 2026</div></div>
+              <div class="tail"><span class="icon"><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="5" r="1.5" fill="currentColor"/><circle cx="12" cy="12" r="1.5" fill="currentColor"/><circle cx="12" cy="19" r="1.5" fill="currentColor"/></svg></span></div>
+            </div>
+            <div class="row">
+              <div class="tile" style="background:var(--c-audio-c);color:var(--c-audio)"><span class="icon"><svg viewBox="0 0 24 24" fill="none"><path d="M9 17V6.5l9-2v10" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/><circle cx="6.5" cy="17" r="2.5" stroke="currentColor" stroke-width="1.75"/><circle cx="15.5" cy="14.5" r="2.5" stroke="currentColor" stroke-width="1.75"/></svg></span></div>
+              <div class="gr"><div class="nm">podcast_ep12.mp3</div><div class="mt">28.7 MB · Jun 22, 2026</div></div>
+              <div class="tail"><span class="icon"><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="5" r="1.5" fill="currentColor"/><circle cx="12" cy="12" r="1.5" fill="currentColor"/><circle cx="12" cy="19" r="1.5" fill="currentColor"/></svg></span></div>
+            </div>
+            <div class="row">
+              <div class="tile" style="background:var(--c-app-c);color:var(--c-app)"><span class="icon"><svg viewBox="0 0 24 24" fill="none"><rect x="5" y="5" width="14" height="14" rx="3.4" stroke="currentColor" stroke-width="1.75"/><path d="M8.5 8.5l2 2M15.5 8.5l-2 2" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/><circle cx="9" cy="14.5" r="1.1" fill="currentColor"/><circle cx="15" cy="14.5" r="1.1" fill="currentColor"/></svg></span></div>
+              <div class="gr"><div class="nm">app-release.apk</div><div class="mt">18.2 MB · Jun 20, 2026</div></div>
+              <div class="tail"><span class="icon"><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="5" r="1.5" fill="currentColor"/><circle cx="12" cy="12" r="1.5" fill="currentColor"/><circle cx="12" cy="19" r="1.5" fill="currentColor"/></svg></span></div>
+            </div>
+            <div class="row">
+              <div class="tile" style="background:var(--c-archive-c);color:var(--c-archive)"><span class="icon"><svg viewBox="0 0 24 24" fill="none"><path d="M5 6.5C5 5.1 6.1 4 7.5 4H18c.8 0 1.5.7 1.5 1.5v13c0 .8-.7 1.5-1.5 1.5H7.5C6.1 20 5 18.9 5 17.5v-11Z" stroke="currentColor" stroke-width="1.75"/><path d="M11 4v3M11 8v2M11 11v2" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"/><rect x="9.5" y="13.5" width="3" height="3.5" rx=".8" stroke="currentColor" stroke-width="1.5"/></svg></span></div>
+              <div class="gr"><div class="nm">backup_archive.zip</div><div class="mt">64.0 MB · Jun 18, 2026</div></div>
+              <div class="tail"><span class="icon"><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="5" r="1.5" fill="currentColor"/><circle cx="12" cy="12" r="1.5" fill="currentColor"/><circle cx="12" cy="19" r="1.5" fill="currentColor"/></svg></span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="fab"><span class="icon"><svg viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span></div>
+      <div class="bnav">
+        <div class="n"><div class="b"><span class="icon"><svg viewBox="0 0 24 24" fill="none"><path d="M4 11l8-6 8 6v8.5c0 .6-.4 1-1 1h-4.5V15h-5v5.5H5c-.6 0-1-.4-1-1V11Z" fill="currentColor"/></svg></span></div>Home</div>
+        <div class="n act"><div class="b"><span class="icon"><svg viewBox="0 0 24 24" fill="none"><path d="M3 7.5C3 6.1 4.1 5 5.5 5H9l1.6 1.8H18.5C19.9 6.8 21 7.9 21 9.3V16.5c0 1.4-1.1 2.5-2.5 2.5h-13C4.1 19 3 17.9 3 16.5V7.5Z" fill="currentColor"/></svg></span></div>Browse</div>
+        <div class="n"><div class="b"><span class="icon"><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="8.5" fill="currentColor" opacity=".26"/><path d="M12 3.5a8.5 8.5 0 0 1 7.4 4.3L12 12Z" fill="currentColor"/></svg></span></div>Storage</div>
+      </div>
+    </div>
+    <div class="cap">Browse · populated (list)<span>Content-first, chrome recedes — toolbar quiet until needed (taste §2.1)</span></div>
+  </div>
+
+  <!-- 2 · BROWSE GRID -->
+  <div class="frame">
+    <div class="phone">
+      <div class="scroll">
+        <div class="content">
+          <div class="status"><span>9:41</span><div class="sdots"><i></i><i></i><i></i><span class="bat"></span></div></div>
+          <div class="appbar">
+            <div class="iconbtn"><span class="icon"><svg viewBox="0 0 24 24" fill="none"><path d="M15 5l-7 7 7 7" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/></svg></span></div>
+            <div class="crumbs"><span class="head">Internal storage</span><span class="sep">›</span><b>Download</b></div>
+            <div class="grp">
+              <div class="iconbtn" style="background:var(--iris-container);color:var(--iris)"><span class="icon"><svg viewBox="0 0 24 24" fill="none"><path d="M4 6.5h16M4 12h16M4 17.5h16" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"/></svg></span></div>
+              <div class="iconbtn"><span class="icon"><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="5" r="1.6" fill="currentColor"/><circle cx="12" cy="12" r="1.6" fill="currentColor"/><circle cx="12" cy="19" r="1.6" fill="currentColor"/></svg></span></div>
+            </div>
+          </div>
+          <div class="searchbar">
+            <span class="icon"><svg viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="6.5" stroke="currentColor" stroke-width="1.75"/><path d="M20 20l-3.5-3.5" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"/></svg></span>
+            <span class="ph">Search this folder</span>
+          </div>
+          <div class="fgrid">
+            <div class="gcell">
+              <div class="gthumb" style="background:var(--c-folder-c);color:var(--c-folder)"><span class="icon"><svg viewBox="0 0 24 24" fill="none"><path d="M3 7.5C3 6.1 4.1 5 5.5 5H9l1.6 1.8H18.5C19.9 6.8 21 7.9 21 9.3V16.5c0 1.4-1.1 2.5-2.5 2.5h-13C4.1 19 3 17.9 3 16.5V7.5Z" fill="currentColor"/></svg></span></div>
+              <div class="gmeta"><div class="gt" style="background:var(--c-folder-c);color:var(--c-folder)"><span class="icon"><svg viewBox="0 0 24 24" fill="none"><path d="M3 7.5C3 6.1 4.1 5 5.5 5H9l1.6 1.8H18.5C19.9 6.8 21 7.9 21 9.3V16.5c0 1.4-1.1 2.5-2.5 2.5h-13C4.1 19 3 17.9 3 16.5V7.5Z" fill="currentColor"/></svg></span></div><div style="min-width:0"><div class="gn">Invoices 2026</div><div class="gm">12 items</div></div></div>
+            </div>
+            <div class="gcell">
+              <div class="gthumb" style="background:var(--c-image-c);color:var(--c-image)"><span class="icon"><svg viewBox="0 0 24 24" fill="none"><rect x="3.5" y="4.5" width="17" height="15" rx="2.4" stroke="currentColor" stroke-width="1.75"/><circle cx="8.5" cy="9.5" r="1.6" fill="currentColor"/><path d="M4 17l4.5-4.5 3.5 3 3-2.5 5 4.5" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/></svg></span></div>
+              <div class="gmeta"><div class="gt" style="background:var(--c-image-c);color:var(--c-image)"><span class="icon"><svg viewBox="0 0 24 24" fill="none"><rect x="3.5" y="4.5" width="17" height="15" rx="2.4" stroke="currentColor" stroke-width="1.75"/><circle cx="8.5" cy="9.5" r="1.6" fill="currentColor"/></svg></span></div><div style="min-width:0"><div class="gn">IMG_2048.jpg</div><div class="gm">3.8 MB</div></div></div>
+            </div>
+            <div class="gcell">
+              <div class="gthumb" style="background:var(--c-video-c);color:var(--c-video)"><span class="icon"><svg viewBox="0 0 24 24" fill="none"><rect x="3" y="6" width="12.5" height="12" rx="2.4" stroke="currentColor" stroke-width="1.75"/><path d="M15.5 10l5.5-3v10l-5.5-3v-4Z" stroke="currentColor" stroke-width="1.75" stroke-linejoin="round"/></svg></span><span class="gpd">1:24</span></div>
+              <div class="gmeta"><div class="gt" style="background:var(--c-video-c);color:var(--c-video)"><span class="icon"><svg viewBox="0 0 24 24" fill="none"><rect x="3" y="6" width="12.5" height="12" rx="2.4" stroke="currentColor" stroke-width="1.75"/><path d="M15.5 10l5.5-3v10l-5.5-3v-4Z" stroke="currentColor" stroke-width="1.75" stroke-linejoin="round"/></svg></span></div><div style="min-width:0"><div class="gn">Clip_final.mp4</div><div class="gm">42.1 MB</div></div></div>
+            </div>
+            <div class="gcell">
+              <div class="gthumb" style="background:var(--c-doc-c);color:var(--c-doc)"><span class="icon"><svg viewBox="0 0 24 24" fill="none"><path d="M6 3.5h8L18.5 8v11.5c0 .8-.7 1.5-1.5 1.5H6c-.8 0-1.5-.7-1.5-1.5v-14C4.5 4.2 5.2 3.5 6 3.5Z" stroke="currentColor" stroke-width="1.75" stroke-linejoin="round"/><path d="M13.5 3.7V8.2h4.5" stroke="currentColor" stroke-width="1.75" stroke-linejoin="round"/></svg></span></div>
+              <div class="gmeta"><div class="gt" style="background:var(--c-doc-c);color:var(--c-doc)"><span class="icon"><svg viewBox="0 0 24 24" fill="none"><path d="M6 3.5h8L18.5 8v11.5c0 .8-.7 1.5-1.5 1.5H6c-.8 0-1.5-.7-1.5-1.5v-14C4.5 4.2 5.2 3.5 6 3.5Z" stroke="currentColor" stroke-width="1.75" stroke-linejoin="round"/></svg></span></div><div style="min-width:0"><div class="gn">Statement.pdf</div><div class="gm">1.4 MB</div></div></div>
+            </div>
+            <div class="gcell">
+              <div class="gthumb" style="background:var(--c-audio-c);color:var(--c-audio)"><span class="icon"><svg viewBox="0 0 24 24" fill="none"><path d="M9 17V6.5l9-2v10" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/><circle cx="6.5" cy="17" r="2.5" stroke="currentColor" stroke-width="1.75"/><circle cx="15.5" cy="14.5" r="2.5" stroke="currentColor" stroke-width="1.75"/></svg></span></div>
+              <div class="gmeta"><div class="gt" style="background:var(--c-audio-c);color:var(--c-audio)"><span class="icon"><svg viewBox="0 0 24 24" fill="none"><path d="M9 17V6.5l9-2v10" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/><circle cx="6.5" cy="17" r="2.5" stroke="currentColor" stroke-width="1.75"/></svg></span></div><div style="min-width:0"><div class="gn">podcast_ep12.mp3</div><div class="gm">28.7 MB</div></div></div>
+            </div>
+            <div class="gcell">
+              <div class="gthumb" style="background:var(--c-archive-c);color:var(--c-archive)"><span class="icon"><svg viewBox="0 0 24 24" fill="none"><path d="M5 6.5C5 5.1 6.1 4 7.5 4H18c.8 0 1.5.7 1.5 1.5v13c0 .8-.7 1.5-1.5 1.5H7.5C6.1 20 5 18.9 5 17.5v-11Z" stroke="currentColor" stroke-width="1.75"/><path d="M11 4v9" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"/><rect x="9.5" y="13.5" width="3" height="3.5" rx=".8" stroke="currentColor" stroke-width="1.5"/></svg></span></div>
+              <div class="gmeta"><div class="gt" style="background:var(--c-archive-c);color:var(--c-archive)"><span class="icon"><svg viewBox="0 0 24 24" fill="none"><path d="M5 6.5C5 5.1 6.1 4 7.5 4H18c.8 0 1.5.7 1.5 1.5v13c0 .8-.7 1.5-1.5 1.5H7.5C6.1 20 5 18.9 5 17.5v-11Z" stroke="currentColor" stroke-width="1.75"/></svg></span></div><div style="min-width:0"><div class="gn">backup.zip</div><div class="gm">64.0 MB</div></div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="fab"><span class="icon"><svg viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span></div>
+      <div class="bnav">
+        <div class="n"><div class="b"><span class="icon"><svg viewBox="0 0 24 24" fill="none"><path d="M4 11l8-6 8 6v8.5c0 .6-.4 1-1 1h-4.5V15h-5v5.5H5c-.6 0-1-.4-1-1V11Z" fill="currentColor"/></svg></span></div>Home</div>
+        <div class="n act"><div class="b"><span class="icon"><svg viewBox="0 0 24 24" fill="none"><path d="M3 7.5C3 6.1 4.1 5 5.5 5H9l1.6 1.8H18.5C19.9 6.8 21 7.9 21 9.3V16.5c0 1.4-1.1 2.5-2.5 2.5h-13C4.1 19 3 17.9 3 16.5V7.5Z" fill="currentColor"/></svg></span></div>Browse</div>
+        <div class="n"><div class="b"><span class="icon"><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="8.5" fill="currentColor" opacity=".26"/><path d="M12 3.5a8.5 8.5 0 0 1 7.4 4.3L12 12Z" fill="currentColor"/></svg></span></div>Storage</div>
+      </div>
+    </div>
+    <div class="cap">Browse · grid view<span>Grid toggle — same tokens, media-forward density (taste §2.2)</span></div>
+  </div>
+
+  <!-- 3 · BROWSE LOADING (SKELETON) -->
+  <div class="frame">
+    <div class="phone">
+      <div class="scroll">
+        <div class="content">
+          <div class="status"><span>9:41</span><div class="sdots"><i></i><i></i><i></i><span class="bat"></span></div></div>
+          <div class="appbar">
+            <div class="iconbtn"><span class="icon"><svg viewBox="0 0 24 24" fill="none"><path d="M15 5l-7 7 7 7" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/></svg></span></div>
+            <div class="crumbs"><span class="head">Internal storage</span><span class="sep">›</span><b>Download</b></div>
+            <div class="grp">
+              <div class="iconbtn"><span class="icon"><svg viewBox="0 0 24 24" fill="none"><rect x="4" y="4" width="7" height="7" rx="1.6" stroke="currentColor" stroke-width="1.75"/><rect x="13" y="4" width="7" height="7" rx="1.6" stroke="currentColor" stroke-width="1.75"/><rect x="4" y="13" width="7" height="7" rx="1.6" stroke="currentColor" stroke-width="1.75"/><rect x="13" y="13" width="7" height="7" rx="1.6" stroke="currentColor" stroke-width="1.75"/></svg></span></div>
+              <div class="iconbtn"><span class="icon"><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="5" r="1.6" fill="currentColor"/><circle cx="12" cy="12" r="1.6" fill="currentColor"/><circle cx="12" cy="19" r="1.6" fill="currentColor"/></svg></span></div>
+            </div>
+          </div>
+          <div class="searchbar">
+            <span class="icon"><svg viewBox="0 0 24 24" fill="none"><circle cx="11" cy="11" r="6.5" stroke="currentColor" stroke-width="1.75"/><path d="M20 20l-3.5-3.5" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"/></svg></span>
+            <span class="ph">Search this folder</span>
+          </div>
+          <div class="list" style="padding-top:4px">
+            <div class="skrow"><div class="sk ski"></div><div class="skg"><div class="sk sk1"></div><div class="sk sk2"></div></div></div>
+            <div class="skrow"><div class="sk ski"></div><div class="skg"><div class="sk sk1" style="width:52%"></div><div class="sk sk2" style="width:34%"></div></div></div>
+            <div class="skrow"><div class="sk ski"></div><div class="skg"><div class="sk sk1" style="width:70%"></div><div class="sk sk2"></div></div></div>
+            <div class="skrow"><div class="sk ski"></div><div class="skg"><div class="sk sk1" style="width:46%"></div><div class="sk sk2" style="width:30%"></div></div></div>
+            <div class="skrow"><div class="sk ski"></div><div class="skg"><div class="sk sk1" style="width:64%"></div><div class="sk sk2" style="width:44%"></div></div></div>
+            <div class="skrow"><div class="sk ski"></div><div class="skg"><div class="sk sk1" style="width:58%"></div><div class="sk sk2" style="width:38%"></div></div></div>
+          </div>
+        </div>
+      </div>
+      <div class="bnav">
+        <div class="n"><div class="b"><span class="icon"><svg viewBox="0 0 24 24" fill="none"><path d="M4 11l8-6 8 6v8.5c0 .6-.4 1-1 1h-4.5V15h-5v5.5H5c-.6 0-1-.4-1-1V11Z" fill="currentColor"/></svg></span></div>Home</div>
+        <div class="n act"><div class="b"><span class="icon"><svg viewBox="0 0 24 24" fill="none"><path d="M3 7.5C3 6.1 4.1 5 5.5 5H9l1.6 1.8H18.5C19.9 6.8 21 7.9 21 9.3V16.5c0 1.4-1.1 2.5-2.5 2.5h-13C4.1 19 3 17.9 3 16.5V7.5Z" fill="currentColor"/></svg></span></div>Browse</div>
+        <div class="n"><div class="b"><span class="icon"><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="8.5" fill="currentColor" opacity=".26"/><path d="M12 3.5a8.5 8.5 0 0 1 7.4 4.3L12 12Z" fill="currentColor"/></svg></span></div>Storage</div>
+      </div>
+    </div>
+    <div class="cap">Browse · loading<span>Skeleton, not a spinner; layout stays stable (taste §2.8)</span></div>
+  </div>
+
+  <!-- 4 · BROWSE EMPTY -->
+  <div class="frame">
+    <div class="phone">
+      <div class="scroll">
+        <div class="status"><span>9:41</span><div class="sdots"><i></i><i></i><i></i><span class="bat"></span></div></div>
+        <div class="appbar">
+          <div class="iconbtn"><span class="icon"><svg viewBox="0 0 24 24" fill="none"><path d="M15 5l-7 7 7 7" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/></svg></span></div>
+          <div class="crumbs"><span class="head">Internal storage</span><span class="sep">›</span><b>New folder</b></div>
+          <div class="grp">
+            <div class="iconbtn"><span class="icon"><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="5" r="1.6" fill="currentColor"/><circle cx="12" cy="12" r="1.6" fill="currentColor"/><circle cx="12" cy="19" r="1.6" fill="currentColor"/></svg></span></div>
+          </div>
+        </div>
+        <div class="state" style="height:calc(100% - 42px)">
+          <div class="bloom">
+            <svg width="130" height="130" viewBox="0 0 130 130" fill="none">
+              <ellipse cx="65" cy="112" rx="42" ry="7" fill="#E6E5FB"/>
+              <path d="M24 54c0-4 3-7 7-7h18l7 8h39c4 0 7 3 7 7v34c0 4-3 7-7 7H31c-4 0-7-3-7-7V54Z" fill="#EAE2FF"/>
+              <path d="M28 66h74l-8 33c-.6 2.6-2.9 4.4-5.6 4.4H41.6c-2.7 0-5-1.8-5.6-4.4L28 66Z" fill="#C7B9FB"/>
+              <circle cx="53" cy="79" r="2.4" fill="#5B5BD6"/><circle cx="77" cy="79" r="2.4" fill="#5B5BD6"/>
+              <path d="M57 87c2.4 2.4 6.6 2.4 9 0" stroke="#5B5BD6" stroke-width="2.2" stroke-linecap="round"/>
+              <path d="M100 40l1.6 4.2 4.4 1.6-4.4 1.6L100 52l-1.6-4.6-4.4-1.6 4.4-1.6L100 40Z" fill="#C06BE6"/>
+              <path d="M34 42l1 2.6 2.6 1-2.6 1-1 2.6-1-2.6-2.6-1 2.6-1 1-2.6Z" fill="#8B5CF6"/>
+            </svg>
+          </div>
+          <h4>This folder is empty</h4>
+          <p>Nothing here yet. Add files or move something in — everything you drop stays on your device.</p>
+          <div class="btn-brand"><span class="icon"><svg viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span>Add files</div>
+        </div>
+      </div>
+      <div class="bnav">
+        <div class="n"><div class="b"><span class="icon"><svg viewBox="0 0 24 24" fill="none"><path d="M4 11l8-6 8 6v8.5c0 .6-.4 1-1 1h-4.5V15h-5v5.5H5c-.6 0-1-.4-1-1V11Z" fill="currentColor"/></svg></span></div>Home</div>
+        <div class="n act"><div class="b"><span class="icon"><svg viewBox="0 0 24 24" fill="none"><path d="M3 7.5C3 6.1 4.1 5 5.5 5H9l1.6 1.8H18.5C19.9 6.8 21 7.9 21 9.3V16.5c0 1.4-1.1 2.5-2.5 2.5h-13C4.1 19 3 17.9 3 16.5V7.5Z" fill="currentColor"/></svg></span></div>Browse</div>
+        <div class="n"><div class="b"><span class="icon"><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="8.5" fill="currentColor" opacity=".26"/><path d="M12 3.5a8.5 8.5 0 0 1 7.4 4.3L12 12Z" fill="currentColor"/></svg></span></div>Storage</div>
+      </div>
+    </div>
+    <div class="cap">Browse · empty<span>Warmth as a feature, one clear next action (taste §2.5 / BetterApp)</span></div>
+  </div>
+
+  <!-- 5 · BROWSE ERROR -->
+  <div class="frame">
+    <div class="phone">
+      <div class="scroll">
+        <div class="status"><span>9:41</span><div class="sdots"><i></i><i></i><i></i><span class="bat"></span></div></div>
+        <div class="appbar">
+          <div class="iconbtn"><span class="icon"><svg viewBox="0 0 24 24" fill="none"><path d="M15 5l-7 7 7 7" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/></svg></span></div>
+          <div class="crumbs"><span class="head">Internal storage</span><span class="sep">›</span><b>SD card</b></div>
+          <div class="grp">
+            <div class="iconbtn"><span class="icon"><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="5" r="1.6" fill="currentColor"/><circle cx="12" cy="12" r="1.6" fill="currentColor"/><circle cx="12" cy="19" r="1.6" fill="currentColor"/></svg></span></div>
+          </div>
+        </div>
+        <div class="state" style="height:calc(100% - 42px)">
+          <div class="bloom">
+            <svg width="130" height="130" viewBox="0 0 130 130" fill="none">
+              <ellipse cx="65" cy="112" rx="40" ry="6.5" fill="#ECEAF7"/>
+              <path d="M30 50c0-3.6 2.8-6.4 6.4-6.4h16.4l6.4 7.2h34.4c3.6 0 6.4 2.8 6.4 6.4v30c0 3.6-2.8 6.4-6.4 6.4H36.4c-3.6 0-6.4-2.8-6.4-6.4V50Z" fill="#ECEBF3"/>
+              <path d="M46 60l38 30M84 60L46 90" stroke="#B7B5CC" stroke-width="3" stroke-linecap="round"/>
+              <circle cx="95" cy="44" r="13" fill="#FFE3E1"/>
+              <path d="M95 39v6" stroke="#E5484D" stroke-width="2.6" stroke-linecap="round"/><circle cx="95" cy="49.5" r="1.5" fill="#E5484D"/>
+            </svg>
+          </div>
+          <h4>Couldn't open this folder</h4>
+          <p>The location may have been moved or unmounted. Check that the SD card is still connected.</p>
+          <div class="btn-out"><span class="icon"><svg viewBox="0 0 24 24" fill="none"><path d="M4.5 9a8 8 0 1 1-.5 5" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"/><path d="M4 5v4h4" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/></svg></span>Try again</div>
+          <div class="btn-text">Go back</div>
+        </div>
+      </div>
+      <div class="bnav">
+        <div class="n"><div class="b"><span class="icon"><svg viewBox="0 0 24 24" fill="none"><path d="M4 11l8-6 8 6v8.5c0 .6-.4 1-1 1h-4.5V15h-5v5.5H5c-.6 0-1-.4-1-1V11Z" fill="currentColor"/></svg></span></div>Home</div>
+        <div class="n act"><div class="b"><span class="icon"><svg viewBox="0 0 24 24" fill="none"><path d="M3 7.5C3 6.1 4.1 5 5.5 5H9l1.6 1.8H18.5C19.9 6.8 21 7.9 21 9.3V16.5c0 1.4-1.1 2.5-2.5 2.5h-13C4.1 19 3 17.9 3 16.5V7.5Z" fill="currentColor"/></svg></span></div>Browse</div>
+        <div class="n"><div class="b"><span class="icon"><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="8.5" fill="currentColor" opacity=".26"/><path d="M12 3.5a8.5 8.5 0 0 1 7.4 4.3L12 12Z" fill="currentColor"/></svg></span></div>Storage</div>
+      </div>
+    </div>
+    <div class="cap">Browse · error<span>Honest, recoverable, calm — error color used sparingly (taste §2.8)</span></div>
+  </div>
+
+  <!-- 6 · PERMISSION GATE -->
+  <div class="frame">
+    <div class="phone">
+      <div class="scroll" style="inset:0">
+        <div class="content">
+          <div class="status"><span>9:41</span><div class="sdots"><i></i><i></i><i></i><span class="bat"></span></div></div>
+          <div class="state" style="height:calc(100% - 26px);padding-top:44px;justify-content:flex-start">
+            <div class="appglyph">
+              <svg viewBox="0 0 24 24" fill="none"><path d="M4 8.5C4 6.6 5.6 5 7.5 5H10l2 2.4h4.5C18.4 7.4 20 9 20 10.9V16c0 1.9-1.6 3.5-3.5 3.5h-9C5.6 19.5 4 17.9 4 16V8.5Z" fill="#fff" opacity=".92"/><circle cx="12" cy="13" r="3.1" fill="#38BDF8"/></svg>
+            </div>
+            <h4>Filora needs access to your files</h4>
+            <p>Grant file access so Filora can browse, organize and clean up storage on this device.</p>
+            <div class="trust">
+              <div class="tb"><div class="tbi"><span class="icon"><svg viewBox="0 0 24 24" fill="none"><path d="M12 3l7 3v5c0 4.4-3 8.2-7 9.5C8 21.2 5 17.4 5 13V6l7-3Z" stroke="currentColor" stroke-width="1.75" stroke-linejoin="round"/><path d="M9 12l2 2 4-4.5" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/></svg></span></div><span>We never upload your files — everything stays on your device.</span></div>
+              <div class="tb"><div class="tbi"><span class="icon"><svg viewBox="0 0 24 24" fill="none"><rect x="5" y="10" width="14" height="10" rx="2" stroke="currentColor" stroke-width="1.75"/><path d="M8 10V7.5a4 4 0 0 1 8 0V10" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"/></svg></span></div><span>You can revoke access anytime in Settings.</span></div>
+              <div class="tb"><div class="tbi"><span class="icon"><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="8" stroke="currentColor" stroke-width="1.75"/><path d="M9 12l2 2 4-4.5" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/></svg></span></div><span>No ads, no tracking, no account required.</span></div>
+            </div>
+            <div class="btn-brand" style="margin-top:26px"><span class="icon"><svg viewBox="0 0 24 24" fill="none"><path d="M5 12l4 4 10-10" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>Allow access</div>
+            <div class="btn-link">Why is this needed?</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="cap">Permission gate<span>Trust first; native &amp; honest (taste §2.4 Mobile_V5)</span></div>
+  </div>
+
+</div>
+
+<!-- ======================================================= FLOW B ======================================================= -->
+<div class="sectlabel">Flow B — Selection &amp; batch actions</div>
+<div class="sectnote">Enter multi-select and the app bar becomes a contextual bar; a big thumb-first action bar docks above the nav. Destructive actions confirm honestly and stay reversible.</div>
+
+<div class="gallery">
+
+  <!-- 7 · SELECTION MODE + ACTION BAR -->
+  <div class="frame">
+    <div class="phone">
+      <div class="scroll" style="inset:0 0 200px 0">
+        <div class="content">
+          <div class="status"><span>9:41</span><div class="sdots"><i></i><i></i><i></i><span class="bat"></span></div></div>
+          <div class="appbar sel">
+            <div class="iconbtn"><span class="icon"><svg viewBox="0 0 24 24" fill="none"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"/></svg></span></div>
+            <div class="seltitle">4 selected</div>
+            <div class="grp">
+              <div class="iconbtn"><span class="icon"><svg viewBox="0 0 24 24" fill="none"><path d="M4 7.5h11M4 12h11M4 16.5h7" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"/><path d="M17.5 13.5l2 2 3-3.5" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/></svg></span></div>
+              <div class="iconbtn"><span class="icon"><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="5" r="1.6" fill="currentColor"/><circle cx="12" cy="12" r="1.6" fill="currentColor"/><circle cx="12" cy="19" r="1.6" fill="currentColor"/></svg></span></div>
+            </div>
+          </div>
+          <div class="list" style="padding-top:8px">
+            <div class="row selrow">
+              <div class="check"><span class="icon"><svg viewBox="0 0 24 24" fill="none"><path d="M5 12l4 4 10-10" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span></div>
+              <div class="tile" style="background:var(--c-image-c);color:var(--c-image)"><span class="icon"><svg viewBox="0 0 24 24" fill="none"><rect x="3.5" y="4.5" width="17" height="15" rx="2.4" stroke="currentColor" stroke-width="1.75"/><circle cx="8.5" cy="9.5" r="1.6" fill="currentColor"/><path d="M4 17l4.5-4.5 3.5 3 3-2.5 5 4.5" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/></svg></span></div>
+              <div class="gr"><div class="nm">IMG_2048.jpg</div><div class="mt">3.8 MB · Jun 25, 2026</div></div>
+            </div>
+            <div class="row selrow">
+              <div class="check"><span class="icon"><svg viewBox="0 0 24 24" fill="none"><path d="M5 12l4 4 10-10" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span></div>
+              <div class="tile" style="background:var(--c-doc-c);color:var(--c-doc)"><span class="icon"><svg viewBox="0 0 24 24" fill="none"><path d="M6 3.5h8L18.5 8v11.5c0 .8-.7 1.5-1.5 1.5H6c-.8 0-1.5-.7-1.5-1.5v-14C4.5 4.2 5.2 3.5 6 3.5Z" stroke="currentColor" stroke-width="1.75" stroke-linejoin="round"/><path d="M13.5 3.7V8.2h4.5" stroke="currentColor" stroke-width="1.75" stroke-linejoin="round"/></svg></span></div>
+              <div class="gr"><div class="nm">Statement_Q2.pdf</div><div class="mt">1.4 MB · Jun 28, 2026</div></div>
+            </div>
+            <div class="row">
+              <div class="checkbox"></div>
+              <div class="tile" style="background:var(--c-video-c);color:var(--c-video)"><span class="icon"><svg viewBox="0 0 24 24" fill="none"><rect x="3" y="6" width="12.5" height="12" rx="2.4" stroke="currentColor" stroke-width="1.75"/><path d="M15.5 10l5.5-3v10l-5.5-3v-4Z" stroke="currentColor" stroke-width="1.75" stroke-linejoin="round"/></svg></span></div>
+              <div class="gr"><div class="nm">Clip_final.mp4</div><div class="mt">42.1 MB · Jun 24, 2026</div></div>
+            </div>
+            <div class="row selrow">
+              <div class="check"><span class="icon"><svg viewBox="0 0 24 24" fill="none"><path d="M5 12l4 4 10-10" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span></div>
+              <div class="tile" style="background:var(--c-audio-c);color:var(--c-audio)"><span class="icon"><svg viewBox="0 0 24 24" fill="none"><path d="M9 17V6.5l9-2v10" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/><circle cx="6.5" cy="17" r="2.5" stroke="currentColor" stroke-width="1.75"/><circle cx="15.5" cy="14.5" r="2.5" stroke="currentColor" stroke-width="1.75"/></svg></span></div>
+              <div class="gr"><div class="nm">podcast_ep12.mp3</div><div class="mt">28.7 MB · Jun 22, 2026</div></div>
+            </div>
+            <div class="row selrow">
+              <div class="check"><span class="icon"><svg viewBox="0 0 24 24" fill="none"><path d="M5 12l4 4 10-10" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span></div>
+              <div class="tile" style="background:var(--c-archive-c);color:var(--c-archive)"><span class="icon"><svg viewBox="0 0 24 24" fill="none"><path d="M5 6.5C5 5.1 6.1 4 7.5 4H18c.8 0 1.5.7 1.5 1.5v13c0 .8-.7 1.5-1.5 1.5H7.5C6.1 20 5 18.9 5 17.5v-11Z" stroke="currentColor" stroke-width="1.75"/><path d="M11 4v9" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"/><rect x="9.5" y="13.5" width="3" height="3.5" rx=".8" stroke="currentColor" stroke-width="1.5"/></svg></span></div>
+              <div class="gr"><div class="nm">backup_archive.zip</div><div class="mt">64.0 MB · Jun 18, 2026</div></div>
+            </div>
+            <div class="row">
+              <div class="checkbox"></div>
+              <div class="tile" style="background:var(--c-app-c);color:var(--c-app)"><span class="icon"><svg viewBox="0 0 24 24" fill="none"><rect x="5" y="5" width="14" height="14" rx="3.4" stroke="currentColor" stroke-width="1.75"/><circle cx="9" cy="14.5" r="1.1" fill="currentColor"/><circle cx="15" cy="14.5" r="1.1" fill="currentColor"/></svg></span></div>
+              <div class="gr"><div class="nm">app-release.apk</div><div class="mt">18.2 MB · Jun 20, 2026</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="actionbar">
+        <div class="act"><div class="ai"><span class="icon"><svg viewBox="0 0 24 24" fill="none"><path d="M3 7.5C3 6.4 3.9 5.5 5 5.5h4l1.6 1.8H16c1.1 0 2 .9 2 2" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/><path d="M14 12h7m0 0l-2.5-2.5M21 12l-2.5 2.5" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/><path d="M3 10.5v6c0 1.1.9 2 2 2h7" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"/></svg></span></div><span>Move</span></div>
+        <div class="act"><div class="ai"><span class="icon"><svg viewBox="0 0 24 24" fill="none"><rect x="8" y="8" width="12" height="12" rx="2.4" stroke="currentColor" stroke-width="1.75"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"/></svg></span></div><span>Copy</span></div>
+        <div class="act"><div class="ai"><span class="icon"><svg viewBox="0 0 24 24" fill="none"><circle cx="6" cy="12" r="2.5" stroke="currentColor" stroke-width="1.75"/><circle cx="17" cy="6" r="2.5" stroke="currentColor" stroke-width="1.75"/><circle cx="17" cy="18" r="2.5" stroke="currentColor" stroke-width="1.75"/><path d="M8.2 10.8l6.6-3.6M8.2 13.2l6.6 3.6" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"/></svg></span></div><span>Share</span></div>
+        <div class="act"><div class="ai"><span class="icon"><svg viewBox="0 0 24 24" fill="none"><path d="M4 20l1-4L15 6l3 3L8 19l-4 1Z" stroke="currentColor" stroke-width="1.75" stroke-linejoin="round"/><path d="M13.5 7.5l3 3" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"/></svg></span></div><span>Rename</span></div>
+        <div class="act del"><div class="ai"><span class="icon"><svg viewBox="0 0 24 24" fill="none"><path d="M4 7h16M6 7l1 12.5c.1 1.4 1.3 2.5 2.7 2.5h4.6c1.4 0 2.6-1.1 2.7-2.5L18 7" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/><path d="M9.5 7V4.5C9.5 4.2 9.7 4 10 4h4c.3 0 .5.2.5.5V7M10 11v6M14 11v6" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"/></svg></span></div><span>Delete</span></div>
+        <div class="act"><div class="ai"><span class="icon"><svg viewBox="0 0 24 24" fill="none"><path d="M5 6.5C5 5.1 6.1 4 7.5 4H18c.8 0 1.5.7 1.5 1.5v13c0 .8-.7 1.5-1.5 1.5H7.5C6.1 20 5 18.9 5 17.5v-11Z" stroke="currentColor" stroke-width="1.75"/><path d="M11 4v9" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"/><rect x="9.5" y="13.5" width="3" height="3.5" rx=".8" stroke="currentColor" stroke-width="1.5"/></svg></span></div><span>Compress</span></div>
+      </div>
+      <div class="bnav">
+        <div class="n"><div class="b"><span class="icon"><svg viewBox="0 0 24 24" fill="none"><path d="M4 11l8-6 8 6v8.5c0 .6-.4 1-1 1h-4.5V15h-5v5.5H5c-.6 0-1-.4-1-1V11Z" fill="currentColor"/></svg></span></div>Home</div>
+        <div class="n act"><div class="b"><span class="icon"><svg viewBox="0 0 24 24" fill="none"><path d="M3 7.5C3 6.1 4.1 5 5.5 5H9l1.6 1.8H18.5C19.9 6.8 21 7.9 21 9.3V16.5c0 1.4-1.1 2.5-2.5 2.5h-13C4.1 19 3 17.9 3 16.5V7.5Z" fill="currentColor"/></svg></span></div>Browse</div>
+        <div class="n"><div class="b"><span class="icon"><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="12" r="8.5" fill="currentColor" opacity=".26"/><path d="M12 3.5a8.5 8.5 0 0 1 7.4 4.3L12 12Z" fill="currentColor"/></svg></span></div>Storage</div>
+      </div>
+    </div>
+    <div class="cap">Multi-select · action bar<span>The object is the interface — big, thumb-first, one purpose per tile (taste §2.3 / InShot)</span></div>
+  </div>
+
+  <!-- 8 · DELETE CONFIRM (BOTTOM SHEET) -->
+  <div class="frame">
+    <div class="phone">
+      <div class="scroll" style="inset:0 0 68px 0">
+        <div class="content">
+          <div class="status"><span>9:41</span><div class="sdots"><i></i><i></i><i></i><span class="bat"></span></div></div>
+          <div class="appbar sel">
+            <div class="iconbtn"><span class="icon"><svg viewBox="0 0 24 24" fill="none"><path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"/></svg></span></div>
+            <div class="seltitle">4 selected</div>
+            <div class="grp">
+              <div class="iconbtn"><span class="icon"><svg viewBox="0 0 24 24" fill="none"><path d="M4 7.5h11M4 12h11M4 16.5h7" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"/><path d="M17.5 13.5l2 2 3-3.5" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/></svg></span></div>
+            </div>
+          </div>
+          <div class="list" style="padding-top:8px">
+            <div class="row selrow"><div class="check"><span class="icon"><svg viewBox="0 0 24 24" fill="none"><path d="M5 12l4 4 10-10" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span></div><div class="tile" style="background:var(--c-image-c);color:var(--c-image)"><span class="icon"><svg viewBox="0 0 24 24" fill="none"><rect x="3.5" y="4.5" width="17" height="15" rx="2.4" stroke="currentColor" stroke-width="1.75"/><circle cx="8.5" cy="9.5" r="1.6" fill="currentColor"/></svg></span></div><div class="gr"><div class="nm">IMG_2048.jpg</div><div class="mt">3.8 MB · Jun 25, 2026</div></div></div>
+            <div class="row selrow"><div class="check"><span class="icon"><svg viewBox="0 0 24 24" fill="none"><path d="M5 12l4 4 10-10" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span></div><div class="tile" style="background:var(--c-doc-c);color:var(--c-doc)"><span class="icon"><svg viewBox="0 0 24 24" fill="none"><path d="M6 3.5h8L18.5 8v11.5c0 .8-.7 1.5-1.5 1.5H6c-.8 0-1.5-.7-1.5-1.5v-14C4.5 4.2 5.2 3.5 6 3.5Z" stroke="currentColor" stroke-width="1.75" stroke-linejoin="round"/></svg></span></div><div class="gr"><div class="nm">Statement_Q2.pdf</div><div class="mt">1.4 MB · Jun 28, 2026</div></div></div>
+            <div class="row selrow"><div class="check"><span class="icon"><svg viewBox="0 0 24 24" fill="none"><path d="M5 12l4 4 10-10" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span></div><div class="tile" style="background:var(--c-audio-c);color:var(--c-audio)"><span class="icon"><svg viewBox="0 0 24 24" fill="none"><path d="M9 17V6.5l9-2v10" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/><circle cx="6.5" cy="17" r="2.5" stroke="currentColor" stroke-width="1.75"/></svg></span></div><div class="gr"><div class="nm">podcast_ep12.mp3</div><div class="mt">28.7 MB · Jun 22, 2026</div></div></div>
+          </div>
+        </div>
+      </div>
+      <div class="scrim"></div>
+      <div class="sheet">
+        <div class="sheetbox">
+          <div class="handle"></div>
+          <div class="shicon"><span class="icon"><svg viewBox="0 0 24 24" fill="none"><path d="M4 7h16M6 7l1 12.5c.1 1.4 1.3 2.5 2.7 2.5h4.6c1.4 0 2.6-1.1 2.7-2.5L18 7" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/><path d="M9.5 7V4.5C9.5 4.2 9.7 4 10 4h4c.3 0 .5.2.5.5V7M10 11v6M14 11v6" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"/></svg></span></div>
+          <h4>Delete 4 items?</h4>
+          <p>Items move to Trash — you can restore them for 30 days before they're permanently removed.</p>
+          <div style="text-align:center"><div class="undo"><span class="icon"><svg viewBox="0 0 24 24" fill="none"><path d="M9 7L4 12l5 5" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/><path d="M4 12h9a6 6 0 0 1 6 6v1" stroke="currentColor" stroke-width="1.75" stroke-linecap="round"/></svg></span>Undo available after delete</div></div>
+          <div class="btn-tonal"><span class="icon"><svg viewBox="0 0 24 24" fill="none"><path d="M4 7h16M6 7l1 12.5c.1 1.4 1.3 2.5 2.7 2.5h4.6c1.4 0 2.6-1.1 2.7-2.5L18 7" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/></svg></span>Move to Trash</div>
+          <div class="btn-cancel">Cancel</div>
+        </div>
+      </div>
+    </div>
+    <div class="cap">Destructive action · confirm<span>Honest confirm + undo, reversibility surfaced (taste §2.6)</span></div>
+  </div>
+
+</div>
+
+<footer>
+  Filora — Hero Flows · Browse (Flow A) + Multi-select &amp; batch actions (Flow B). Static hi-fi artifact applying the
+  Play Store Taste Guide <code>APP-136</code> to the shipped <code>Filora Iris</code> design system <code>APP-134</code>.
+  Tokens map 1:1 to <code>core-ui/theme</code>. One accent (Iris) + per-category accent wheel — no second brand color.
+  Not production code.
+</footer>
+</body>
+</html>
