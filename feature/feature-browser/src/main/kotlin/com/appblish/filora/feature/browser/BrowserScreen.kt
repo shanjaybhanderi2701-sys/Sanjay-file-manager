@@ -55,6 +55,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -169,6 +170,7 @@ fun BrowserScreen(
     ) { padding ->
         BrowserContent(
             uiState = uiState,
+            onNavigate = onOpenDirectory,
             onItemTap = { item ->
                 when {
                     uiState.inSelectionMode -> viewModel.toggleSelection(item)
@@ -316,10 +318,12 @@ internal fun BrowserContent(
     onToggleHidden: () -> Unit,
     onRefresh: () -> Unit,
     modifier: Modifier = Modifier,
+    onNavigate: (String) -> Unit = {},
 ) {
     Column(modifier = modifier.fillMaxSize()) {
         BrowserToolbar(
             uiState = uiState,
+            onNavigate = onNavigate,
             onToggleLayout = onToggleLayout,
             onSortBy = onSortBy,
             onToggleHidden = onToggleHidden,
@@ -379,6 +383,7 @@ internal fun BrowserContent(
 @Composable
 private fun BrowserToolbar(
     uiState: BrowserUiState,
+    onNavigate: (String) -> Unit,
     onToggleLayout: () -> Unit,
     onSortBy: (SortOrder.By) -> Unit,
     onToggleHidden: () -> Unit,
@@ -387,11 +392,10 @@ private fun BrowserToolbar(
         modifier = Modifier.fillMaxWidth().padding(horizontal = 8.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        Text(
-            text = uiState.location.substringAfterLast('/').ifBlank { uiState.location },
-            style = MaterialTheme.typography.titleMedium,
+        BreadcrumbBar(
+            location = uiState.location,
+            onNavigate = onNavigate,
             modifier = Modifier.weight(1f).padding(start = 8.dp),
-            maxLines = 1,
         )
         IconButton(onClick = onToggleHidden) {
             Icon(
@@ -464,7 +468,9 @@ private fun BrowserList(
     onToggleFavorite: (FileItem) -> Unit,
 ) {
     val context = LocalContext.current
-    LazyColumn(modifier = Modifier.fillMaxSize()) {
+    // Stable per-path keys let Compose reuse row nodes across scroll (NFR-1.3 fps); the
+    // testTag gives the macrobenchmark a deterministic scroll anchor over the 10k fixture.
+    LazyColumn(modifier = Modifier.fillMaxSize().testTag(BrowserTestTags.LIST)) {
         items(entries, key = FileItem::path) { item ->
             FileEntryContextMenu(
                 item = item,
@@ -497,7 +503,7 @@ private fun BrowserGrid(
     val context = LocalContext.current
     LazyVerticalGrid(
         columns = GridCells.Adaptive(minSize = 112.dp),
-        modifier = Modifier.fillMaxSize().padding(horizontal = 8.dp),
+        modifier = Modifier.fillMaxSize().padding(horizontal = 8.dp).testTag(BrowserTestTags.GRID),
     ) {
         gridItems(entries, key = FileItem::path) { item ->
             val selected = selection.isSelected(item.path)
