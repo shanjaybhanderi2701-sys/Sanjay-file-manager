@@ -179,10 +179,10 @@ jobs:
     # ':baselineprofile:generateBaselineProfile', but the androidx baseline-profile
     # plugin registers generation on the consumer :app module (flavour-aware), so the
     # real task is ':app:generateStandardBaselineProfile'.
-    # TEMPORARY advisory: kept for the first post-fix push-to-main run so the corrected
-    # job can be observed green on the emulator before it becomes hard-blocking. Removed
-    # in the immediate follow-up commit once verified (APP-148 phase 2).
-    continue-on-error: true
+    # Promoted to a hard-blocking gate (APP-153 / APP-147 phase 2): the corrected job
+    # was observed green on a push-to-main run (run 28518687488, main@3cf928e) — the
+    # emulator booted and the startup benchmark ran to success — so `continue-on-error`
+    # is removed and this job is now required.
     # Generates the baseline profile and measures cold start on a managed emulator.
     # Runs on push to main (and manual dispatch) — too heavy for every PR.
     if: github.event_name == 'push' || github.event_name == 'workflow_dispatch'
