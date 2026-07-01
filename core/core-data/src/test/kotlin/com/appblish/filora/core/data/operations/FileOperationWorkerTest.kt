@@ -6,6 +6,7 @@ import androidx.work.ListenableWorker
 import androidx.work.testing.TestListenableWorkerBuilder
 import com.appblish.filora.core.common.result.Result
 import com.appblish.filora.core.common.result.asSuccess
+import com.appblish.filora.core.common.result.map
 import com.appblish.filora.core.domain.model.ConflictStrategy
 import com.appblish.filora.core.domain.model.FileOperationKind
 import com.appblish.filora.core.domain.model.TrashRetention
