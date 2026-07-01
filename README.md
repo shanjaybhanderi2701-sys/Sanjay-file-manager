@@ -5,11 +5,36 @@
 An Android-native file manager (Jetpack Compose + Kotlin) by appblish.
 
 This is the engineering README — how to build, run, and contribute. Product and
-design context lives under [`docs/`](docs/); the authoritative architecture is
-[`docs/architecture/system-design.md`](docs/architecture/system-design.md) and
-[`docs/architecture/module-design.md`](docs/architecture/module-design.md).
+planning context lives under [`docs/phase-1/`](docs/phase-1/); the as-built
+architecture is [`docs/phase-1/architecture.md`](docs/phase-1/architecture.md),
+and contributor conventions are in [`CONTRIBUTING.md`](CONTRIBUTING.md).
 
 ---
+
+## Features
+
+Filora is organized around six top-level areas, each backed by its own
+`feature-*` module:
+
+- **Home** — a dashboard of storage volumes, media category counts, recents, and
+  pinned favorites, with tap-through to the relevant screen.
+- **Browse** — navigate the file tree with list/grid layouts, sort, hidden-file
+  toggle, and pull-to-refresh; multi-select with a batch action bar; create,
+  rename, delete, copy/move (conflict-aware), and share via `FileProvider`.
+- **Search** — streaming, cancelable name search across the tree with removable
+  type / size / date filter chips; tap a result to jump to its location.
+- **Media** — seven category hubs (images, video, audio, docs, etc.) with Coil
+  thumbnails, a category detail grid, and open/play/share intents.
+- **Storage** — per-volume used/free breakdown, by-category sizing, a
+  storage-story hero band, and a largest-files view with open/share/delete.
+- **Favorites** — pin/unpin files and folders from Browse and Media, surfaced on
+  the Home strip (Room-backed).
+- **Settings** — theme, dynamic color, default list/grid layout, sort order, and
+  hidden-file preference, persisted via DataStore and applied live.
+
+Archive support (ZIP compress/extract) and file operations run as WorkManager
+foreground jobs with progress. See the
+[Phase-1 changelog](CHANGELOG.md) for what shipped in each milestone.
 
 ## Requirements
 
@@ -36,7 +61,7 @@ version catalog — never hard-code a version in a module `build.gradle.kts`.
 ./gradlew ktlintCheck detekt checkModuleDependencies lint test assembleStandardDebug
 ```
 
-The app launches to an empty, themed **Home** (Milestone 1). Two product flavors:
+The app launches to the **Home** dashboard. Two product flavors:
 
 - **standard** — the Play default. Least-privilege; **no** all-files access.
 - **fullaccess** — opt-in only; declares `MANAGE_EXTERNAL_STORAGE`, gated by
@@ -52,7 +77,7 @@ core/
   core-domain       Entities + repository interfaces                  (pure JVM)
   core-ui           FiloraTheme (M3 + dynamic color), shared composables
   core-database     Room db, entities, DAOs, DI
-  core-data         Repository impls / data sources (lands in later milestones)
+  core-data         Repository impls, data sources, WorkManager operations
 feature/
   feature-home | -browser | -search | -media | -storage | -settings
 ```
