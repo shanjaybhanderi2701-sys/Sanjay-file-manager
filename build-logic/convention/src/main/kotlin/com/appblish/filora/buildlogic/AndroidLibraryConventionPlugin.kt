@@ -30,6 +30,14 @@ class AndroidLibraryConventionPlugin : Plugin<Project> {
             add("testImplementation", libs.findLibrary("kotlinx-coroutines-test").get())
             add("testImplementation", libs.findLibrary("turbine").get())
             add("testImplementation", libs.findLibrary("mockk").get())
+
+            // Every library module declares `testInstrumentationRunner = AndroidJUnitRunner`
+            // above, so every library module must also carry the runner (+ AndroidJUnit4)
+            // on its androidTest classpath. Without this, `connectedDebugAndroidTest` fails
+            // to instantiate the instrumentation before a single test runs (e.g. core-data,
+            // which is a library module but does not apply the Room convention). See APP-150.
+            add("androidTestImplementation", libs.findLibrary("androidx-test-ext-junit").get())
+            add("androidTestImplementation", libs.findLibrary("androidx-test-runner").get())
         }
     }
 }

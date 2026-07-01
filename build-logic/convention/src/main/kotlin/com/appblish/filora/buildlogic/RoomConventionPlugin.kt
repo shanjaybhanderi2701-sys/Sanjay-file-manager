@@ -25,9 +25,9 @@ class RoomConventionPlugin : Plugin<Project> {
             add("implementation", libs.findLibrary("androidx-room-runtime").get())
             add("implementation", libs.findLibrary("androidx-room-ktx").get())
             add("ksp", libs.findLibrary("androidx-room-compiler").get())
+            // The androidTest runner (+ AndroidJUnit4) is provided by
+            // AndroidLibraryConventionPlugin, which every Room module also applies.
             add("androidTestImplementation", libs.findLibrary("androidx-room-testing").get())
-            add("androidTestImplementation", libs.findLibrary("androidx-test-ext-junit").get())
-            add("androidTestImplementation", libs.findLibrary("androidx-test-runner").get())
         }
     }
 }
