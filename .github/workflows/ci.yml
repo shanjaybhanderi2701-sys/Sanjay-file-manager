@@ -61,6 +61,77 @@ jobs:
           if-no-files-found: ignore
           retention-days: 7
 
+  coverage:
+    name: Coverage · Kover (T170)
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      # Aggregated coverage report across core-* and feature-* modules (JVM — no emulator).
+      - name: Kover aggregated report
+        run: ./gradlew --no-daemon --stacktrace koverXmlReport koverHtmlReport
+
+      # Threshold enforcement is a Product Manager decision (APP-36 interaction c51ac274).
+      # The placeholder bounds (50% overall, 70% core-domain/core-data) are wired in
+      # build.gradle.kts but kept NON-BLOCKING until PM confirms. To turn the gate on,
+      # remove `continue-on-error` (and adjust the bounds to the confirmed values).
+      - name: Kover verify (placeholder thresholds — non-blocking pending PM)
+        continue-on-error: true
+        run: ./gradlew --no-daemon --stacktrace koverVerify
+
+      - name: Upload coverage report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: build/reports/kover/
+          if-no-files-found: ignore
+          retention-days: 14
+
+  screenshots:
+    name: Screenshot · Roborazzi (T171)
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v4
+
+      # Verifies core-ui component snapshots (light/dark/dynamic + content/loading/empty/
+      # error) against committed goldens. JVM-only via Robolectric — no emulator. Golden
+      # PNGs must be recorded once via `./gradlew :core:core-ui:recordRoborazziDebug` and
+      # committed (see docs/phase-1/testing/screenshot-and-coverage.md).
+      - name: Verify screenshots
+        run: ./gradlew --no-daemon --stacktrace :core:core-ui:verifyRoborazziDebug
+
+      - name: Upload screenshot diffs
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: screenshot-diffs
+          path: core/core-ui/build/outputs/roborazzi/
+          if-no-files-found: ignore
+          retention-days: 7
+
   release-size:
     name: Release · R8 · Size budget (NFR-9.1)
     runs-on: ubuntu-latest
