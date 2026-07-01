@@ -20,15 +20,21 @@ class OperationNotificationTextTest {
         every { context.getString(R.string.ops_title_move) } returns "Moving files"
         every { context.getString(R.string.ops_title_delete) } returns "Deleting files"
         every { context.getString(R.string.ops_status_pending) } returns "Preparing…"
+        // `Context.getString(resId, vararg Any)` reaches MockK as two JVM arguments —
+        // the resId and a single `Object[]` holding the format args — so the format
+        // values live in `args[1]` as an array, not spread across `args[1..n]`.
         every { context.getString(R.string.ops_status_progress, any(), any()) } answers {
-            "${args[1]} of ${args[2]}"
+            val fmt = args[1] as Array<*>
+            "${fmt[0]} of ${fmt[1]}"
         }
         every { context.getString(R.string.ops_status_progress_named, any(), any(), any()) } answers {
-            "${args[1]} of ${args[2]} · ${args[3]}"
+            val fmt = args[1] as Array<*>
+            "${fmt[0]} of ${fmt[1]} · ${fmt[2]}"
         }
         every { context.getString(R.string.ops_status_succeeded_one) } returns "Completed 1 item"
         every { context.getString(R.string.ops_status_succeeded_many, any()) } answers {
-            "Completed ${args[1]} items"
+            val fmt = args[1] as Array<*>
+            "Completed ${fmt[0]} items"
         }
         every { context.getString(R.string.ops_status_failed) } returns "Couldn't complete the operation"
         every { context.getString(R.string.ops_status_cancelled) } returns "Cancelled"

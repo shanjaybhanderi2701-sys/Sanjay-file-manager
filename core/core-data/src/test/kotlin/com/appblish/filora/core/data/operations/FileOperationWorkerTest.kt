@@ -4,11 +4,18 @@ import android.content.Context
 import androidx.work.Data
 import androidx.work.ListenableWorker
 import androidx.work.testing.TestListenableWorkerBuilder
+import com.appblish.filora.core.common.result.Result
+import com.appblish.filora.core.common.result.asSuccess
 import com.appblish.filora.core.domain.model.ConflictStrategy
 import com.appblish.filora.core.domain.model.FileOperationKind
+import com.appblish.filora.core.domain.model.TrashRetention
+import com.appblish.filora.core.domain.model.TrashedItem
+import com.appblish.filora.core.domain.repository.TrashRepository
 import com.appblish.filora.core.testing.FakeFileRepository
 import com.appblish.filora.core.testing.fileTree
 import com.google.common.truth.Truth.assertThat
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -57,7 +64,10 @@ class FileOperationWorkerTest {
             .setInputData(input)
             .setProgressUpdater(progressUpdater)
             .build()
-            .apply { injectedDependencies = OperationDependencies(repository, WorkRequestStore()) }
+            .apply {
+                injectedDependencies =
+                    OperationDependencies(repository, WorkRequestStore(), DelegatingTrashRepository(repository))
+            }
     }
 
     @Test
@@ -230,4 +240,32 @@ class FileOperationWorkerTest {
 
         assertThat(result).isInstanceOf(ListenableWorker.Result.Failure::class.java)
     }
+}
+
+/**
+ * Minimal [TrashRepository] for the worker wiring tests. Moving to trash is modelled as a
+ * hard delete on the same [FakeFileRepository] the worker operates on, mirroring production
+ * where trashing removes the source from its original location. The trash *semantics* are
+ * covered by the domain `DeleteUseCaseTest`; here we only need the delete worker's dispatch
+ * to resolve a repository off the injection seam instead of the Hilt entry point.
+ */
+private class DelegatingTrashRepository(
+    private val files: FakeFileRepository,
+) : TrashRepository {
+    override fun observeTrash(): Flow<List<TrashedItem>> = flowOf(emptyList())
+
+    override fun observeTrashSize(): Flow<Long> = flowOf(0L)
+
+    override fun canTrash(path: String): Boolean = !path.startsWith("content://")
+
+    override suspend fun moveToTrash(paths: List<String>): Result<Int> =
+        files.delete(paths, toTrash = false).map { it.deletedCount }
+
+    override suspend fun restore(ids: List<String>): Result<Int> = 0.asSuccess()
+
+    override suspend fun deleteForever(ids: List<String>): Result<Int> = 0.asSuccess()
+
+    override suspend fun emptyTrash(): Result<Int> = 0.asSuccess()
+
+    override suspend fun purgeExpired(retention: TrashRetention): Result<Int> = 0.asSuccess()
 }

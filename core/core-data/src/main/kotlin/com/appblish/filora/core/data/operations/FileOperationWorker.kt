@@ -59,6 +59,7 @@ internal interface FileOperationWorkerEntryPoint {
 internal data class OperationDependencies(
     val fileRepository: FileRepository?,
     val store: WorkRequestStore,
+    val trashRepository: TrashRepository? = null,
 )
 
 /** A copy/move batch call — both use cases share this shape, so the loop is kind-agnostic. */
@@ -109,6 +110,7 @@ internal abstract class FileOperationWorker(
         injectedDependencies ?: OperationDependencies(
             fileRepository = entryPoint.fileRepository().orElse(null),
             store = entryPoint.workRequestStore(),
+            trashRepository = entryPoint.trashRepository(),
         )
 
     override suspend fun getForegroundInfo() = notifier.foregroundInfo(OperationProgress.Pending(kind))
@@ -119,12 +121,15 @@ internal abstract class FileOperationWorker(
             ?: return success(0) // nothing to do (e.g. stashed list evicted after a cold restart)
         // The FileRepository data binding is not wired yet; fail cleanly rather than crash.
         val repository = deps.fileRepository ?: return failure(OperationError.Unknown())
+        // Drawn from the same seam as [repository] so JVM/Robolectric tests can exercise the
+        // delete path without the Hilt entry point (which crashes off the application graph).
+        val trashRepository = deps.trashRepository ?: return failure(OperationError.Unknown())
 
         return try {
             setForeground(notifier.foregroundInfo(OperationProgress.Pending(kind)))
             when (args.kind) {
                 FileOperationKind.Delete ->
-                    runDelete(args, DeleteUseCase(repository, entryPoint.trashRepository()))
+                    runDelete(args, DeleteUseCase(repository, trashRepository))
                 FileOperationKind.Copy -> runTransfer(args, repository, CopyUseCase(repository)::invoke)
                 FileOperationKind.Move ->
                     runTransfer(args, repository, MoveUseCase(CopyUseCase(repository), repository)::invoke)
