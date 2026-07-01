@@ -25,26 +25,26 @@ import org.junit.runner.RunWith
  */
 @RunWith(AndroidJUnit4::class)
 class BaselineProfileGenerator {
-
     @get:Rule
     val baselineProfileRule = BaselineProfileRule()
 
     @Test
-    fun generate() = baselineProfileRule.collect(
-        packageName = PACKAGE_NAME,
-        // Stable, since the home screen content is data-dependent across devices.
-        includeInStartupProfile = true,
-    ) {
-        pressHome()
-        startActivityAndWait()
-        // Wait for the app content to be present, then scroll the dashboard so the Home
-        // list composables are exercised (and thus included in the profile).
-        device.wait(Until.hasObject(By.res(PACKAGE_NAME, "filora_app_root")), 5_000)
-        device.findObject(By.scrollable(true))?.apply {
-            setGestureMargin(device.displayWidth / 5)
-            fling(Direction.DOWN)
-            fling(Direction.UP)
+    fun generate() =
+        baselineProfileRule.collect(
+            packageName = PACKAGE_NAME,
+            // Stable, since the home screen content is data-dependent across devices.
+            includeInStartupProfile = true,
+        ) {
+            pressHome()
+            startActivityAndWait()
+            // Wait for the app content to be present, then scroll the dashboard so the Home
+            // list composables are exercised (and thus included in the profile).
+            device.wait(Until.hasObject(By.res(PACKAGE_NAME, "filora_app_root")), 5_000)
+            device.findObject(By.scrollable(true))?.apply {
+                setGestureMargin(device.displayWidth / 5)
+                fling(Direction.DOWN)
+                fling(Direction.UP)
+            }
+            device.waitForIdle()
         }
-        device.waitForIdle()
-    }
 }
