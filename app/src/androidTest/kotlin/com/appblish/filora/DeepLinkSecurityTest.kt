@@ -4,6 +4,7 @@ import android.Manifest
 import android.content.Intent
 import android.net.Uri
 import android.os.Build
+import androidx.compose.ui.test.assertDoesNotExist
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.junit4.createEmptyComposeRule
 import androidx.compose.ui.test.onNodeWithText
@@ -42,14 +43,38 @@ class DeepLinkSecurityTest {
     val chain: RuleChain =
         RuleChain.outerRule(grantRule).around(hiltRule).around(composeRule)
 
+    // --- query form (the routed form for the optional-arg templates) ------------------
+
     @Test
     fun hostileBrowserDeepLinkFallsBackToHomeInsteadOfBrowsing() {
-        val hostile = Uri.parse(
-            "filora://browser?location=/data/data/com.appblish.filora/databases/filora.db",
-        )
+        assertFallsBackToHome("filora://browser?location=/data/data/com.appblish.filora/databases/filora.db")
+    }
+
+    @Test
+    fun traversalDeepLinkFallsBackToHome() {
+        assertFallsBackToHome("filora://browser?location=/storage/emulated/0/../../data/data/com.appblish.filora")
+    }
+
+    // --- path form (what a hostile link uses to try to dodge the query-param check) ----
+    // Reviewer F1 repro: with a path-form target, getQueryParameter("location") is null, so
+    // an unhardened sanitizer would see the "empty default" and wave the intent through. The
+    // sanitizer now also inspects the decoded path tail, so these must still land on Home.
+
+    @Test
+    fun pathFormHostileBrowserDeepLinkFallsBackToHome() {
+        assertFallsBackToHome("filora://browser/data/data/com.appblish.filora/databases/filora.db")
+    }
+
+    @Test
+    fun pathFormTraversalDeepLinkFallsBackToHome() {
+        assertFallsBackToHome("filora://browser/storage/emulated/0/../../data/data/com.appblish.filora")
+    }
+
+    /** Launch [MainActivity] with a crafted VIEW intent and assert it lands on Home, not the target. */
+    private fun assertFallsBackToHome(uri: String) {
         val intent = Intent(
             Intent.ACTION_VIEW,
-            hostile,
+            Uri.parse(uri),
             ApplicationProvider.getApplicationContext(),
             MainActivity::class.java,
         )
@@ -60,24 +85,6 @@ class DeepLinkSecurityTest {
             // Fell back to Home: the Home top bar is shown and the attacker path is not.
             composeRule.onNodeWithText("Filora").assertIsDisplayed()
             composeRule.onNodeWithText("filora.db", substring = true).assertDoesNotExist()
-        }
-    }
-
-    @Test
-    fun traversalDeepLinkFallsBackToHome() {
-        val hostile = Uri.parse(
-            "filora://browser?location=/storage/emulated/0/../../data/data/com.appblish.filora",
-        )
-        val intent = Intent(
-            Intent.ACTION_VIEW,
-            hostile,
-            ApplicationProvider.getApplicationContext(),
-            MainActivity::class.java,
-        )
-
-        ActivityScenario.launch<MainActivity>(intent).use {
-            composeRule.waitForIdle()
-            composeRule.onNodeWithText("Filora").assertIsDisplayed()
         }
     }
 }

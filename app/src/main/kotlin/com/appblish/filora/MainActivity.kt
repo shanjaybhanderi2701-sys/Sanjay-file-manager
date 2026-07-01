@@ -1,6 +1,7 @@
 package com.appblish.filora
 
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -100,6 +101,12 @@ class MainActivity : ComponentActivity() {
      * `..` traversal, or an unknown category) is neutralised to a plain `MAIN` launch, so
      * the graph falls back to its start destination (Home) instead of browsing an
      * attacker-chosen location. Never crashes: a malformed link is simply dropped.
+     *
+     * The [Route] args are optional, so Navigation routes on the **query** form
+     * (`filora://browser?location=…`). But a hostile link can instead put the target in the
+     * URI **path** (`filora://browser/data/data/…`); to keep validation independent of how
+     * Navigation happens to resolve the template, we validate the query value when present
+     * and otherwise fall back to the decoded path tail — whichever a link actually carries.
      */
     private fun sanitizeInboundDeepLink(intent: Intent?) {
         if (intent == null || intent.action != Intent.ACTION_VIEW) return
@@ -109,11 +116,12 @@ class MainActivity : ComponentActivity() {
         val validator = ViewIntentValidator(
             grantedTreeUris = { safTreeAccess.persistedTreeUris().mapTo(HashSet<String>()) { it.toString() } },
         )
+        val pathCandidate = pathTail(data)
         val allowed = runCatching {
             validator.isDeepLinkAllowed(
                 host = data.host,
-                locationArg = data.getQueryParameter("location"),
-                categoryArg = data.getQueryParameter("category"),
+                locationArg = data.getQueryParameter("location") ?: pathCandidate,
+                categoryArg = data.getQueryParameter("category") ?: pathCandidate,
             )
         }.getOrDefault(false)
 
@@ -122,4 +130,13 @@ class MainActivity : ComponentActivity() {
             intent.data = null
         }
     }
+
+    /**
+     * The decoded URI path after the host, re-joined with `/`, or `null` when the link has no
+     * path (the plain query form). E.g. `filora://browser/data/data/app/db` → `data/data/app/db`;
+     * `filora://browser?location=…` → `null`. [Uri.getPathSegments] is already percent-decoded and
+     * drops empty segments, so a leading-slash or double-slash link cannot smuggle a segment past us.
+     */
+    private fun pathTail(data: Uri): String? =
+        data.pathSegments.takeIf { it.isNotEmpty() }?.joinToString("/")
 }
