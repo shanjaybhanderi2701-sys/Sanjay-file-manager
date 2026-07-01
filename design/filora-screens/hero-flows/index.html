@@ -1,0 +1,403 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Filora — Hero Flows (APP-137)</title>
+<style>
+  /* ---- Filora design-system tokens (see docs/phase-1/design/07-design-system.md) ---- */
+  :root{
+    --iris:#5B5BD6; --iris-press:#4B47CF; --iris-cont:#E6E5FB; --on-iris-cont:#1B1A54;
+    --bg:#F5F4FB; --surface:#FFFFFF; --surface-raise:#FBFAFF;
+    --ink:#15142B; --ink-2:#403E5C; --muted:#75738F; --outline:#E2DFF2;
+    --error:#E5484D; --error-cont:#FFE3E1; --success:#12A46B;
+    /* category wheel */
+    --cat-img:#F43F6E; --cat-img-c:#FFE1E9;
+    --cat-vid:#7C5CF7; --cat-vid-c:#EAE2FF;
+    --cat-aud:#F5921B; --cat-aud-c:#FFEBCF;
+    --cat-doc:#2E7CF6; --cat-doc-c:#DBE9FF;
+    --cat-dl:#12A46B;  --cat-dl-c:#CFF3E1;
+    --cat-app:#5B5BD6; --cat-app-c:#E4E4FB;
+    --cat-arc:#B44BC9; --cat-arc-c:#F6DEFB;
+    --cat-fold:#6E6C8A;--cat-fold-c:#ECEBF3;
+    --cat-fav:#F5A524; --cat-fav-c:#FFF0D2;
+    /* spacing */
+    --sm:8px; --md:12px; --lg:16px; --xl:24px;
+    /* radius */
+    --r-sm:8px; --r-md:12px; --r-lg:16px; --r-xl:28px;
+    --grad:linear-gradient(135deg,#5B5BD6,#8B5CF6,#C06BE6);
+    --shadow-1:0 1px 2px rgba(21,20,43,.05),0 1px 3px rgba(21,20,43,.04);
+    --shadow-2:0 6px 16px rgba(21,20,43,.07),0 2px 5px rgba(21,20,43,.05);
+    --shadow-3:0 16px 34px rgba(21,20,43,.12),0 5px 12px rgba(21,20,43,.08);
+    --shadow-brand:0 12px 26px rgba(91,91,214,.30);
+  }
+  *{box-sizing:border-box;margin:0;padding:0;-webkit-font-smoothing:antialiased}
+  body{font-family:'Manrope',-apple-system,'Segoe UI',Roboto,sans-serif;background:#E9E7F6;color:var(--ink);
+       padding:40px 24px 80px}
+  h1.page{font-size:26px;font-weight:800;letter-spacing:-.5px;text-align:center;color:#2A2960}
+  p.sub{text-align:center;color:var(--ink-2);max-width:760px;margin:10px auto 6px;font-size:14px;line-height:1.5}
+  p.meta{text-align:center;color:var(--muted);font-size:12.5px;margin-bottom:34px}
+  .legend{display:flex;flex-wrap:wrap;gap:8px 14px;justify-content:center;max-width:820px;margin:0 auto 40px;
+          font-size:11.5px;color:var(--ink-2)}
+  .legend span{display:inline-flex;align-items:center;gap:5px}
+  .legend i{width:11px;height:11px;border-radius:3px;display:inline-block}
+
+  .grid{display:flex;flex-wrap:wrap;gap:46px 34px;justify-content:center;align-items:flex-start;max-width:1500px;margin:0 auto}
+  .frame{width:320px}
+  .frame > .cap{font-size:13px;font-weight:700;color:#2A2960;margin-bottom:4px}
+  .frame > .capd{font-size:11.5px;color:var(--muted);margin-bottom:12px;line-height:1.4;min-height:32px}
+  .phone{width:320px;height:660px;background:var(--bg);border-radius:34px;overflow:hidden;position:relative;
+         box-shadow:var(--shadow-3);border:1px solid #d9d5ee;display:flex;flex-direction:column}
+
+  /* status + appbar */
+  .status{height:26px;display:flex;justify-content:space-between;align-items:center;padding:0 16px;font-size:10.5px;
+          color:var(--muted);font-weight:600}
+  .appbar{display:flex;align-items:center;gap:10px;padding:10px 14px 6px}
+  .appbar .t{font-size:19px;font-weight:800;letter-spacing:-.4px;flex:1}
+  .icbtn{width:36px;height:36px;border-radius:12px;display:grid;place-items:center;color:var(--ink-2);font-size:16px}
+  .crumbs{display:flex;gap:6px;align-items:center;padding:0 16px 8px;font-size:12px;color:var(--muted);flex-wrap:wrap}
+  .crumbs b{color:var(--iris);font-weight:700}
+  .search{margin:2px 14px 8px;background:var(--surface);border:1px solid var(--outline);border-radius:16px;
+          padding:9px 14px;display:flex;align-items:center;gap:9px;color:var(--muted);font-size:13px;box-shadow:var(--shadow-1)}
+  .toolrow{display:flex;align-items:center;padding:0 16px 8px;gap:8px}
+  .toolrow .lbl{font-size:11px;color:var(--muted);font-weight:600;flex:1}
+  .chip{font-size:11px;padding:5px 10px;border-radius:8px;background:var(--surface);border:1px solid var(--outline);color:var(--ink-2)}
+
+  /* list */
+  .list{flex:1;overflow:hidden;padding:2px 10px}
+  .row{display:flex;align-items:center;gap:12px;padding:10px 8px;border-radius:12px}
+  .row + .row{margin-top:1px}
+  .tile{width:42px;height:42px;border-radius:12px;display:grid;place-items:center;font-size:15px;font-weight:800;flex-shrink:0}
+  .row .nm{flex:1;min-width:0}
+  .row .nm .n{font-size:15px;font-weight:600;color:var(--ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .row .nm .m{font-size:11.5px;color:var(--muted);margin-top:2px}
+  .row .tr{color:var(--muted);font-size:16px;padding-left:4px}
+  .row.sel{background:var(--iris-cont)}
+  .check{width:22px;height:22px;border-radius:50%;border:2px solid var(--outline);flex-shrink:0}
+  .check.on{background:var(--iris);border-color:var(--iris);display:grid;place-items:center;color:#fff;font-size:13px;font-weight:800}
+
+  /* fab + nav */
+  .fab{position:absolute;right:16px;bottom:74px;width:56px;height:56px;border-radius:20px;background:var(--grad);
+       box-shadow:var(--shadow-brand);display:grid;place-items:center;color:#fff;font-size:24px;font-weight:300}
+  .nav{height:60px;background:var(--surface);border-top:1px solid var(--outline);display:flex;align-items:center;
+       justify-content:space-around;padding-bottom:4px}
+  .nav div{display:flex;flex-direction:column;align-items:center;gap:3px;font-size:10px;color:var(--muted);font-weight:600}
+  .nav div.act{color:var(--iris)}
+  .nav .d{font-size:17px}
+
+  /* skeleton */
+  .sk{height:12px;border-radius:6px;background:linear-gradient(90deg,#EDEBF7,#F6F5FC,#EDEBF7);background-size:200% 100%;
+      animation:sh 1.3s ease-in-out infinite}
+  .sk.tile{width:42px;height:42px;border-radius:12px}
+  @keyframes sh{0%{background-position:200% 0}100%{background-position:-200% 0}}
+
+  /* state (empty/error/perm) */
+  .state{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:0 34px}
+  .bloom{width:112px;height:112px;border-radius:50%;display:grid;place-items:center;font-size:46px;margin-bottom:20px}
+  .state h3{font-size:20px;font-weight:800;letter-spacing:-.3px;margin-bottom:8px}
+  .state p{font-size:13px;color:var(--ink-2);line-height:1.5;margin-bottom:22px}
+  .btn{background:var(--iris);color:#fff;font-weight:700;font-size:14px;padding:12px 22px;border-radius:14px;
+       box-shadow:var(--shadow-brand);border:none}
+  .btn.ghost{background:transparent;color:var(--iris);box-shadow:none}
+  .btn.out{background:transparent;color:var(--iris);border:1.5px solid var(--outline);box-shadow:none}
+  .btn.err{background:var(--error);box-shadow:none}
+  .trust{text-align:left;background:var(--surface);border:1px solid var(--outline);border-radius:16px;padding:14px 16px;
+         margin-bottom:20px;width:100%;box-shadow:var(--shadow-1)}
+  .trust li{list-style:none;font-size:12.5px;color:var(--ink-2);display:flex;gap:8px;align-items:flex-start;margin:7px 0}
+  .trust li .k{color:var(--success);font-weight:800}
+
+  /* selection appbar */
+  .selbar{display:flex;align-items:center;gap:12px;padding:12px 16px 10px;background:var(--iris-cont)}
+  .selbar .x{font-size:18px;color:var(--on-iris-cont)}
+  .selbar .c{flex:1;font-size:18px;font-weight:800;color:var(--on-iris-cont);letter-spacing:-.3px}
+  .selbar .a{font-size:13px;font-weight:700;color:var(--iris)}
+
+  /* bottom action bar */
+  .actionbar{background:var(--surface);border-top:1px solid var(--outline);box-shadow:0 -6px 20px rgba(21,20,43,.08);
+             padding:12px 8px calc(12px + env(safe-area-inset-bottom));display:flex;justify-content:space-around}
+  .act{display:flex;flex-direction:column;align-items:center;gap:6px;min-width:52px;padding:4px 2px}
+  .act .ic{width:46px;height:46px;border-radius:16px;background:var(--iris-cont);display:grid;place-items:center;
+           font-size:19px;color:var(--iris)}
+  .act .l{font-size:10.5px;font-weight:700;color:var(--ink-2)}
+  .act.del .ic{background:var(--error-cont);color:var(--error)}
+  .act.dis{opacity:.38}
+  .act.dis .ic{background:#F0EFF6;color:var(--muted)}
+
+  /* delete sheet */
+  .scrim{position:absolute;inset:0;background:rgba(21,20,43,.42)}
+  .sheet{position:absolute;left:0;right:0;bottom:0;background:var(--surface);border-radius:28px 28px 0 0;
+         padding:12px 22px calc(22px + env(safe-area-inset-bottom));box-shadow:var(--shadow-3)}
+  .handle{width:36px;height:4px;border-radius:2px;background:var(--outline);margin:2px auto 16px}
+  .sheet h3{font-size:19px;font-weight:800;margin-bottom:8px}
+  .sheet p{font-size:13px;color:var(--ink-2);line-height:1.5;margin-bottom:20px}
+  .sheet .full{width:100%;padding:14px;border-radius:14px;font-weight:700;font-size:15px;border:none;background:var(--error-cont);color:var(--error)}
+  .sheet .cancel{width:100%;padding:12px;background:transparent;color:var(--muted);font-weight:700;font-size:14px;border:none;margin-top:6px}
+
+  /* snackbar */
+  .snack{position:absolute;left:14px;right:14px;bottom:16px;background:#211F3A;color:#fff;border-radius:14px;
+         padding:14px 16px;display:flex;align-items:center;gap:12px;font-size:13px;box-shadow:var(--shadow-3)}
+  .snack b{color:#B7B5FF;font-weight:800;margin-left:auto}
+
+  .principle{display:inline-block;font-size:10px;font-weight:700;color:var(--iris);background:var(--iris-cont);
+             border-radius:6px;padding:2px 7px;margin-bottom:8px}
+  .sectionhead{width:100%;text-align:center;font-size:16px;font-weight:800;color:#2A2960;margin:26px 0 4px;letter-spacing:-.2px}
+</style>
+</head>
+<body>
+  <h1 class="page">Filora — Hero Flows</h1>
+  <p class="sub">The two hero flows the Taste Guide asked for, in the Filora Iris design language. <b>A — Browse</b> (content-first, all five states) and <b>B — Multi-select bottom action bar</b> (the InShot instinct: the object is the interface, big single-purpose tools in the thumb zone). Every value here comes from the token system in <b>07-design-system.md</b> — taste, not theft.</p>
+  <p class="meta">APP-137 · applies APP-136 Taste Guide · UI/UX Designer · one accent (Iris #5B5BD6) + fixed category wheel · ≥48dp targets · Material 3 + dynamic color</p>
+
+  <div class="legend">
+    <span><i style="background:var(--cat-img)"></i>Images</span>
+    <span><i style="background:var(--cat-vid)"></i>Video</span>
+    <span><i style="background:var(--cat-aud)"></i>Audio</span>
+    <span><i style="background:var(--cat-doc)"></i>Documents</span>
+    <span><i style="background:var(--cat-dl)"></i>Downloads</span>
+    <span><i style="background:var(--cat-app)"></i>Apps</span>
+    <span><i style="background:var(--cat-arc)"></i>Archives</span>
+    <span><i style="background:var(--cat-fold)"></i>Folders</span>
+    <span><i style="background:var(--cat-fav)"></i>Favorite</span>
+  </div>
+
+  <div class="sectionhead">HERO FLOW A · Browse (content-first) — five states</div>
+  <div class="grid">
+
+    <!-- A1 Populated -->
+    <div class="frame">
+      <div class="cap">A1 · Populated</div>
+      <div class="capd">Content ≥80% of the viewport; chrome quiet. Name = bodyLarge, meta = bodySmall/muted.</div>
+      <div class="phone">
+        <div class="status"><span>9:41</span><span>▮▮▮ ▯</span></div>
+        <div class="appbar"><div class="t">Documents</div><div class="icbtn">⌕</div><div class="icbtn">⋮</div></div>
+        <div class="crumbs">Internal › <b>Documents</b></div>
+        <div class="search">⌕ Search in Documents</div>
+        <div class="toolrow"><span class="lbl">28 items</span><span class="chip">◫ Grid</span><span class="chip">⇅ Name</span></div>
+        <div class="list">
+          <div class="row"><div class="tile" style="background:var(--cat-fold-c);color:var(--cat-fold)">▤</div><div class="nm"><div class="n">Work Projects</div><div class="m">14 items</div></div><div class="tr">›</div></div>
+          <div class="row"><div class="tile" style="background:var(--cat-fold-c);color:var(--cat-fold)">▤</div><div class="nm"><div class="n">Tax 2025</div><div class="m">6 items</div></div><div class="tr">›</div></div>
+          <div class="row"><div class="tile" style="background:var(--cat-doc-c);color:var(--cat-doc)">P</div><div class="nm"><div class="n">Lease agreement.pdf</div><div class="m">2.4 MB · Yesterday</div></div><div class="tr">⋮</div></div>
+          <div class="row"><div class="tile" style="background:var(--cat-doc-c);color:var(--cat-doc)">W</div><div class="nm"><div class="n">Resume_final_v3.docx</div><div class="m">88 KB · Mon</div></div><div class="tr">⋮</div></div>
+          <div class="row"><div class="tile" style="background:var(--cat-img-c);color:var(--cat-img)">▦</div><div class="nm"><div class="n">Scan_receipt.jpg</div><div class="m">1.1 MB · Mon</div></div><div class="tr">⋮</div></div>
+          <div class="row"><div class="tile" style="background:var(--cat-arc-c);color:var(--cat-arc)">▣</div><div class="nm"><div class="n">Archive_2024.zip</div><div class="m">340 MB · Apr 2</div></div><div class="tr">⋮</div></div>
+          <div class="row"><div class="tile" style="background:var(--cat-doc-c);color:var(--cat-doc)">X</div><div class="nm"><div class="n">Budget.xlsx</div><div class="m">52 KB · Mar 30</div></div><div class="tr">⋮</div></div>
+        </div>
+        <div class="fab">+</div>
+        <div class="nav"><div><span class="d">⌂</span>Home</div><div class="act"><span class="d">▤</span>Browse</div><div><span class="d">◔</span>Storage</div><div><span class="d">⚙</span>Settings</div></div>
+      </div>
+    </div>
+
+    <!-- A2 Loading -->
+    <div class="frame">
+      <div class="cap">A2 · Loading</div>
+      <div class="capd">Skeleton mirrors the real layout (not a centred spinner); crossfades 150ms → content.</div>
+      <div class="phone">
+        <div class="status"><span>9:41</span><span>▮▮▮ ▯</span></div>
+        <div class="appbar"><div class="t">Documents</div><div class="icbtn">⌕</div><div class="icbtn">⋮</div></div>
+        <div class="crumbs">Internal › <b>Documents</b></div>
+        <div class="search">⌕ Search in Documents</div>
+        <div class="toolrow"><span class="lbl">Loading…</span></div>
+        <div class="list">
+          <div class="row"><div class="sk tile"></div><div class="nm"><div class="sk" style="width:70%"></div><div class="sk" style="width:38%;margin-top:8px;height:9px"></div></div></div>
+          <div class="row"><div class="sk tile"></div><div class="nm"><div class="sk" style="width:58%"></div><div class="sk" style="width:44%;margin-top:8px;height:9px"></div></div></div>
+          <div class="row"><div class="sk tile"></div><div class="nm"><div class="sk" style="width:76%"></div><div class="sk" style="width:32%;margin-top:8px;height:9px"></div></div></div>
+          <div class="row"><div class="sk tile"></div><div class="nm"><div class="sk" style="width:64%"></div><div class="sk" style="width:40%;margin-top:8px;height:9px"></div></div></div>
+          <div class="row"><div class="sk tile"></div><div class="nm"><div class="sk" style="width:52%"></div><div class="sk" style="width:36%;margin-top:8px;height:9px"></div></div></div>
+          <div class="row"><div class="sk tile"></div><div class="nm"><div class="sk" style="width:70%"></div><div class="sk" style="width:30%;margin-top:8px;height:9px"></div></div></div>
+        </div>
+        <div class="nav"><div><span class="d">⌂</span>Home</div><div class="act"><span class="d">▤</span>Browse</div><div><span class="d">◔</span>Storage</div><div><span class="d">⚙</span>Settings</div></div>
+      </div>
+    </div>
+
+    <!-- A3 Empty -->
+    <div class="frame">
+      <div class="cap">A3 · Empty</div>
+      <div class="capd">Warm bloom + one clear next action — never a blank screen (BetterApp warmth, §2.5).</div>
+      <div class="phone">
+        <div class="status"><span>9:41</span><span>▮▮▮ ▯</span></div>
+        <div class="appbar"><div class="icbtn">‹</div><div class="t">New Folder</div><div class="icbtn">⋮</div></div>
+        <div class="crumbs">Internal › Documents › <b>New Folder</b></div>
+        <div class="state">
+          <span class="principle">§2.5 warmth</span>
+          <div class="bloom" style="background:var(--cat-fold-c);color:var(--cat-fold)">🗂</div>
+          <h3>This folder is empty</h3>
+          <p>Nothing here yet. Add files or move them in from anywhere on your device.</p>
+          <button class="btn">＋ Add files</button>
+        </div>
+        <div class="fab">+</div>
+        <div class="nav"><div><span class="d">⌂</span>Home</div><div class="act"><span class="d">▤</span>Browse</div><div><span class="d">◔</span>Storage</div><div><span class="d">⚙</span>Settings</div></div>
+      </div>
+    </div>
+
+    <!-- A4 Error -->
+    <div class="frame">
+      <div class="cap">A4 · Error</div>
+      <div class="capd">Calm, not alarming. Cause line + retry/back. Error color used sparingly.</div>
+      <div class="phone">
+        <div class="status"><span>9:41</span><span>▮▮▮ ▯</span></div>
+        <div class="appbar"><div class="icbtn">‹</div><div class="t">Documents</div><div class="icbtn">⋮</div></div>
+        <div class="crumbs">Internal › <b>Documents</b></div>
+        <div class="state">
+          <span class="principle">§2.8 honest</span>
+          <div class="bloom" style="background:var(--error-cont);color:var(--error)">⚠</div>
+          <h3>Couldn't open this folder</h3>
+          <p>Something went wrong reading this location. Your files are safe — try again.</p>
+          <button class="btn out" style="margin-bottom:10px">↻ Try again</button>
+          <button class="btn ghost">Go back</button>
+        </div>
+        <div class="nav"><div><span class="d">⌂</span>Home</div><div class="act"><span class="d">▤</span>Browse</div><div><span class="d">◔</span>Storage</div><div><span class="d">⚙</span>Settings</div></div>
+      </div>
+    </div>
+
+    <!-- A5 Permission -->
+    <div class="frame">
+      <div class="cap">A5 · Permission</div>
+      <div class="capd">Trust first: explain the why before the system prompt (§2.4 native/trustworthy).</div>
+      <div class="phone">
+        <div class="status"><span>9:41</span><span>▮▮▮ ▯</span></div>
+        <div class="appbar"><div class="t">Filora</div></div>
+        <div class="state">
+          <span class="principle">§2.4 trust</span>
+          <div class="bloom" style="background:var(--iris-cont);color:var(--iris)">🛡</div>
+          <h3>Filora needs access to your files</h3>
+          <p>So we can show and organize your documents, photos and downloads.</p>
+          <ul class="trust">
+            <li><span class="k">✓</span> Your files never leave your device — nothing is uploaded.</li>
+            <li><span class="k">✓</span> You can revoke access anytime in Settings.</li>
+            <li><span class="k">✓</span> We only read what you open.</li>
+          </ul>
+          <button class="btn">Allow access</button>
+          <button class="btn ghost" style="margin-top:8px">Why is this needed?</button>
+        </div>
+        <div class="nav"><div class="act"><span class="d">⌂</span>Home</div><div><span class="d">▤</span>Browse</div><div><span class="d">◔</span>Storage</div><div><span class="d">⚙</span>Settings</div></div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="sectionhead">HERO FLOW B · Multi-select + bottom action bar (InShot instinct)</div>
+  <div class="grid">
+
+    <!-- B1 selection -->
+    <div class="frame">
+      <div class="cap">B1 · Selection + action bar</div>
+      <div class="capd">Long-press → the object is the interface. Big single-purpose tiles in the thumb zone; Delete carries the only error tint.</div>
+      <div class="phone">
+        <div class="status"><span>9:41</span><span>▮▮▮ ▯</span></div>
+        <div class="selbar"><span class="x">✕</span><span class="c">3 selected</span><span class="a">Select all</span><span class="x">⋮</span></div>
+        <div class="list" style="padding-top:6px">
+          <div class="row sel"><div class="check on">✓</div><div class="tile" style="background:var(--cat-doc-c);color:var(--cat-doc)">P</div><div class="nm"><div class="n">Lease agreement.pdf</div><div class="m">2.4 MB · Yesterday</div></div></div>
+          <div class="row"><div class="check"></div><div class="tile" style="background:var(--cat-doc-c);color:var(--cat-doc)">W</div><div class="nm"><div class="n">Resume_final_v3.docx</div><div class="m">88 KB · Mon</div></div></div>
+          <div class="row sel"><div class="check on">✓</div><div class="tile" style="background:var(--cat-img-c);color:var(--cat-img)">▦</div><div class="nm"><div class="n">Scan_receipt.jpg</div><div class="m">1.1 MB · Mon</div></div></div>
+          <div class="row sel"><div class="check on">✓</div><div class="tile" style="background:var(--cat-arc-c);color:var(--cat-arc)">▣</div><div class="nm"><div class="n">Archive_2024.zip</div><div class="m">340 MB · Apr 2</div></div></div>
+          <div class="row"><div class="check"></div><div class="tile" style="background:var(--cat-doc-c);color:var(--cat-doc)">X</div><div class="nm"><div class="n">Budget.xlsx</div><div class="m">52 KB · Mar 30</div></div></div>
+        </div>
+        <div class="actionbar">
+          <div class="act"><div class="ic">⇄</div><div class="l">Move</div></div>
+          <div class="act"><div class="ic">⧉</div><div class="l">Copy</div></div>
+          <div class="act"><div class="ic">↗</div><div class="l">Share</div></div>
+          <div class="act del"><div class="ic">🗑</div><div class="l">Delete</div></div>
+          <div class="act"><div class="ic">⋯</div><div class="l">More</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- B2 single select -->
+    <div class="frame">
+      <div class="cap">B2 · One selected (Rename enabled)</div>
+      <div class="capd">Rename appears only when exactly one item is selected — progressive disclosure, no dead controls.</div>
+      <div class="phone">
+        <div class="status"><span>9:41</span><span>▮▮▮ ▯</span></div>
+        <div class="selbar"><span class="x">✕</span><span class="c">1 selected</span><span class="a">Select all</span><span class="x">⋮</span></div>
+        <div class="list" style="padding-top:6px">
+          <div class="row"><div class="check"></div><div class="tile" style="background:var(--cat-fold-c);color:var(--cat-fold)">▤</div><div class="nm"><div class="n">Work Projects</div><div class="m">14 items</div></div></div>
+          <div class="row sel"><div class="check on">✓</div><div class="tile" style="background:var(--cat-doc-c);color:var(--cat-doc)">P</div><div class="nm"><div class="n">Lease agreement.pdf</div><div class="m">2.4 MB · Yesterday</div></div></div>
+          <div class="row"><div class="check"></div><div class="tile" style="background:var(--cat-img-c);color:var(--cat-img)">▦</div><div class="nm"><div class="n">Scan_receipt.jpg</div><div class="m">1.1 MB · Mon</div></div></div>
+          <div class="row"><div class="check"></div><div class="tile" style="background:var(--cat-arc-c);color:var(--cat-arc)">▣</div><div class="nm"><div class="n">Archive_2024.zip</div><div class="m">340 MB · Apr 2</div></div></div>
+        </div>
+        <div class="actionbar">
+          <div class="act"><div class="ic">⇄</div><div class="l">Move</div></div>
+          <div class="act"><div class="ic">⧉</div><div class="l">Copy</div></div>
+          <div class="act"><div class="ic">↗</div><div class="l">Share</div></div>
+          <div class="act"><div class="ic">✎</div><div class="l">Rename</div></div>
+          <div class="act del"><div class="ic">🗑</div><div class="l">Delete</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- B3 folder selected: share disabled -->
+    <div class="frame">
+      <div class="cap">B3 · Folder in selection (Share disabled)</div>
+      <div class="capd">Share disables with a visible + spoken reason when a folder is selected — honest, never silent.</div>
+      <div class="phone">
+        <div class="status"><span>9:41</span><span>▮▮▮ ▯</span></div>
+        <div class="selbar"><span class="x">✕</span><span class="c">2 selected</span><span class="a">Select all</span><span class="x">⋮</span></div>
+        <div class="list" style="padding-top:6px">
+          <div class="row sel"><div class="check on">✓</div><div class="tile" style="background:var(--cat-fold-c);color:var(--cat-fold)">▤</div><div class="nm"><div class="n">Work Projects</div><div class="m">14 items</div></div></div>
+          <div class="row sel"><div class="check on">✓</div><div class="tile" style="background:var(--cat-doc-c);color:var(--cat-doc)">P</div><div class="nm"><div class="n">Lease agreement.pdf</div><div class="m">2.4 MB · Yesterday</div></div></div>
+          <div class="row"><div class="check"></div><div class="tile" style="background:var(--cat-img-c);color:var(--cat-img)">▦</div><div class="nm"><div class="n">Scan_receipt.jpg</div><div class="m">1.1 MB · Mon</div></div></div>
+          <div style="text-align:center;font-size:11px;color:var(--muted);margin-top:14px;padding:0 24px">Sharing a folder isn't supported — deselect it to share the files.</div>
+        </div>
+        <div class="actionbar">
+          <div class="act"><div class="ic">⇄</div><div class="l">Move</div></div>
+          <div class="act"><div class="ic">⧉</div><div class="l">Copy</div></div>
+          <div class="act dis"><div class="ic">↗</div><div class="l">Share</div></div>
+          <div class="act del"><div class="ic">🗑</div><div class="l">Delete</div></div>
+          <div class="act"><div class="ic">⋯</div><div class="l">More</div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- B4 delete confirm -->
+    <div class="frame">
+      <div class="cap">B4 · Delete confirm (honest + undo)</div>
+      <div class="capd">Reversibility surfaced before the action; Undo snackbar follows. Destructive is never a bare icon (§2.8).</div>
+      <div class="phone">
+        <div class="status"><span>9:41</span><span>▮▮▮ ▯</span></div>
+        <div class="selbar"><span class="x">✕</span><span class="c">3 selected</span><span class="a">Select all</span><span class="x">⋮</span></div>
+        <div class="list" style="padding-top:6px;filter:blur(1px);opacity:.5">
+          <div class="row sel"><div class="check on">✓</div><div class="tile" style="background:var(--cat-doc-c);color:var(--cat-doc)">P</div><div class="nm"><div class="n">Lease agreement.pdf</div><div class="m">2.4 MB</div></div></div>
+          <div class="row sel"><div class="check on">✓</div><div class="tile" style="background:var(--cat-img-c);color:var(--cat-img)">▦</div><div class="nm"><div class="n">Scan_receipt.jpg</div><div class="m">1.1 MB</div></div></div>
+          <div class="row sel"><div class="check on">✓</div><div class="tile" style="background:var(--cat-arc-c);color:var(--cat-arc)">▣</div><div class="nm"><div class="n">Archive_2024.zip</div><div class="m">340 MB</div></div></div>
+        </div>
+        <div class="scrim"></div>
+        <div class="sheet">
+          <div class="handle"></div>
+          <h3>Delete 3 items?</h3>
+          <p>They'll move to Trash and can be restored for 30 days before they're permanently removed.</p>
+          <button class="full">Move to Trash</button>
+          <button class="cancel">Cancel</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- B5 undo snackbar -->
+    <div class="frame">
+      <div class="cap">B5 · After delete (Undo)</div>
+      <div class="capd">Instant feedback + reversible. Selection clears, app bar cross-fades back, Undo is one tap.</div>
+      <div class="phone">
+        <div class="status"><span>9:41</span><span>▮▮▮ ▯</span></div>
+        <div class="appbar"><div class="t">Documents</div><div class="icbtn">⌕</div><div class="icbtn">⋮</div></div>
+        <div class="crumbs">Internal › <b>Documents</b></div>
+        <div class="search">⌕ Search in Documents</div>
+        <div class="toolrow"><span class="lbl">25 items</span><span class="chip">◫ Grid</span><span class="chip">⇅ Name</span></div>
+        <div class="list">
+          <div class="row"><div class="tile" style="background:var(--cat-fold-c);color:var(--cat-fold)">▤</div><div class="nm"><div class="n">Work Projects</div><div class="m">14 items</div></div><div class="tr">›</div></div>
+          <div class="row"><div class="tile" style="background:var(--cat-fold-c);color:var(--cat-fold)">▤</div><div class="nm"><div class="n">Tax 2025</div><div class="m">6 items</div></div><div class="tr">›</div></div>
+          <div class="row"><div class="tile" style="background:var(--cat-doc-c);color:var(--cat-doc)">W</div><div class="nm"><div class="n">Resume_final_v3.docx</div><div class="m">88 KB · Mon</div></div><div class="tr">⋮</div></div>
+          <div class="row"><div class="tile" style="background:var(--cat-doc-c);color:var(--cat-doc)">X</div><div class="nm"><div class="n">Budget.xlsx</div><div class="m">52 KB · Mar 30</div></div><div class="tr">⋮</div></div>
+        </div>
+        <div class="snack">🗑 3 items moved to Trash <b>UNDO</b></div>
+        <div class="nav"><div><span class="d">⌂</span>Home</div><div class="act"><span class="d">▤</span>Browse</div><div><span class="d">◔</span>Storage</div><div><span class="d">⚙</span>Settings</div></div>
+      </div>
+    </div>
+
+  </div>
+
+  <p class="meta" style="margin-top:40px;max-width:820px;margin-left:auto;margin-right:auto">
+    <b>Taste, not theft.</b> No competitor layout, icon set, or flow is reproduced. The instincts studied
+    (InShot's direct-manipulation toolbar, Simple Design's one-system discipline, Mobile_V5's native honesty,
+    BetterApp's warmth) are internalized into Filora's own token system — see <b>docs/phase-1/design/07-design-system.md</b>.
+  </p>
+</body>
+</html>
