@@ -55,7 +55,6 @@ mockk = "1.13.13"
 turbine = "1.2.0"
 truth = "1.4.4"
 coroutinesTest = "1.9.0"
-robolectric = "4.14.1"
 
 [libraries]
 # Kotlin / Coroutines
@@ -121,7 +120,6 @@ kotlinx-coroutines-test = { group = "org.jetbrains.kotlinx", name = "kotlinx-cor
 robolectric = { group = "org.robolectric", name = "robolectric", version.ref = "robolectric" }
 
 # M16 — JVM screenshot testing (Roborazzi renders Compose on the JVM via Robolectric; no emulator).
-robolectric = { group = "org.robolectric", name = "robolectric", version.ref = "robolectric" }
 roborazzi = { group = "io.github.takahirom.roborazzi", name = "roborazzi", version.ref = "roborazzi" }
 roborazzi-compose = { group = "io.github.takahirom.roborazzi", name = "roborazzi-compose", version.ref = "roborazzi" }
 roborazzi-junit-rule = { group = "io.github.takahirom.roborazzi", name = "roborazzi-junit-rule", version.ref = "roborazzi" }
